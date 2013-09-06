@@ -7,19 +7,23 @@
 # License: Apache v2
 #------------------------------------------------------------------------------
 
-import ply.lex
+from ply import lex
+from ply.lex import TOKEN
 
 class SyntaxError (Exception):
     def __init__(self, msg, LEXER, src, lineno=None, lexpos=None):
         if lineno is None:
-            lineno = LEXER.lex.lineno
+            lineno = LEXER.lexer.lineno
         if lexpos is None:
-            lexpos = LEXER.lex.lexpos
+            lexpos = LEXER.lexer.lexpos
         msg += " at %d column %d: %r" % (
             lineno, lexpos - LEXER.line_head_pos, src)
         Exception.__init__(self, msg)
 
 class Lexer():
+
+    def __init__(self):
+        self.line_head_pos = 0
 
     def build(self, **kwargs):
         """ Builds the lexer from the specification. Must be
@@ -34,7 +38,11 @@ class Lexer():
     def input(self, text):
         """ Sets the input for the lexer
         """
-        self.lexer.input(text)   
+        self.lexer.input(text)  
+    
+    def token(self):
+        self.last_token = self.lexer.token()
+        return self.last_token
 
     t_ignore = ' \t\r\f\v' # Whitespace skipped
     t_ignore_comment = r'\#.*' # Ignore comments
@@ -48,14 +56,25 @@ class Lexer():
         s = t.value[0]
         raise SyntaxError("bad character", self, t.value[0])
 
+    ##
+    ## Regexes for use in tokens
+    ##
+
+    decimal_constant = '[+-]?(?<!\.)\b[0-9]+\b(?!\.[0-9])'
+
+    ##
+    ## List of tokens recognized by the lexer
+    ##
+ 
     keywords = {
         
     }
     
-    ##
-    ## List of tokens recognized by the lexer
-    ##
     tokens = [
+        # Constants
+
+        'INT_CONST_DEC', 
+            
         # Operators
         'PLUS', 'MINUS', 'TIMES', 'DIVIDE'
     ] + list(keywords.values())           
@@ -64,5 +83,11 @@ class Lexer():
     ## Rules for the normal state
     ##
 
-    T_PLUS          = r'\+'
-    
+    t_PLUS          = r'\+'
+    t_MINUS         = r'\-'
+    t_DIVIDE        = r'\\'
+    t_TIMES         = r'\*'    
+
+    @TOKEN(decimal_constant)
+    def t_INT_CONST_DEC(self, t):
+        return t
