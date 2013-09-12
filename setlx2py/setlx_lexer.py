@@ -44,8 +44,12 @@ class Lexer():
         self.last_token = self.lexer.token()
         return self.last_token
 
-    t_ignore = ' \t\r\f\v' # Whitespace skipped
-    t_ignore_comment = r'\#.*' # Ignore comments
+    ##
+    ## Lexer configuration
+    ##
+
+    t_ignore = ' \t\r\f\v'          # Whitespace skipped
+    t_ignore_comment = r'\#.*'      # Ignore comments
 
     def t_newline(self, t):
         r'\n'
@@ -60,7 +64,13 @@ class Lexer():
     ## Regexes for use in tokens
     ##
 
-    decimal_constant = '[+-]?(?<!\.)\b[0-9]+\b(?!\.[0-9])'
+    # decimal constants    
+    decimal_constant = '0|([1-9][0-9]*)'
+
+    # floating constants
+    exponent_part = r'([eE][-+]?[0-9]+)'
+    fractional_constant = r'([0-9]*\.[0-9]+)|([0-9]+\.)'
+    floating_constant = '(((('+fractional_constant+')'+exponent_part+'?)|([0-9]+'+exponent_part+'))[FfLl]?)'
 
     ##
     ## List of tokens recognized by the lexer
@@ -72,8 +82,7 @@ class Lexer():
     
     tokens = [
         # Constants
-
-        'INT_CONST_DEC', 
+        'INT_CONST_DEC', 'FLOAT_CONST',
             
         # Operators
         'PLUS', 'MINUS', 'TIMES', 'DIVIDE'
@@ -87,6 +96,10 @@ class Lexer():
     t_MINUS         = r'\-'
     t_DIVIDE        = r'\\'
     t_TIMES         = r'\*'    
+
+    @TOKEN(floating_constant)
+    def t_FLOAT_CONST(self, t):
+        return t
 
     @TOKEN(decimal_constant)
     def t_INT_CONST_DEC(self, t):
