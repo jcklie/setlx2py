@@ -40,3 +40,7 @@ venv/
 *.swp
 
 .ropeproject/
+
+# PLY related
+parser.out
+parsetab.py
