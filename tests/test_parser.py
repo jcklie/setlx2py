@@ -19,5 +19,9 @@ def test_should_be_creatable():
     assert parser is not None
 
 def test_expressions_simple():
-    t1 = """1 + 1"""
-
+    t1 = """1 + 1;"""
+    parser = Parser()
+    res = parser.parse(t1)
+    assert res is not None    
+    
+    

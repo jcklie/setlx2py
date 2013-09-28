@@ -7,10 +7,11 @@
 # License: Apache v2
 #------------------------------------------------------------------------------
 
-import setlx2py.setlx_ast
 
 from ply import yacc
+
 from setlx2py.setlx_lexer import Lexer
+from setlx2py.setlx_ast import *
 
 class Parser():
 
@@ -51,23 +52,44 @@ class Parser():
         """ translation_unit_or_empty   : translation_unit
                                         | empty
         """
-        if p[1] is None:
-            p[0] = setlx_ast.FileAST([])
-        else:
-            p[0] = setlx_ast.FileAST(p[1])
+        p[0] = p[1]
 
     def p_empty(self, p):
         'empty : '
         p[0] = None
     
     def p_translation_unit(self, p):
-        ' translation_unit : binary_expression'
+        """ translation_unit : init_block
+                             | init_expr
+        """
+        p[0] = p[1] 
+
+    def p_init_block(self, p):
+        """ init_block       : constant """
         p[0] = None
 
-    def p_binary_expression(self, p):
+    def p_init_expr(self, p):
+        """ init_expr       : binary_expression SEMICOLON
+        """
+        p[0] = p[1]
+
+    def p_binary_expression_1(self, p):
         """ binary_expression   : binary_expression TIMES binary_expression
                                 | binary_expression DIVIDE binary_expression
                                 | binary_expression PLUS binary_expression
                                 | binary_expression MINUS binary_expression
-                                | INT_CONST_DEC
         """
+        p[0] = BinaryOp(p[2], p[1], p[3], "Foo")
+
+    def p_binary_expression_2(self, p):
+        """ binary_expression   : constant
+        """
+        p[0] = p[1]
+
+    def p_constant(self, p):
+        """ constant : INT_CONST_DEC
+                     | FLOAT_CONST        
+        """
+        p[0] = int(p[1])
+
+        

@@ -85,18 +85,27 @@ class Lexer():
         'INT_CONST_DEC', 'FLOAT_CONST',
             
         # Operators
-        'PLUS', 'MINUS', 'TIMES', 'DIVIDE'
+        'PLUS', 'MINUS', 'TIMES', 'DIVIDE',
+
+        # Delimiter
+        'SEMICOLON',
     ] + list(keywords.values())           
 
     ##
     ## Rules for the normal state
     ##
+    
+    # Operators
 
     t_PLUS          = r'\+'
     t_MINUS         = r'\-'
     t_DIVIDE        = r'\\'
     t_TIMES         = r'\*'    
 
+    # Delimiter
+
+    t_SEMICOLON    = r';'
+    
     @TOKEN(floating_constant)
     def t_FLOAT_CONST(self, t):
         return t

@@ -44,3 +44,4 @@ venv/
 # PLY related
 parser.out
 parsetab.py
+test.py
