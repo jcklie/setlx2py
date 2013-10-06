@@ -56,3 +56,7 @@ def test_constants_double():
 
     # Zero Digit . Single digit 
     assert_token_types('.1', ['DOUBLE'])
+
+def test_constants_bool():
+    assert_token_types('true', ['TRUE'])
+    assert_token_types('false', ['FALSE'])

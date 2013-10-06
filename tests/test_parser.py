@@ -23,6 +23,18 @@ def teardown_func():
 def test_should_be_creatable():
     assert parser is not None
 
-def test_atomic_value():
-    node = parser.parse("42")
-    assert node.value == 42  
+def test_atomic_value_int():
+    node = parser.parse("42;")
+    assert node.value == 42
+
+def test_atomic_value_double():
+    node = parser.parse("42.0;")
+    assert abs(node.value - 42.0) < .001
+
+def test_atomic_value_true():
+    node = parser.parse("true;")
+    assert node.value
+
+def test_atomic_value_false():
+    node = parser.parse("false;")
+    assert node.value

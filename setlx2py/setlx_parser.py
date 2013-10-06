@@ -47,7 +47,7 @@ class Parser():
     ## 
 
     def p_init_expr(self, p):
-        """ init_expr : expr """
+        """ init_expr : expr SEMICOLON """
         p[0] = p[1]
 
     ##
@@ -102,4 +102,14 @@ class Parser():
         """ atomic_value  : INTEGER """
         p[0] = Constant('int', int(p[1]))
 
-        
+    def p_atomic_value_2(self, p):
+        """ atomic_value : DOUBLE """
+        p[0] = Constant('double', float(p[1]))
+
+    def p_atomic_value_3(self, p):
+        """ atomic_value : TRUE """
+        p[0] = Constant('bool', True)
+
+    def p_atomic_value_4(self, p):
+        """ atomic_value : FALSE """
+        p[0] = Constant('bool', False)

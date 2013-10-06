@@ -77,7 +77,8 @@ class Lexer():
     ##
  
     keywords = {
-        
+        "true"  : "TRUE",
+        "false" : "FALSE"
     }
     
     tokens = [
