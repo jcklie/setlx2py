@@ -1,0 +1,48 @@
+     
+    def p_implication_2(self, p):
+        """ implication : disjunction IMPLICATES implication """
+        p[0] = BinaryOp(p[2], p[1], p[3], "Foo")
+    
+    def p_disjunction_2(self, p):
+        """ disjunction : conjunction OR conjunction """
+        p[0] = BinaryOp(p[2], p[1], p[3], "Foo")
+        
+    def p_conjunction_2(self, p):
+        """ conjunction : comparison AND comparison """
+        p[0] = BinaryOp(p[2], p[1], p[3], "Foo")
+        
+    def p_comparison_2(self, p):
+        """ comparison : sum EQ    sum
+                       | sum NEQ   sum
+                       | sum LT    sum
+                       | sum LE    sum
+                       | sum GT    sum
+                       | sum GE    sum
+                       | sum IN    sum
+                       | sum NOTIN sum     
+        """
+        p[0] = BinaryOp(p[2], p[1], p[3], "Foo")
+        
+    def p_sum_2(self, p):
+        """ sum : product PLUS product
+                | product MINUS product
+        """        
+        p[0] = BinaryOp(p[2], p[1], p[3], "Foo")
+        
+    def p_product_2(self, p):
+        """ product : reduce TIMES     reduce
+                    | reduce DIVIDE    reduce
+                    | reduce IDIVIDE   reduce
+                    | reduce MOD       reduce
+                    | reduce CARTESIAN reduce
+        """
+        p[0] = BinaryOp(p[2], p[1], p[3], "Foo")
+
+    def p_reduce_2(self, p):
+        """ reduce : prefixOperation MPLUS  prefixOperation
+                   | prefixOperation MTIMES prefixOperation
+        """        
+        p[0] = BinaryOp(p[2], p[1], p[3], "Foo")
+        
+    def p_prefixOperation_1(self, p):
+        """ prefixOperation : factor """

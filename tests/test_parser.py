@@ -5,23 +5,24 @@ from setlx2py.setlx_parser import Parser
 
 ######################--   TEST UTIL --######################
 
-def create_parser():
+global parser
+
+def setup_func():
+    global parser
     parser = Parser()
-    return parser 
+
+def teardown_func():
+    parser = None
 
 ######################--   ASSERTS   --######################  
 
 
 ######################--   TESTS     --######################
 
+@with_setup(setup_func, teardown_func)
 def test_should_be_creatable():
-    parser= Parser()
     assert parser is not None
 
-def test_expressions_simple():
-    t1 = """1 + 1;"""
-    parser = Parser()
-    res = parser.parse(t1)
-    assert res is not None    
-    
-    
+def test_atomic_value():
+    node = parser.parse("42")
+    assert node.value == 42  

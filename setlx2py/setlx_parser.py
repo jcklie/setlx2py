@@ -24,7 +24,7 @@ class Parser():
         self.lexer.build()
 
         # Parser
-        self.parser = yacc.yacc(module=self, start='translation_unit_or_empty')
+        self.parser = yacc.yacc(module=self, start='init_expr')
 
     def parse(self, text):
         return self.parser.parse(input=text, lexer=self.lexer)
@@ -39,8 +39,6 @@ class Parser():
     ## Precedence and associativity of operators
     ##
     precedence = (
-        ('left', 'PLUS', 'MINUS'),
-        ('left', 'TIMES', 'DIVIDE')
     )
 
     ##
@@ -48,48 +46,60 @@ class Parser():
     ## Implementation of the BNF defined in Pure.g of setlx interpreter 
     ## 
 
-    def p_translation_unit_or_empty(self, p):
-        """ translation_unit_or_empty   : translation_unit
-                                        | empty
-        """
-        p[0] = p[1]
-
-    def p_empty(self, p):
-        'empty : '
-        p[0] = None
-    
-    def p_translation_unit(self, p):
-        """ translation_unit : init_block
-                             | init_expr
-        """
-        p[0] = p[1] 
-
-    def p_init_block(self, p):
-        """ init_block       : constant """
-        p[0] = None
-
     def p_init_expr(self, p):
-        """ init_expr       : binary_expression SEMICOLON
-        """
+        """ init_expr : expr """
         p[0] = p[1]
 
-    def p_binary_expression_1(self, p):
-        """ binary_expression   : binary_expression TIMES binary_expression
-                                | binary_expression DIVIDE binary_expression
-                                | binary_expression PLUS binary_expression
-                                | binary_expression MINUS binary_expression
-        """
-        p[0] = BinaryOp(p[2], p[1], p[3], "Foo")
+    ##
+    ## Expressions
+    ##
 
-    def p_binary_expression_2(self, p):
-        """ binary_expression   : constant
-        """
+    def p_expr_1(self, p):
+        """ expr : implication """
+        p[0] = p[1]
+        
+    def p_implication_1(self, p):
+        """ implication : disjunction """
         p[0] = p[1]
 
-    def p_constant(self, p):
-        """ constant : INT_CONST_DEC
-                     | FLOAT_CONST        
-        """
-        p[0] = int(p[1])
+    def p_disjunction_1(self, p):
+        """ disjunction : conjunction  """
+        p[0] = p[1]
+
+    def p_conjunction_1(self, p):
+        """ conjunction : comparison """
+        p[0] = p[1]
+
+    def p_comparison_1(self, p):
+        """ comparison : sum """
+        p[0] = p[1]
+
+    def p_sum_1(self, p):
+        """ sum : product """
+        p[0] = p[1]
+        
+    def p_product_1(self, p):
+        """ product : reduce """
+        p[0] = p[1]
+        
+    def p_reduce_1(self, p):
+        """ reduce : prefix_operation """
+        p[0] = p[1]
+        
+    def p_prefixOperation_1(self, p):
+        """ prefix_operation : factor """
+        p[0] = p[1]
+        
+    def p_factor_1(self, p):
+        """ factor  : value """
+        p[0] = p[1]
+        
+    def p_value_1(self, p):
+        """ value  : atomic_value """
+        p[0] = p[1]
+        
+    def p_atomic_value_1(self, p):
+        """ atomic_value  : INTEGER """
+        p[0] = Constant('int', int(p[1]))
 
         

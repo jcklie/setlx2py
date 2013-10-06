@@ -64,13 +64,13 @@ class Lexer():
     ## Regexes for use in tokens
     ##
 
-    # decimal constants    
-    decimal_constant = '0|([1-9][0-9]*)'
+    # integer constants    
+    integer_constant = '0|([1-9][0-9]*)'
 
     # floating constants
     exponent_part = r'([eE][-+]?[0-9]+)'
-    fractional_constant = r'([0-9]*\.[0-9]+)|([0-9]+\.)'
-    floating_constant = '(((('+fractional_constant+')'+exponent_part+'?)|([0-9]+'+exponent_part+'))[FfLl]?)'
+    frac_constant = r'([0-9]*\.[0-9]+)|([0-9]+\.)'
+    double_constant = '(((('+frac_constant+')'+exponent_part+'?)|([0-9]+'+exponent_part+'))[FfLl]?)'
 
     ##
     ## List of tokens recognized by the lexer
@@ -82,10 +82,11 @@ class Lexer():
     
     tokens = [
         # Constants
-        'INT_CONST_DEC', 'FLOAT_CONST',
+        'INTEGER', 'DOUBLE',
             
         # Operators
         'PLUS', 'MINUS', 'TIMES', 'DIVIDE',
+        'EQUIVALENT', 'ANTIVALENT',
 
         # Delimiter
         'SEMICOLON',
@@ -102,14 +103,17 @@ class Lexer():
     t_DIVIDE        = r'\\'
     t_TIMES         = r'\*'    
 
+    t_EQUIVALENT    = r'<==>'
+    t_ANTIVALENT    = r'<!=>'
+
     # Delimiter
 
     t_SEMICOLON    = r';'
     
-    @TOKEN(floating_constant)
-    def t_FLOAT_CONST(self, t):
+    @TOKEN(double_constant)
+    def t_DOUBLE(self, t):
         return t
 
-    @TOKEN(decimal_constant)
-    def t_INT_CONST_DEC(self, t):
+    @TOKEN(integer_constant)
+    def t_INTEGER(self, t):
         return t
