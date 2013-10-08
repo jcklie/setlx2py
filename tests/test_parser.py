@@ -33,8 +33,8 @@ def test_atomic_value_double():
 
 def test_atomic_value_true():
     node = parser.parse("true;")
-    assert node.value
+    assert node.value is True
 
 def test_atomic_value_false():
     node = parser.parse("false;")
-    assert node.value
+    assert node.value is False

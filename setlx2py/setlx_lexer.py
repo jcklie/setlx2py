@@ -64,6 +64,10 @@ class Lexer():
     ## Regexes for use in tokens
     ##
 
+    # An identifier must start with a lower case letter
+    # and may contain numbers, letters and underscores   
+    identifier = r'[a-z][a-zA-Z_0-9]*'
+
     # integer constants    
     integer_constant = '0|([1-9][0-9]*)'
 
@@ -82,6 +86,9 @@ class Lexer():
     }
     
     tokens = [
+        # Identifiers
+        'IDENTIFIER',
+        
         # Constants
         'INTEGER', 'DOUBLE',
             
@@ -96,7 +103,7 @@ class Lexer():
     ##
     ## Rules for the normal state
     ##
-    
+
     # Operators
 
     t_PLUS          = r'\+'
@@ -110,6 +117,11 @@ class Lexer():
     # Delimiter
 
     t_SEMICOLON    = r';'
+
+    @TOKEN(identifier)
+    def t_IDENTIFIER(self, t):
+        t.type = self.keywords.get(t.value, 'IDENTIFIER')
+        return t
     
     @TOKEN(double_constant)
     def t_DOUBLE(self, t):
