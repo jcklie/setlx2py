@@ -68,6 +68,12 @@ class Lexer():
     # and may contain numbers, letters and underscores   
     identifier = r'[a-z][a-zA-Z_0-9]*'
 
+    # character sequences
+
+    char_sequence = r'(\\.|[^"])*' # 
+    string = '"' + char_sequence + '"'
+    literal= "'" + char_sequence + "'"
+    
     # integer constants    
     integer_constant = '0|([1-9][0-9]*)'
 
@@ -91,6 +97,10 @@ class Lexer():
         
         # Constants
         'INTEGER', 'DOUBLE',
+
+        # Character Sequences
+
+        'STRING', 'LITERAL',
             
         # Operators
         'PLUS', 'MINUS', 'TIMES', 'DIVIDE',
@@ -129,4 +139,12 @@ class Lexer():
 
     @TOKEN(integer_constant)
     def t_INTEGER(self, t):
+        return t
+
+    @TOKEN(string)
+    def t_STRING(self, t):
+        return t
+
+    @TOKEN(literal)
+    def t_LITERAL(self, t):
         return t

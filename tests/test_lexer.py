@@ -60,3 +60,18 @@ def test_constants_double():
 def test_constants_bool():
     assert_token_types('true', ['TRUE'])
     assert_token_types('false', ['FALSE'])
+
+def test_identifier():
+    assert_token_types('q0', ['IDENTIFIER'])
+    assert_token_types('a', ['IDENTIFIER'])
+    assert_token_types('a_', ['IDENTIFIER'])
+    assert_token_types('a13234', ['IDENTIFIER'])
+    assert_token_types('z42a_____', ['IDENTIFIER'])
+
+def test_strings():
+    assert_token_types('"FOOBAR"', ['STRING'])
+    assert_token_types('"\n4214"', ['STRING'])
+
+def test_literal():
+    assert_token_types("'FOOBAR'", ['LITERAL'])
+    assert_token_types("'\n4214'", ['LITERAL'])
