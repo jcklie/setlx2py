@@ -20,6 +20,11 @@ def assert_binop(text, operator, left, right):
     assert node.left.value == left
     assert node.right.value == right
 
+def assert_unop(text, operator, val):
+    node = parser.parse(text)
+    assert node.op == operator
+    assert node.expr == val
+    
 ######################--   ASSERTS   --######################  
 
 
@@ -47,22 +52,12 @@ def test_atomic_value_false():
 
 # Binary Operations
 
-def test_binop_equivalence():
+def test_binop_boolean():
     assert_binop("true <==> true;", '<==>', True, True)
-
-def test_binop_antivalence():
     assert_binop("true <!=> true;", '<!=>', True, True)    
-
-def test_binop_implication():
     assert_binop("true => true;", '=>', True, True)    
-
-def test_binop_or():
     assert_binop("true || false;", '||', True, False)
-
-def test_binop_and():
     assert_binop("true && false;", '&&', True, False)
-
-def test_binop_rel():
     assert_binop("true == false;", '==', True, False)
     assert_binop("true != false;", '!=', True, False)
     assert_binop("true <  false;",  '<', True, False)
@@ -71,5 +66,28 @@ def test_binop_rel():
     assert_binop("true >= false;", '>=', True, False)
 
 def test_binop_contain():
-    assert_binop("true    in false;", 'in',    True, False)
-    assert_binop("true notin false;", 'notin', True, False)    
+    assert_binop("true    in false;",    'in', True, False)
+    assert_binop("true notin false;", 'notin', True, False)
+
+def test_binop_sum():
+    assert_binop("42 + 43;", '+', 42, 43)
+    assert_binop("42 - 43;", '-', 42, 43)
+
+def test_binop_product():
+    assert_binop("42 *  43;",  '*', 42, 43)
+    assert_binop("42 /  43;",  '/', 42, 43)
+    assert_binop("42 \  43;", '\\', 42, 43)
+    assert_binop("42 %  43;",  '%', 42, 43)
+    assert_binop("42 >< 43;", '><', 42, 43)
+
+def test_binop_reduce():
+    assert_binop("42 +/ 43;", '+/', 42, 43)
+    assert_binop("42 */ 43;", '*/', 42, 43)
+
+def test_unop_prefix():
+    assert_unop('+/ 42', '+/', 42)
+    assert_unop('*/ 42', '*/', 42)
+    assert_unop('-  42',  '-', 42)
+    assert_unop('#  42',  '#', 42)
+    assert_unop('@  42',  '@', 42)
+                

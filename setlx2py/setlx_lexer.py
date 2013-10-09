@@ -107,11 +107,14 @@ class Lexer():
         'STRING', 'LITERAL',
             
         # Operators
-        'PLUS', 'MINUS', 'TIMES', 'DIVIDE',
+        'PLUS', 'MINUS',
+        'TIMES', 'DIVIDE', 'IDIVIDE', 'MOD', 'CARTESIAN', 'POW',
         'EQUIVALENT', 'ANTIVALENT', 'IMPLICATES',
         'OR', 'AND',
         'EQ', 'NEQ',
         'LT', 'LE', 'GT', 'GE',
+        'SUM', 'PRODUCT',
+        'HASH', 'AT',
 
         # Delimiter
         'SEMICOLON',
@@ -125,8 +128,15 @@ class Lexer():
 
     t_PLUS          = r'\+'
     t_MINUS         = r'\-'
-    t_DIVIDE        = r'\\'
-    t_TIMES         = r'\*'    
+    
+    t_DIVIDE        = r'/'
+    t_TIMES         = r'\*'
+    t_IDIVIDE       = r'\\'
+    t_MOD           = r'%'
+    t_CARTESIAN     = r'><'
+    t_POW           = r'\*\*'
+    t_HASH          = r'\#'
+    t_AT            = r'@'
 
     t_EQUIVALENT    = r'<==>'
     t_ANTIVALENT    = r'<!=>'
@@ -141,7 +151,9 @@ class Lexer():
     t_LE            = r'<='
     t_GT            = r'>'
     t_GE            = r'>='
-
+    t_SUM           = r'\+/'
+    t_PRODUCT       = r'\*/'
+    
     # Delimiter
 
     t_SEMICOLON     = r';'

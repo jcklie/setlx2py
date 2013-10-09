@@ -107,18 +107,48 @@ class Parser():
     def p_sum_1(self, p):
         """ sum : product """
         p[0] = p[1]
+
+    def p_sum_2(self, p):
+        """ sum : product PLUS  product
+                | product MINUS product
+        """
+        p[0] = BinaryOp(p[2], p[1], p[3], p[1].coord)
         
     def p_product_1(self, p):
         """ product : reduce """
         p[0] = p[1]
+
+    def p_product_2(self, p):
+        """ product : reduce TIMES     reduce
+                    | reduce DIVIDE    reduce
+                    | reduce IDIVIDE   reduce
+                    | reduce MOD       reduce
+                    | reduce CARTESIAN reduce
+        """
+        p[0] = BinaryOp(p[2], p[1], p[3], p[1].coord)
         
     def p_reduce_1(self, p):
         """ reduce : prefix_operation """
         p[0] = p[1]
+
+    def p_reduce_2(self, p):
+        """ reduce : prefix_operation SUM prefix_operation
+                   | prefix_operation PRODUCT prefix_operation
+        """
+        p[0] = BinaryOp(p[2], p[1], p[3], p[1].coord)
         
     def p_prefix_operation_1(self, p):
         """ prefix_operation : factor """
         p[0] = p[1]
+
+    def p_prefix_operation_2(self, p):
+        """ prefix_operation : SUM     prefix_operation
+                             | PRODUCT prefix_operation
+                             | HASH    prefix_operation
+                             | MINUS   prefix_operation
+                             | AT      prefix_operation
+        """
+        p[0] = UnaryOp(p[1], p[2], p[2].coord)
         
     def p_factor_1(self, p):
         """ factor  : value """

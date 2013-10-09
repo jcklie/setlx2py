@@ -29,11 +29,25 @@ def test_should_be_creatable():
     lexer = Lexer()
     assert lexer is not None
 
-def test_operators_calc():
+def test_operators_sum():
     assert_token_types('+', ['PLUS'])
     assert_token_types('-', ['MINUS'])
-    assert_token_types('\\', ['DIVIDE'])
+
+def test_operators_product():
+    assert_token_types('/', ['DIVIDE'])
     assert_token_types('*', ['TIMES'])
+    assert_token_types('\\', ['IDIVIDE'])
+    assert_token_types('%', ['MOD'])
+    assert_token_types('><', ['CARTESIAN'])
+    assert_token_types('**', ['POW'])
+
+def test_operators_prefix():
+    assert_token_types('@', ['AT'])
+    assert_token_types('#', ['HASH'])
+
+def test_operators_reduce():
+    assert_token_types('+/', ['SUM'])
+    assert_token_types('*/', ['PRODUCT'])
 
 def test_operators_boolean():
     assert_token_types('<==>', ['EQUIVALENT'])
