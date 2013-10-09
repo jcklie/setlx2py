@@ -37,7 +37,18 @@ def test_operators_calc():
 
 def test_operators_boolean():
     assert_token_types('<==>', ['EQUIVALENT'])
-    assert_token_types('<!=>', ['ANTIVALENT'])            
+    assert_token_types('<!=>', ['ANTIVALENT'])
+    assert_token_types('=>', ['IMPLICATES'])
+    assert_token_types('||', ['OR'])
+    assert_token_types('&&', ['AND'])
+    assert_token_types('==', ['EQ'])
+    assert_token_types('!=', ['NEQ'])
+    assert_token_types('<', ['LT'])
+    assert_token_types('<=', ['LE'])
+    assert_token_types('>', ['GT'])
+    assert_token_types('>=', ['GE'])
+    assert_token_types('in', ['IN'])
+    assert_token_types('notin', ['NOTIN'])
 
 def test_constants_integer():
     assert_token_types('1337', ['INTEGER'])
@@ -75,3 +86,6 @@ def test_strings():
 def test_literal():
     assert_token_types("'FOOBAR'", ['LITERAL'])
     assert_token_types("'\n4214'", ['LITERAL'])
+
+def test_unused():
+    assert_token_types("_", ['UNUSED'])

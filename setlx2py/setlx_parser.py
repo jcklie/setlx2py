@@ -57,22 +57,52 @@ class Parser():
     def p_expr_1(self, p):
         """ expr : implication """
         p[0] = p[1]
+
+    def p_expr_2(self, p):
+        """ expr : implication EQUIVALENT implication
+                 | implication ANTIVALENT implication
+        """
+        p[0] = BinaryOp(p[2], p[1], p[3], p[1].coord)
         
     def p_implication_1(self, p):
         """ implication : disjunction """
         p[0] = p[1]
 
+    def p_implication_2(self, p):
+        """ implication : disjunction IMPLICATES disjunction """
+        p[0] = BinaryOp(p[2], p[1], p[3], p[1].coord)
+
     def p_disjunction_1(self, p):
         """ disjunction : conjunction  """
         p[0] = p[1]
+
+    def p_disjunction_2(self, p):
+        """ disjunction : conjunction OR disjunction """
+        p[0] = BinaryOp(p[2], p[1], p[3], p[1].coord)        
 
     def p_conjunction_1(self, p):
         """ conjunction : comparison """
         p[0] = p[1]
 
+    def p_conjunction_2(self, p):
+        """ conjunction : comparison AND comparison """
+        p[0] = BinaryOp(p[2], p[1], p[3], p[1].coord)
+
     def p_comparison_1(self, p):
         """ comparison : sum """
         p[0] = p[1]
+
+    def p_comparison_2(self, p):
+        """ comparison : sum EQ sum
+                       | sum NEQ sum
+                       | sum LT sum
+                       | sum LE sum
+                       | sum GT sum
+                       | sum GE sum
+                       | sum IN sum
+                       | sum NOTIN sum
+        """
+        p[0] = BinaryOp(p[2], p[1], p[3], p[1].coord)
 
     def p_sum_1(self, p):
         """ sum : product """
@@ -86,7 +116,7 @@ class Parser():
         """ reduce : prefix_operation """
         p[0] = p[1]
         
-    def p_prefixOperation_1(self, p):
+    def p_prefix_operation_1(self, p):
         """ prefix_operation : factor """
         p[0] = p[1]
         
@@ -95,8 +125,20 @@ class Parser():
         p[0] = p[1]
         
     def p_value_1(self, p):
-        """ value  : atomic_value """
+        """ value : atomic_value """
         p[0] = p[1]
+
+    def p_value_2(self, p):
+        """ value : STRING """
+        p[0] = Constant('string', str(p[1]))
+
+    def p_value_3(self, p):
+        """ value : LITERAL """
+        p[0] = Constant('literal', str(p[1]))
+
+    def p_value_4(self, p):
+        """ value : UNUSED """
+        p[0] = Constant('unused', 'unused')
         
     def p_atomic_value_1(self, p):
         """ atomic_value  : INTEGER """
