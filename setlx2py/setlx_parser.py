@@ -33,7 +33,8 @@ class Parser():
         if t is None:
             raise SyntaxError("unexpected token", self.lexer, None)
         else:
-            raise SyntaxError("unexpected token", self.lexer, t.value, t.lineno, t.lexpos)
+            msg = "unexpected token in line {}: {}".format(t.lineno, t.value)
+            raise SyntaxError(msg, self.lexer, t.value, t.lineno, t.lexpos)
 
     ##
     ## Precedence and associativity of operators
@@ -149,6 +150,10 @@ class Parser():
                              | AT      prefix_operation
         """
         p[0] = UnaryOp(p[1], p[2], p[2].coord)
+
+    def p_prefix_operation_3(self, p):
+        """ prefix_operation : factor POW prefix_operation """
+        p[0] = BinaryOp(p[2], p[1], p[3], p[1].coord)
         
     def p_factor_1(self, p):
         """ factor  : value """
