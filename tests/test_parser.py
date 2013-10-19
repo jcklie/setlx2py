@@ -1,4 +1,4 @@
-from nose.tools import eq_, with_setup
+from nose.tools import eq_, with_setup, nottest
 
 from setlx2py.setlx_lexer import Lexer
 from setlx2py.setlx_parser import Parser
@@ -13,39 +13,43 @@ def setup_func():
 
 def teardown_func():
     parser = None
-  
-@with_setup(setup_func, teardown_func)    
+
+@with_setup(setup_func, teardown_func)        
+def parse_single_statement(text):
+    root = parser.parse(text) # FileAST
+    return root.stmt # First statement of AST
+
 def assert_binop(text, operator, left, right):
-    node = parser.parse(text)
+    node = parse_single_statement(text)
     eq_(node.op, operator)
     eq_(node.left.value, left)
     eq_( node.right.value, right)
 
-@with_setup(setup_func, teardown_func)
 def assert_unop(text, operator, val):
-    node = parser.parse(text)
+    node = parse_single_statement(text)
     eq_(node.op, operator)
     eq_(node.expr.value, val)
     
 ######################--   TESTS     --######################
 
+@with_setup(setup_func, teardown_func)        
 def test_should_be_creatable():
     assert parser is not None
 
 def test_atomic_value_int():
-    node = parser.parse('42;')
+    node = parse_single_statement('42;')
     eq_(node.value, 42)
 
 def test_atomic_value_double():
-    node = parser.parse('42.0;')
+    node = parse_single_statement('42.0;')
     assert abs(node.value - 42.0) < .001
 
 def test_atomic_value_true():
-    node = parser.parse('true;')
+    node = parse_single_statement('true;')
     eq_(node.value, True)
 
 def test_atomic_value_false():
-    node = parser.parse('false;')
+    node = parse_single_statement('false;')
     eq_(node.value,  False)
 
 # Binary Operations
@@ -86,9 +90,17 @@ def test_binop_reduce():
 # Unary operations
 
 def test_unop_prefix():
-    assert_unop('+/ 42;', '+/', 42)
-    assert_unop('*/ 42;', '*/', 42)
-    assert_unop('-  42;',  '-', 42)
-    assert_unop('#  42;',  '#', 42)
-    assert_unop('@  42;',  '@', 42)
-                
+    assert_unop('+/ 42;',  '+/', 42)
+    assert_unop('*/ 42;',  '*/', 42)
+    assert_unop('-  42;',   '-', 42)
+    assert_unop('#  42;',   '#', 42)
+    assert_unop('@  42;',   '@', 42)
+    assert_unop('!true;', 'not', True)
+    assert_unop('1337!;', 'fac', 1337)
+
+def test_more_than_one_operand():
+    nodes = parse_single_statement('4 + 2 + 0;')
+
+@nottest    
+def test_more_than_one_statement():
+    nodes = parse_single_statement("42 + 3; 1 + 3 + 3 + 7;")

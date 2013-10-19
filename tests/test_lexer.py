@@ -44,6 +44,7 @@ def test_operators_product():
 def test_operators_prefix():
     assert_token_types('@', ['AT'])
     assert_token_types('#', ['HASH'])
+    assert_token_types('!', ['BANG'])
 
 def test_operators_reduce():
     assert_token_types('+/', ['SUM'])

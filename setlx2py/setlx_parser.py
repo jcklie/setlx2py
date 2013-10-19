@@ -24,7 +24,7 @@ class Parser():
         self.lexer.build()
 
         # Parser
-        self.parser = yacc.yacc(module=self, start='init_expr')
+        self.parser = yacc.yacc(module=self, start='init_block_or_epsilon')
 
     def parse(self, text):
         return self.parser.parse(input=text, lexer=self.lexer)
@@ -33,7 +33,7 @@ class Parser():
         if t is None:
             raise SyntaxError("unexpected token", self.lexer, None)
         else:
-            msg = "unexpected token in line {}: {}".format(t.lineno, t.value)
+            msg = "unexpected token: '{}' - Line: {} - Pos: {}".format(t.value, t.lineno, t.lexpos)
             raise SyntaxError(msg, self.lexer, t.value, t.lineno, t.lexpos)
 
     ##
@@ -45,10 +45,26 @@ class Parser():
     ##
     ## Grammar productions
     ## Implementation of the BNF defined in Pure.g of setlx interpreter 
-    ## 
+    ##
 
-    def p_init_expr(self, p):
-        """ init_expr : expr SEMICOLON """
+    def p_init_block_or_epsilon(self, p):
+        """ init_block_or_epsilon : init_block
+                                  | epsilon
+        """
+        p[0] = FileAST([]) if p[1] is None else FileAST(p[1])
+
+    def p_init_block_1(self, p):
+        """ init_block : statement  """
+        p[0] = p[1]
+
+    def p_init_block_2(self, p):
+        """ init_block : init_block statement """
+        if p[2] is not None:
+            p[1].extend(p[2])
+        p[0] = p[1]
+
+    def p_statement_1(self, p):
+        """ statement : expr SEMICOLON """
         p[0] = p[1]
 
     ##
@@ -158,6 +174,14 @@ class Parser():
     def p_factor_1(self, p):
         """ factor  : value """
         p[0] = p[1]
+
+    def p_factor_2(self, p):
+        """ factor : BANG factor """
+        p[0] = UnaryOp('not', p[2], p[2].coord)
+
+    def p_factor_3(self, p):
+        """ factor : value BANG """
+        p[0] = UnaryOp('fac', p[1], p[1].coord)
         
     def p_value_1(self, p):
         """ value : atomic_value """
@@ -190,3 +214,7 @@ class Parser():
     def p_atomic_value_4(self, p):
         """ atomic_value : FALSE """
         p[0] = Constant('bool', False)
+
+    def p_epsilon(self, p):
+        """ epsilon : """
+        p[0] = None

@@ -113,7 +113,7 @@ class Lexer():
         'OR', 'AND',
         'EQ', 'NEQ',
         'LT', 'LE', 'GT', 'GE',
-        'SUM', 'PRODUCT',
+        'SUM', 'PRODUCT', 'BANG', 
         'HASH', 'AT',
 
         # Delimiter
@@ -151,6 +151,7 @@ class Lexer():
     t_LE            = r'<='
     t_GT            = r'>'
     t_GE            = r'>='
+    t_BANG          = r'!'
     t_SUM           = r'\+/'
     t_PRODUCT       = r'\*/'
     

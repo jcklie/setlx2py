@@ -153,6 +153,19 @@ class Constant(Node):
 
     attr_names = ('type','value',)
 
+class FileAST(Node):
+    def __init__(self, stmt, coord=None):
+        self.stmt = stmt
+        self.coord = coord
+
+    def children(self):
+        nodelist = []
+        for i, child in enumerate(self.stmt or []):
+            nodelist.append(("stmt[%d]" % i, child))
+        return tuple(nodelist)
+
+    attr_names = ()
+
 class UnaryOp(Node):
     def __init__(self, op, expr, coord=None):
         self.op = op
