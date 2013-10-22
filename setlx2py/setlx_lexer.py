@@ -95,7 +95,7 @@ class Lexer():
     
     tokens = [
         # Identifiers
-        'IDENTIFIER',
+#        'IDENTIFIER',
 
         # Unused placeholder
         'UNUSED',

@@ -94,7 +94,7 @@ class Parser():
         p[0] = p[1]
 
     def p_disjunction_2(self, p):
-        """ disjunction : conjunction OR disjunction """
+        """ disjunction : disjunction OR conjunction """
         p[0] = BinaryOp(p[2], p[1], p[3], p[1].coord)        
 
     def p_conjunction_1(self, p):
@@ -102,7 +102,7 @@ class Parser():
         p[0] = p[1]
 
     def p_conjunction_2(self, p):
-        """ conjunction : comparison AND comparison """
+        """ conjunction : conjunction AND comparison """
         p[0] = BinaryOp(p[2], p[1], p[3], p[1].coord)
 
     def p_comparison_1(self, p):
@@ -126,21 +126,21 @@ class Parser():
         p[0] = p[1]
 
     def p_sum_2(self, p):
-        """ sum : product PLUS  product
-                | product MINUS product
+        """ sum : sum PLUS product 
+                | sum MINUS product
         """
         p[0] = BinaryOp(p[2], p[1], p[3], p[1].coord)
-        
+                
     def p_product_1(self, p):
         """ product : reduce """
         p[0] = p[1]
 
     def p_product_2(self, p):
-        """ product : reduce TIMES     reduce
-                    | reduce DIVIDE    reduce
-                    | reduce IDIVIDE   reduce
-                    | reduce MOD       reduce
-                    | reduce CARTESIAN reduce
+        """ product : product TIMES     reduce
+                    | product DIVIDE    reduce
+                    | product IDIVIDE   reduce
+                    | product MOD       reduce
+                    | product CARTESIAN reduce
         """
         p[0] = BinaryOp(p[2], p[1], p[3], p[1].coord)
         
@@ -149,8 +149,8 @@ class Parser():
         p[0] = p[1]
 
     def p_reduce_2(self, p):
-        """ reduce : prefix_operation SUM prefix_operation
-                   | prefix_operation PRODUCT prefix_operation
+        """ reduce : reduce SUM prefix_operation
+                   | reduce PRODUCT prefix_operation
         """
         p[0] = BinaryOp(p[2], p[1], p[3], p[1].coord)
         

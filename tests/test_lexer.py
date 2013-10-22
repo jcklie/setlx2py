@@ -1,4 +1,4 @@
-from nose.tools import with_setup, eq_
+from nose.tools import with_setup, eq_, nottest
 
 from setlx2py.setlx_lexer import Lexer
 
@@ -87,6 +87,7 @@ def test_constants_bool():
     assert_token_types('true', ['TRUE'])
     assert_token_types('false', ['FALSE'])
 
+@nottest    
 def test_identifier():
     assert_token_types('q0', ['IDENTIFIER'])
     assert_token_types('a', ['IDENTIFIER'])

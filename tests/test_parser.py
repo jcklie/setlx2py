@@ -25,6 +25,32 @@ def assert_binop(text, operator, left, right):
     eq_(node.left.value, left)
     eq_( node.right.value, right)
 
+def assert_binop_triade(text, op1, op2, left, middle, right):
+    """
+    Asserts whether an expression of three operands
+    and two binary operations are parsed as expected.
+
+    The tree representation tested looks like the following:
+
+    BinaryOp: op2
+      BinaryOp: op1
+        Constant: left
+        Constant: middle
+      Constant: right
+    """
+    binop1 = parse_single_statement(text)
+    binop2 = binop1.left
+    const = binop1.right
+    try:
+        eq_(binop1.op, op2)
+        eq_(binop2.op, op1)
+        eq_(binop2.left.value, left)
+        eq_(binop2.right.value, middle)
+        eq_(binop1.right.value, right)
+    except AssertionError as e:
+        binop1.show()
+        raise e
+    
 def assert_unop(text, operator, val):
     node = parse_single_statement(text)
     eq_(node.op, operator)
@@ -99,7 +125,11 @@ def test_unop_prefix():
     assert_unop('1337!;', 'fac', 1337)
 
 def test_more_than_one_operand():
-    nodes = parse_single_statement('4 + 2 + 0;')
+    assert_binop_triade('4 + 2 + 0;', '+', '+', 4, 2, 0)
+    assert_binop_triade('true || false || true;', '||', '||', True, False, True)
+    assert_binop_triade('true && false && true;', '&&', '&&', True, False, True)
+    assert_binop_triade('4 % 2 * 0;', '%', '*', 4, 2, 0)
+    assert_binop_triade('4 +/ 2 */ 0;', '+/', '*/', 4, 2, 0)
 
 @nottest    
 def test_more_than_one_statement():
