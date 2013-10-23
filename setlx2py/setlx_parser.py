@@ -89,7 +89,9 @@ class Parser():
     ## Assignable
 
     def p_assignable_1(self, p):
-        """ assignable : variable """
+        """ assignable : variable
+                       | unused
+        """
         p[0] = p[1]
 
     ##
@@ -258,6 +260,10 @@ class Parser():
     ##
     ## Values
     ##
+
+    def p_unused(self, p):
+        """ unused : UNUSED """
+        p[0] = Variable('unused', 'unused')
         
     def p_value_1(self, p):
         """ value : atomic_value """
@@ -272,8 +278,8 @@ class Parser():
         p[0] = Constant('literal', str(p[1]))
 
     def p_value_4(self, p):
-        """ value : UNUSED """
-        p[0] = Constant('unused', 'unused')
+        """ value : unused """
+        p[0] = p[1]
         
     def p_atomic_value_1(self, p):
         """ atomic_value  : INTEGER """

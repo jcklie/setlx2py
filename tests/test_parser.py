@@ -180,3 +180,4 @@ def test_term_multi_arg():
 
 def test_assignment():
     assert_assignment('foo := 42;', ':=', 'foo', 42)
+    assert_assignment('_ := true;', ':=', 'unused', True)
