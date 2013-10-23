@@ -15,10 +15,13 @@ def teardown_func():
     parser = None
 
 @with_setup(setup_func, teardown_func)        
-def parse_single_statement(text):
+def parse_statements(text):    
     root = parser.parse(text) # FileAST
-    return root.stmt # First statement of AST
+    return root.stmt # List of statements
 
+def parse_single_statement(text):
+    return parse_statements(text)[0] # first statement
+    
 def assert_binop(text, operator, left, right):
     node = parse_single_statement(text)
     eq_(node.op, operator)
@@ -131,6 +134,5 @@ def test_more_than_one_operand():
     assert_binop_triade('4 % 2 * 0;', '%', '*', 4, 2, 0)
     assert_binop_triade('4 +/ 2 */ 0;', '+/', '*/', 4, 2, 0)
 
-@nottest    
 def test_more_than_one_statement():
     nodes = parse_single_statement("42 + 3; 1 + 3 + 3 + 7;")

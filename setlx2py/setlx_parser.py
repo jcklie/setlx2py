@@ -65,7 +65,7 @@ class Parser():
 
     def p_statement_1(self, p):
         """ statement : expr SEMICOLON """
-        p[0] = p[1]
+        p[0] = [p[1]]
 
     ##
     ## Expressions
