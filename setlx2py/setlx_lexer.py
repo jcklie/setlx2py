@@ -121,6 +121,9 @@ class Lexer():
         # Delimiter
         'SEMICOLON', 'COMMA',
         'LPAREN', 'RPAREN',
+
+        # Assign
+        'ASSIGN',
     ] + list(keywords.values())           
 
     ##
@@ -164,6 +167,10 @@ class Lexer():
     t_COMMA         = r','
     t_LPAREN        = r'\('
     t_RPAREN        = r'\)'
+
+    # Assign
+
+    t_ASSIGN        = r':='
 
     # Unused
     t_UNUSED        = r'_'

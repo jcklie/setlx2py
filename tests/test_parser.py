@@ -35,7 +35,12 @@ def parse_single_statement(text):
 ##
 ## Custom asserts
 ##
-    
+
+def assert_unop(text, operator, val):
+    node = parse_single_statement(text)
+    eq_(node.op, operator)
+    eq_(node.expr.value, val)
+
 def assert_binop_from_node(node, operator, left, right):    
     eq_(node.op, operator)
     eq_(node.left.value, left)
@@ -70,11 +75,12 @@ def assert_binop_triade(text, op1, op2, left, middle, right):
     except AssertionError as e:
         binop1.show()
         raise e
-    
-def assert_unop(text, operator, val):
+
+def assert_assignment(text, operator, left, right):
     node = parse_single_statement(text)
     eq_(node.op, operator)
-    eq_(node.expr.value, val)
+    eq_(node.left.name, left)
+    eq_( node.right.value, right)
     
 ##
 ## Tests
@@ -172,4 +178,5 @@ def test_term_multi_arg():
     eq_(True, e1.value)
     eq_(False, e2.value)    
 
-    
+def test_assignment():
+    assert_assignment('foo := 42;', ':=', 'foo', 42)

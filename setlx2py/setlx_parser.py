@@ -64,8 +64,33 @@ class Parser():
         p[0] = p[1]
 
     def p_statement_1(self, p):
-        """ statement : expr SEMICOLON """
+        """ statement : expr SEMICOLON 
+                      | assignment_direct SEMICOLON
+        """
         p[0] = [p[1]]
+
+    # Variable
+
+    def p_variable(self, p):
+        """ variable : IDENTIFIER """
+        p[0] = Variable(p[1])
+
+    ## Condition
+
+#    def p_condition(self, p):
+#        """ condition : expr """
+#        p[0] = p[1]
+
+    ## Assignment Direct
+    def p_assignment_direct_1(self, p):
+        """ assignment_direct : assignable ASSIGN expr """
+        p[0] = Assignment(p[2], p[1], p[3])
+        
+    ## Assignable
+
+    def p_assignable_1(self, p):
+        """ assignable : variable """
+        p[0] = p[1]
 
     ##
     ## Expressions
@@ -215,6 +240,10 @@ class Parser():
     def p_factor_4(self, p):
         """ factor : TERM LPAREN term_arguments RPAREN """
         p[0] = Term(p[1], p[3], p[3].coord)
+
+    ## For All
+
+    
 
     ##
     ## Term

@@ -126,6 +126,21 @@ class NodeVisitor(object):
             self.visit(c)
 
 
+class Assignment(Node):
+    def __init__(self, op, left, right, coord=None):
+        self.op = op
+        self.left = left
+        self.right = right
+        self.coord = coord
+
+    def children(self):
+        nodelist = []
+        if self.left is not None: nodelist.append(("left", self.left))
+        if self.right is not None: nodelist.append(("right", self.right))
+        return tuple(nodelist)
+
+    attr_names = ('op',)
+
 class BinaryOp(Node):
     def __init__(self, op, left, right, coord=None):
         self.op = op
@@ -204,4 +219,15 @@ class UnaryOp(Node):
         return tuple(nodelist)
 
     attr_names = ('op',)
+
+class Variable(Node):
+    def __init__(self, name, coord=None):
+        self.name = name
+        self.coord = coord
+
+    def children(self):
+        nodelist = []
+        return tuple(nodelist)
+
+    attr_names = ('name',)
 

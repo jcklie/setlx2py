@@ -118,3 +118,6 @@ def test_delimiter():
     assert_token_type(';', 'SEMICOLON')
     assert_token_type(',', 'COMMA')
     assert_token_types('()', ['LPAREN', 'RPAREN'])
+
+def test_assign():
+    assert_token_type(':=', 'ASSIGN')
