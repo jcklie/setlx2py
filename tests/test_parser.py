@@ -2,6 +2,7 @@ from nose.tools import eq_, with_setup, nottest
 
 from setlx2py.setlx_lexer import Lexer
 from setlx2py.setlx_parser import Parser
+from setlx2py.setlx_ast import *
 
 ######################--   TEST UTIL --######################
 
@@ -14,19 +15,35 @@ def setup_func():
 def teardown_func():
     parser = None
 
+##
+## Misc helper
+##
+
+
+##
+## Parse helper
+##
+
 @with_setup(setup_func, teardown_func)        
 def parse_statements(text):    
     root = parser.parse(text) # FileAST
     return root # List of statements
 
 def parse_single_statement(text):
-    return parse_statements(text).stmt[0] # first statement after FileAST
+    return parse_statements(text).stmts[0] # first statement after FileAST
+
+##
+## Custom asserts
+##
     
-def assert_binop(text, operator, left, right):
-    node = parse_single_statement(text)
+def assert_binop_from_node(node, operator, left, right):    
     eq_(node.op, operator)
     eq_(node.left.value, left)
     eq_( node.right.value, right)
+    
+def assert_binop(text, operator, left, right):
+    node = parse_single_statement(text)
+    assert_binop_from_node(node, operator, left, right)
 
 def assert_binop_triade(text, op1, op2, left, middle, right):
     """
@@ -59,7 +76,9 @@ def assert_unop(text, operator, val):
     eq_(node.op, operator)
     eq_(node.expr.value, val)
     
-######################--   TESTS     --######################
+##
+## Tests
+##
 
 @with_setup(setup_func, teardown_func)        
 def test_should_be_creatable():
@@ -134,6 +153,23 @@ def test_more_than_one_operand():
     assert_binop_triade('4 % 2 * 0;', '%', '*', 4, 2, 0)
     assert_binop_triade('4 +/ 2 */ 0;', '+/', '*/', 4, 2, 0)
 
-def test_more_than_one_statement():
-    nodes = parse_statements("42 + 3; 1 + 3 + 3 + 7;")
-    nodes.show()
+def test_more_than_one_statement_simple():
+    nodes = parse_statements('1 + 2; 3 * 4;')
+    stmt1,stmt2 = nodes.stmts
+    assert_binop_from_node(stmt1, '+', 1, 2)
+    assert_binop_from_node(stmt2, '*', 3, 4)   
+
+def test_term_single_arg():
+    node = parse_single_statement('F(true);')
+    eq_(True, isinstance(node, Term))
+    expression = node.args
+    eq_(True, expression.value)
+
+def test_term_multi_arg():
+    node = parse_single_statement('F(true, false);')
+    eq_(True, isinstance(node, Term))
+    e1, e2 = node.args.exprs
+    eq_(True, e1.value)
+    eq_(False, e2.value)    
+
+    

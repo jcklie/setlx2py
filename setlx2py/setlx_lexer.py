@@ -67,6 +67,7 @@ class Lexer():
     # An identifier must start with a lower case letter
     # and may contain numbers, letters and underscores   
     identifier = r'[a-z][a-zA-Z_0-9]*'
+    term = r'[\^A-Z]' + '[a-zA-Z_0-9]*'
 
     # character sequences
 
@@ -95,7 +96,8 @@ class Lexer():
     
     tokens = [
         # Identifiers
-#        'IDENTIFIER',
+        'IDENTIFIER',
+        'TERM',
 
         # Unused placeholder
         'UNUSED',
@@ -117,7 +119,8 @@ class Lexer():
         'HASH', 'AT',
 
         # Delimiter
-        'SEMICOLON',
+        'SEMICOLON', 'COMMA',
+        'LPAREN', 'RPAREN',
     ] + list(keywords.values())           
 
     ##
@@ -158,6 +161,9 @@ class Lexer():
     # Delimiter
 
     t_SEMICOLON     = r';'
+    t_COMMA         = r','
+    t_LPAREN        = r'\('
+    t_RPAREN        = r'\)'
 
     # Unused
     t_UNUSED        = r'_'
@@ -165,6 +171,10 @@ class Lexer():
     @TOKEN(identifier)
     def t_IDENTIFIER(self, t):
         t.type = self.keywords.get(t.value, 'IDENTIFIER')
+        return t
+
+    @TOKEN(term)
+    def t_TERM(self, t):
         return t
     
     @TOKEN(double_constant)

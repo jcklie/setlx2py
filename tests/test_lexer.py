@@ -23,6 +23,9 @@ def assert_token_types(text, expected_types):
     actual_tokens = token_types(lexer)
     eq_(expected_types, actual_tokens, "{} != {}".format(expected_types, actual_tokens))
 
+def assert_token_type(text, expected_type):
+    assert_token_types(text, [expected_type])
+
 ######################--   TESTS     --######################
 
 def test_should_be_creatable():
@@ -74,7 +77,7 @@ def test_constants_double():
     # More digits - More digits
     assert_token_types('1337.42', ['DOUBLE'])
         
-    # Singe digit - Single digit
+    # Single digit - Single digit
     assert_token_types('0.0', ['DOUBLE'])
     
     # Zero Digit - More digits
@@ -87,13 +90,18 @@ def test_constants_bool():
     assert_token_types('true', ['TRUE'])
     assert_token_types('false', ['FALSE'])
 
-@nottest    
 def test_identifier():
     assert_token_types('q0', ['IDENTIFIER'])
     assert_token_types('a', ['IDENTIFIER'])
     assert_token_types('a_', ['IDENTIFIER'])
     assert_token_types('a13234', ['IDENTIFIER'])
     assert_token_types('z42a_____', ['IDENTIFIER'])
+
+def test_term():
+    assert_token_type('F', 'TERM')
+    assert_token_type('FabcXYZ', 'TERM')
+    assert_token_type('Hugo_', 'TERM')
+    assert_token_type('^sum', 'TERM')
 
 def test_strings():
     assert_token_types('"FOOBAR"', ['STRING'])
@@ -105,3 +113,8 @@ def test_literal():
 
 def test_unused():
     assert_token_types("_", ['UNUSED'])
+
+def test_delimiter():
+    assert_token_type(';', 'SEMICOLON')
+    assert_token_type(',', 'COMMA')
+    assert_token_types('()', ['LPAREN', 'RPAREN'])

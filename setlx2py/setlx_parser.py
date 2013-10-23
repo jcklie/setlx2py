@@ -80,6 +80,19 @@ class Parser():
                  | implication ANTIVALENT implication
         """
         p[0] = BinaryOp(p[2], p[1], p[3], p[1].coord)
+
+    def p_expr_list_1(self, p):
+        """ expr_list : expr  """
+        p[0] = p[1]
+
+    def p_expr_list_2(self, p):
+        """ expr_list : expr_list COMMA expr """
+        if not isinstance(p[1], ExprList):
+            p[1] = ExprList([p[1]], p[1].coord)
+        p[1].exprs.append(p[3])
+        p[0] = p[1]
+
+    ## Implication
         
     def p_implication_1(self, p):
         """ implication : disjunction """
@@ -89,13 +102,17 @@ class Parser():
         """ implication : disjunction IMPLICATES disjunction """
         p[0] = BinaryOp(p[2], p[1], p[3], p[1].coord)
 
+    ## Disjunction
+
     def p_disjunction_1(self, p):
         """ disjunction : conjunction  """
         p[0] = p[1]
 
     def p_disjunction_2(self, p):
         """ disjunction : disjunction OR conjunction """
-        p[0] = BinaryOp(p[2], p[1], p[3], p[1].coord)        
+        p[0] = BinaryOp(p[2], p[1], p[3], p[1].coord)
+
+    ## Conjunction
 
     def p_conjunction_1(self, p):
         """ conjunction : comparison """
@@ -104,6 +121,8 @@ class Parser():
     def p_conjunction_2(self, p):
         """ conjunction : conjunction AND comparison """
         p[0] = BinaryOp(p[2], p[1], p[3], p[1].coord)
+
+    ## Comparison
 
     def p_comparison_1(self, p):
         """ comparison : sum """
@@ -121,6 +140,8 @@ class Parser():
         """
         p[0] = BinaryOp(p[2], p[1], p[3], p[1].coord)
 
+    ## Sum
+
     def p_sum_1(self, p):
         """ sum : product """
         p[0] = p[1]
@@ -130,6 +151,8 @@ class Parser():
                 | sum MINUS product
         """
         p[0] = BinaryOp(p[2], p[1], p[3], p[1].coord)
+
+    ## Product
                 
     def p_product_1(self, p):
         """ product : reduce """
@@ -143,6 +166,8 @@ class Parser():
                     | product CARTESIAN reduce
         """
         p[0] = BinaryOp(p[2], p[1], p[3], p[1].coord)
+
+    ## Reduce
         
     def p_reduce_1(self, p):
         """ reduce : prefix_operation """
@@ -153,6 +178,8 @@ class Parser():
                    | reduce PRODUCT prefix_operation
         """
         p[0] = BinaryOp(p[2], p[1], p[3], p[1].coord)
+
+    ## Prefix Operation
         
     def p_prefix_operation_1(self, p):
         """ prefix_operation : factor """
@@ -170,6 +197,8 @@ class Parser():
     def p_prefix_operation_3(self, p):
         """ prefix_operation : factor POW prefix_operation """
         p[0] = BinaryOp(p[2], p[1], p[3], p[1].coord)
+
+    ## Factor
         
     def p_factor_1(self, p):
         """ factor  : value """
@@ -182,6 +211,24 @@ class Parser():
     def p_factor_3(self, p):
         """ factor : value BANG """
         p[0] = UnaryOp('fac', p[1], p[1].coord)
+
+    def p_factor_4(self, p):
+        """ factor : TERM LPAREN term_arguments RPAREN """
+        p[0] = Term(p[1], p[3], p[3].coord)
+
+    ##
+    ## Term
+    ##
+
+    def p_term_arguments(self, p):
+        """ term_arguments : expr_list
+                           | epsilon
+        """
+        p[0] = p[1] if p[1] is not None else ExprList([])    
+    
+    ##
+    ## Values
+    ##
         
     def p_value_1(self, p):
         """ value : atomic_value """

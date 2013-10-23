@@ -153,18 +153,44 @@ class Constant(Node):
 
     attr_names = ('type','value',)
 
-class FileAST(Node):
-    def __init__(self, stmt, coord=None):
-        self.stmt = stmt
+class ExprList(Node):
+    def __init__(self, exprs, coord=None):
+        self.exprs = exprs
         self.coord = coord
 
     def children(self):
         nodelist = []
-        for i, child in enumerate(self.stmt or []):
-            nodelist.append(("stmt[%d]" % i, child))
+        for i, child in enumerate(self.exprs or []):
+            nodelist.append(("exprs[%d]" % i, child))
         return tuple(nodelist)
 
     attr_names = ()
+
+class FileAST(Node):
+    def __init__(self, stmts, coord=None):
+        self.stmts = stmts
+        self.coord = coord
+
+    def children(self):
+        nodelist = []
+        for i, child in enumerate(self.stmts or []):
+            nodelist.append(("stmts[%d]" % i, child))
+        return tuple(nodelist)
+
+    attr_names = ()
+
+class Term(Node):
+    def __init__(self, name, args, coord=None):
+        self.name = name
+        self.args = args
+        self.coord = coord
+
+    def children(self):
+        nodelist = []
+        if self.args is not None: nodelist.append(("args", self.args))
+        return tuple(nodelist)
+
+    attr_names = ('name',)
 
 class UnaryOp(Node):
     def __init__(self, op, expr, coord=None):
