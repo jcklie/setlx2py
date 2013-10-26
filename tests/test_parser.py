@@ -77,10 +77,44 @@ def assert_binop_triade(text, op1, op2, left, middle, right):
         raise e
 
 def assert_assignment(text, operator, left, right):
+    try:
+        node = parse_single_statement(text)
+        eq_(node.op, operator)
+        eq_(node.left.name, left)
+        eq_( node.right.value, right)
+    except AssertionError as e:
+        node.show()
+        raise e
+
+def assert_assignment_member_access(text, operator, name, field, right):
+    try:
+        node = parse_single_statement(text)
+        eq_(node.op, operator)
+        eq_(node.left.name.name, name)   # Assignable->MemberAccess->Variable
+        eq_(node.left.field.name, field) # Assignable->MemberAccess->Variable
+        eq_( node.right.value, right)
+    except AssertionError as e:
+        node.show()
+        raise e
+
+def assert_member_access_equals(node, name=None, field=None):
+    if name is not None: eq_(node.name.name, name)
+    if field is not None: eq_(node.field.name, field)
+
+def assert_array_ref_equals(node, name=None, subscript=None):
+    try:
+        if name is not None: eq_(node.name.name, name)
+        if subscript is not None: eq_(node.subscript.value, subscript)
+    except AssertionError as e:
+        node.show()
+        raise e
+
+def assert_assignment_explicit(text, operator, left, right):
     node = parse_single_statement(text)
     eq_(node.op, operator)
-    eq_(node.left.name, left)
-    eq_( node.right.value, right)
+    for var, l in zip(node.left.assignments, left):
+        eq_(var.name, l)
+    eq_(node.right.value, right)
     
 ##
 ## Tests
@@ -176,8 +210,70 @@ def test_term_multi_arg():
     eq_(True, isinstance(node, Term))
     e1, e2 = node.args.exprs
     eq_(True, e1.value)
-    eq_(False, e2.value)    
+    eq_(False, e2.value)
 
+def test_assignable_member_access():
+    """
+    Assignment: :=
+        MemberAccess:
+            Variable: foo
+            Variable: bar
+        Constant: int, 42
+    """
+    assignment = parse_single_statement('foo.bar := true;')
+    member_access = assignment.left
+
+    assert_member_access_equals(member_access, 'foo', 'bar')
+
+
+def test_assignable_member_access_chained():
+    """
+    Assignment: :=
+        MemberAccess:            #1
+            MemberAccess:        #2
+                Variable: foo
+                Variable: bar
+        Variable: baz
+        Constant: int, 42
+    """
+    assignment = parse_single_statement('foo.bar.baz := 42;')
+    member_access1 = assignment.left
+    member_access2 = member_access1.name
+
+    assert_member_access_equals(member_access2, 'foo', 'bar')
+    assert_member_access_equals(member_access1, field='baz')
+
+def test_assignable_array_ref():
+    assignment = parse_single_statement('foo[0] := true;')
+    array_ref = assignment.left
+
+    assert_array_ref_equals(array_ref, 'foo', 0)
+
+def test_assignable_array_ref_chained():
+    """
+    ArrayRef:                    #1
+        ArrayRef:                #2
+            Variable: foo
+            Constant: int, 0
+        Constant: int, 1
+    """
+    assignment = parse_single_statement('foo[0][1] := true;')
+    array_ref1 = assignment.left
+    array_ref2 = array_ref1.name
+
+    assert_array_ref_equals(array_ref2, 'foo', 0)
+    assert_array_ref_equals(array_ref1, subscript=1)
+    
 def test_assignment():
-    assert_assignment('foo := 42;', ':=', 'foo', 42)
-    assert_assignment('_ := true;', ':=', 'unused', True)
+    assert_assignment('foo := 42;', ':=',  'foo', 42)
+    assert_assignment('_ := true;', ':=',  'unused', True)
+    assert_assignment('foo += 42;', '+=',  'foo', 42)
+    assert_assignment('foo -= 1;',  '-=',  'foo', 1)
+    assert_assignment('foo *= 2;',  '*=',  'foo', 2)
+    assert_assignment('foo /= 2;',  '/=',  'foo', 2)
+    assert_assignment('foo \\= 3;', '\\=', 'foo', 3)
+    assert_assignment('foo %= 10;', '%=',  'foo', 10)
+
+def test_assignment_explicit():
+    assert_assignment('[foo] := 42;', ':=', 'foo', 42)
+    assert_assignment_explicit('[foo, bar] := 42;', ':=', ['foo', 'bar'], 42)

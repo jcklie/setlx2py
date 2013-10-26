@@ -126,6 +126,20 @@ class NodeVisitor(object):
             self.visit(c)
 
 
+class ArrayRef(Node):
+    def __init__(self, name, subscript, coord=None):
+        self.name = name
+        self.subscript = subscript
+        self.coord = coord
+
+    def children(self):
+        nodelist = []
+        if self.name is not None: nodelist.append(("name", self.name))
+        if self.subscript is not None: nodelist.append(("subscript", self.subscript))
+        return tuple(nodelist)
+
+    attr_names = ()
+
 class Assignment(Node):
     def __init__(self, op, left, right, coord=None):
         self.op = op
@@ -140,6 +154,19 @@ class Assignment(Node):
         return tuple(nodelist)
 
     attr_names = ('op',)
+
+class AssignmentList(Node):
+    def __init__(self, assignments, coord=None):
+        self.assignments = assignments
+        self.coord = coord
+
+    def children(self):
+        nodelist = []
+        for i, child in enumerate(self.assignments or []):
+            nodelist.append(("assignments[%d]" % i, child))
+        return tuple(nodelist)
+
+    attr_names = ()
 
 class BinaryOp(Node):
     def __init__(self, op, left, right, coord=None):
@@ -190,6 +217,20 @@ class FileAST(Node):
         nodelist = []
         for i, child in enumerate(self.stmts or []):
             nodelist.append(("stmts[%d]" % i, child))
+        return tuple(nodelist)
+
+    attr_names = ()
+
+class MemberAccess(Node):
+    def __init__(self, name, field, coord=None):
+        self.name = name
+        self.field = field
+        self.coord = coord
+
+    def children(self):
+        nodelist = []
+        if self.name is not None: nodelist.append(("name", self.name))
+        if self.field is not None: nodelist.append(("field", self.field))
         return tuple(nodelist)
 
     attr_names = ()

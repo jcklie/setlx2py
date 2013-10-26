@@ -119,11 +119,16 @@ class Lexer():
         'HASH', 'AT',
 
         # Delimiter
-        'SEMICOLON', 'COMMA',
+        'SEMICOLON', 'COMMA', 'DOT',
         'LPAREN', 'RPAREN',
+        'LBRACKET', 'RBRACKET',
 
         # Assign
         'ASSIGN',
+        'PLUS_EQUAL', 'MINUS_EQUAL',
+        'TIMES_EQUAL', 'MOD_EQUAL',
+        'DIVIDE_EQUAL', 'IDIVIDE_EQUAL',
+
     ] + list(keywords.values())           
 
     ##
@@ -165,12 +170,21 @@ class Lexer():
 
     t_SEMICOLON     = r';'
     t_COMMA         = r','
+    t_DOT           = r'\.'
     t_LPAREN        = r'\('
     t_RPAREN        = r'\)'
+    t_LBRACKET      = r'\['
+    t_RBRACKET      = r'\]'
 
     # Assign
 
     t_ASSIGN        = r':='
+    t_PLUS_EQUAL    = r'\+='
+    t_MINUS_EQUAL   = r'\-='
+    t_TIMES_EQUAL   = r'\*='
+    t_DIVIDE_EQUAL  = r'/='
+    t_IDIVIDE_EQUAL = r'\\='
+    t_MOD_EQUAL     = r'%='
 
     # Unused
     t_UNUSED        = r'_'

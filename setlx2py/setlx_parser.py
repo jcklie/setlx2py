@@ -66,6 +66,7 @@ class Parser():
     def p_statement_1(self, p):
         """ statement : expr SEMICOLON 
                       | assignment_direct SEMICOLON
+                      | assignment_other  SEMICOLON
         """
         p[0] = [p[1]]
 
@@ -81,9 +82,24 @@ class Parser():
 #        """ condition : expr """
 #        p[0] = p[1]
 
+    ##
+    ## Assignment
+    ##
+
     ## Assignment Direct
     def p_assignment_direct_1(self, p):
         """ assignment_direct : assignable ASSIGN expr """
+        p[0] = Assignment(p[2], p[1], p[3])
+
+    ## Assignment Other
+    def p_assignment_other(self, p):
+        """ assignment_other : assignable PLUS_EQUAL    expr
+                             | assignable MINUS_EQUAL   expr
+                             | assignable TIMES_EQUAL   expr
+                             | assignable DIVIDE_EQUAL  expr
+                             | assignable IDIVIDE_EQUAL expr
+                             | assignable MOD_EQUAL     expr
+        """
         p[0] = Assignment(p[2], p[1], p[3])
         
     ## Assignable
@@ -92,6 +108,30 @@ class Parser():
         """ assignable : variable
                        | unused
         """
+        p[0] = p[1]
+
+    def p_assignable_2(self, p):
+        """ assignable : assignable DOT variable """
+        p[0] = MemberAccess(p[1], p[3], p[1].coord)
+
+    def p_assignable_3(self, p):
+        """ assignable : assignable LBRACKET expr RBRACKET """
+        p[0] = ArrayRef(p[1], p[3], p[1].coord)
+
+    def p_assignable_4(self, p):
+        """ assignable : LBRACKET explicit_assign_list RBRACKET
+        """
+        p[0] = p[2]
+
+    def p_explicit_assign_list_1(self, p):
+        """ explicit_assign_list : assignable """
+        p[0] = p[1]
+
+    def p_explicit_assign_list_2(self, p):
+        """ explicit_assign_list : explicit_assign_list COMMA assignable """
+        if not isinstance(p[1], AssignmentList):
+            p[1] = AssignmentList([p[1]], p[1].coord)
+        p[1].assignments.append(p[3])
         p[0] = p[1]
 
     ##
@@ -280,6 +320,8 @@ class Parser():
     def p_value_4(self, p):
         """ value : unused """
         p[0] = p[1]
+
+    ## Atomic Value
         
     def p_atomic_value_1(self, p):
         """ atomic_value  : INTEGER """

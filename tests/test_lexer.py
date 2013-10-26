@@ -117,7 +117,16 @@ def test_unused():
 def test_delimiter():
     assert_token_type(';', 'SEMICOLON')
     assert_token_type(',', 'COMMA')
+    assert_token_type('.', 'DOT')
     assert_token_types('()', ['LPAREN', 'RPAREN'])
+    assert_token_types('[]', ['LBRACKET', 'RBRACKET'])    
 
 def test_assign():
-    assert_token_type(':=', 'ASSIGN')
+    assert_token_type(':=',  'ASSIGN')
+    assert_token_type('+=',  'PLUS_EQUAL')
+    assert_token_type('-=',  'MINUS_EQUAL')
+    assert_token_type('*=',  'TIMES_EQUAL')
+    assert_token_type('/=',  'DIVIDE_EQUAL')
+    assert_token_type('\\=', 'IDIVIDE_EQUAL')
+    assert_token_type('%=',  'MOD_EQUAL')
+    
