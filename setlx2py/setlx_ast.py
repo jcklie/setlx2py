@@ -127,14 +127,14 @@ class NodeVisitor(object):
 
 
 class ArrayRef(Node):
-    def __init__(self, name, subscript, coord=None):
-        self.name = name
+    def __init__(self, obj, subscript, coord=None):
+        self.obj = obj
         self.subscript = subscript
         self.coord = coord
 
     def children(self):
         nodelist = []
-        if self.name is not None: nodelist.append(("name", self.name))
+        if self.obj is not None: nodelist.append(("obj", self.obj))
         if self.subscript is not None: nodelist.append(("subscript", self.subscript))
         return tuple(nodelist)
 
@@ -222,14 +222,14 @@ class FileAST(Node):
     attr_names = ()
 
 class MemberAccess(Node):
-    def __init__(self, name, field, coord=None):
-        self.name = name
+    def __init__(self, obj, field, coord=None):
+        self.obj = obj
         self.field = field
         self.coord = coord
 
     def children(self):
         nodelist = []
-        if self.name is not None: nodelist.append(("name", self.name))
+        if self.obj is not None: nodelist.append(("obj", self.obj))
         if self.field is not None: nodelist.append(("field", self.field))
         return tuple(nodelist)
 

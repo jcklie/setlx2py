@@ -77,6 +77,17 @@ def assert_binop_triade(text, op1, op2, left, middle, right):
         raise e
 
 def assert_assignment(text, operator, left, right):
+    """ Asserts that a given assignment has the
+    expected operator, left- and ride hand side.
+
+    Args:
+        text: The string containing an assignment
+        operator: The expected assignment operator 
+        left: The expected left hand side variable
+        right: The expected right hand side variable
+    Raises:
+        AssertionError: if result != expected
+    """
     try:
         node = parse_single_statement(text)
         eq_(node.op, operator)
@@ -86,24 +97,36 @@ def assert_assignment(text, operator, left, right):
         node.show()
         raise e
 
-def assert_assignment_member_access(text, operator, name, field, right):
-    try:
-        node = parse_single_statement(text)
-        eq_(node.op, operator)
-        eq_(node.left.name.name, name)   # Assignable->MemberAccess->Variable
-        eq_(node.left.field.name, field) # Assignable->MemberAccess->Variable
-        eq_( node.right.value, right)
-    except AssertionError as e:
-        node.show()
-        raise e
+def assert_member_access_equals(node, obj=None, field=None):
+    """ Asserts that a given member access (e.g. foo.bar,
+    where name=foo, bar=field) has the expected name and
+    field.
 
-def assert_member_access_equals(node, name=None, field=None):
-    if name is not None: eq_(node.name.name, name)
+    Args:
+        node: The MemberAccess AST node
+        obj: Name of the object accessed
+        field: Name of the field accessed
+    Raises:
+        AssertionError: if result != expected
+    """
+
+    if obj is not None: eq_(node.obj.name, obj)
     if field is not None: eq_(node.field.name, field)
 
-def assert_array_ref_equals(node, name=None, subscript=None):
+def assert_array_ref_equals(node, obj=None, subscript=None):
+    """ Asserts that a given array reference (e.g. foo[0],
+    where name=foo, subscript=0), has the expected name
+    and subscript.
+
+    Args:
+        node: The ArrayRef AST node
+        obj: The object which is accessed by subscript
+        subscript: The subscript of the access
+    Raises:
+        AssertionError: if result != expected
+    """
     try:
-        if name is not None: eq_(node.name.name, name)
+        if obj is not None: eq_(node.obj.name, obj)
         if subscript is not None: eq_(node.subscript.value, subscript)
     except AssertionError as e:
         node.show()
@@ -238,7 +261,7 @@ def test_assignable_member_access_chained():
     """
     assignment = parse_single_statement('foo.bar.baz := 42;')
     member_access1 = assignment.left
-    member_access2 = member_access1.name
+    member_access2 = member_access1.obj
 
     assert_member_access_equals(member_access2, 'foo', 'bar')
     assert_member_access_equals(member_access1, field='baz')
@@ -250,7 +273,7 @@ def test_assignable_array_ref():
     assert_array_ref_equals(array_ref, 'foo', 0)
 
 def test_assignable_array_ref_chained():
-    """
+    """ 
     ArrayRef:                    #1
         ArrayRef:                #2
             Variable: foo
@@ -259,7 +282,7 @@ def test_assignable_array_ref_chained():
     """
     assignment = parse_single_statement('foo[0][1] := true;')
     array_ref1 = assignment.left
-    array_ref2 = array_ref1.name
+    array_ref2 = array_ref1.obj
 
     assert_array_ref_equals(array_ref2, 'foo', 0)
     assert_array_ref_equals(array_ref1, subscript=1)
