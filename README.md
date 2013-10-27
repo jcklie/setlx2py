@@ -35,3 +35,5 @@ Shovel
 To create the Python AST representation for the parse tree, use
 
 	shovel build.ast
+
+[![Build Status](https://travis-ci.org/Rentier/setlx2py.png?branch=master)](https://travis-ci.org/Rentier/setlx2py)
