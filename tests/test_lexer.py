@@ -65,8 +65,12 @@ def test_operators_boolean():
     assert_token_types('<=', ['LE'])
     assert_token_types('>', ['GT'])
     assert_token_types('>=', ['GE'])
-    assert_token_types('in', ['IN'])
-    assert_token_types('notin', ['NOTIN'])
+
+def assert_keywords():
+    assert_token_type('in', 'IN')
+    assert_token_type('notin', 'NOTIN')
+    assert_token_type('forall', 'FORALL')
+    assert_token_type('exists', 'EXISTS')
 
 def test_constants_integer():
     assert_token_types('1337', ['INTEGER'])

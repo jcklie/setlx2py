@@ -300,3 +300,26 @@ def test_assignment():
 def test_assignment_explicit():
     assert_assignment('[foo] := 42;', ':=', 'foo', 42)
     assert_assignment_explicit('[foo, bar] := 42;', ':=', ['foo', 'bar'], 42)
+
+def test_quantifier_all():
+    quantor =  parse_single_statement('forall (x in 1 | true);')
+    iterator = quantor.lhs
+    condition = quantor.cond
+
+    eq_(quantor.name, 'all')
+    eq_(iterator.assignable.name, 'x')
+    eq_(iterator.expression.value, 1)
+    eq_(condition.value, True)
+
+def test_quantifier_exists():
+    quantor =  parse_single_statement('exists (x in 1 | true);')
+    iterator = quantor.lhs
+    condition = quantor.cond
+
+    eq_(quantor.name, 'any')
+    eq_(iterator.assignable.name, 'x')
+    eq_(iterator.expression.value, 1)
+    eq_(condition.value, True)
+
+
+    

@@ -159,6 +159,12 @@ class Parser():
         p[1].exprs.append(p[3])
         p[0] = p[1]
 
+    ## Condition
+
+    def p_condition(self, p):
+        """ condition : expr """
+        p[0] = p[1]
+
     ## Implication
         
     def p_implication_1(self, p):
@@ -283,9 +289,15 @@ class Parser():
         """ factor : TERM LPAREN term_arguments RPAREN """
         p[0] = Term(p[1], p[3], p[3].coord)
 
-    ## For All
+    ## Quantor
 
-    
+    def p_factor_5(self, p):
+        """ factor : FORALL LPAREN iterator_chain PIPE condition RPAREN """
+        p[0] = Quantor('all', p[3], p[5], p[3].coord)
+
+    def p_factor_6(self, p):
+        """ factor : EXISTS LPAREN iterator_chain PIPE condition RPAREN """
+        p[0] = Quantor('any', p[3], p[5], p[3].coord)    
 
     ##
     ## Term
@@ -295,8 +307,27 @@ class Parser():
         """ term_arguments : expr_list
                            | epsilon
         """
-        p[0] = p[1] if p[1] is not None else ExprList([])    
-    
+        p[0] = p[1] if p[1] is not None else ExprList([])
+
+    ##
+    ## Iterator
+    ##
+
+    def p_iterator(self, p):
+        """ iterator : assignable IN expr """
+        p[0] = Iterator(p[1], p[3], p[1].coord)
+
+    def p_iterator_chain_1(self, p):
+        """ iterator_chain : iterator """
+        p[0] = p[1]
+
+    def p_iterator_chain_2(self, p):
+        """ iterator_chain : iterator_chain COMMA iterator """
+        if not isinstance(p[1], IteratorChain):
+            p[1] = IteratorChain([p[1]], p[1].coord)
+        p[1].iterators.append(p[3])
+        p[0] = p[1]
+
     ##
     ## Values
     ##
@@ -311,7 +342,7 @@ class Parser():
 
     def p_value_2(self, p):
         """ value : STRING """
-        p[0] = Constant('string', str(p[1]))
+        p[0] = Constant('string', str(p[1]), p[1].coord)
 
     def p_value_3(self, p):
         """ value : LITERAL """

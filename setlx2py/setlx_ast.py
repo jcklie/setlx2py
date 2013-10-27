@@ -221,6 +221,33 @@ class FileAST(Node):
 
     attr_names = ()
 
+class Iterator(Node):
+    def __init__(self, assignable, expression, coord=None):
+        self.assignable = assignable
+        self.expression = expression
+        self.coord = coord
+
+    def children(self):
+        nodelist = []
+        if self.assignable is not None: nodelist.append(("assignable", self.assignable))
+        if self.expression is not None: nodelist.append(("expression", self.expression))
+        return tuple(nodelist)
+
+    attr_names = ()
+
+class IteratorChain(Node):
+    def __init__(self, iterators, coord=None):
+        self.iterators = iterators
+        self.coord = coord
+
+    def children(self):
+        nodelist = []
+        for i, child in enumerate(self.iterators or []):
+            nodelist.append(("iterators[%d]" % i, child))
+        return tuple(nodelist)
+
+    attr_names = ()
+
 class MemberAccess(Node):
     def __init__(self, obj, field, coord=None):
         self.obj = obj
@@ -234,6 +261,21 @@ class MemberAccess(Node):
         return tuple(nodelist)
 
     attr_names = ()
+
+class Quantor(Node):
+    def __init__(self, name, lhs, cond, coord=None):
+        self.name = name
+        self.lhs = lhs
+        self.cond = cond
+        self.coord = coord
+
+    def children(self):
+        nodelist = []
+        if self.lhs is not None: nodelist.append(("lhs", self.lhs))
+        if self.cond is not None: nodelist.append(("cond", self.cond))
+        return tuple(nodelist)
+
+    attr_names = ('name',)
 
 class Term(Node):
     def __init__(self, name, args, coord=None):
