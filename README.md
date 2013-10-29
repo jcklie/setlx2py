@@ -8,7 +8,7 @@ The homepage for setlX can be found on <http://randoom.org/Software/SetlX>.
 Dependencies
 ============
 
-* Python 3.3.2
+* Python 2.7.3
 * PLY (Python Lex-Yacc)
 
 Virtualenv
