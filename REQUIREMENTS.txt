@@ -1,7 +1,7 @@
 argparse==1.2.1
+-e git+https://github.com/Rentier/ast-gen.git@4f0f9d4cef830adcdf7930e15ebc5cdce0aac3b1#egg=ast_gen-dev
 distribute==0.6.27
 nose==1.3.0
 nose-ignore-docstring==0.2
 ply==3.4
-pycparser==2.10
 shovel==0.1.10
