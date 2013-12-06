@@ -36,10 +36,10 @@ def parse_single_statement(text):
 ## Custom asserts
 ##
 
-def assert_unop(text, operator, val):
+def assert_unop(text, operator, typ, val):
     node = parse_single_statement(text)
-    eq_(node.op, operator)
-    eq_(node.expr.value, val)
+    eq_(node.to_tuples(),
+        ('UnaryOp', operator, ('Constant', typ, val)))
 
 def assert_binop_from_node(node, operator, left, right):    
     eq_(node.op, operator)
@@ -138,7 +138,7 @@ def assert_assignment_explicit(text, operator, left, right):
     for var, l in zip(node.left.assignments, left):
         eq_(var.name, l)
     eq_(node.right.value, right)
-    
+
 ##
 ## Tests
 ##
@@ -200,14 +200,14 @@ def test_binop_reduce():
 
 # Unary operations
 
-def test_unop_prefix():
-    assert_unop('+/ 42;',  '+/', 42)
-    assert_unop('*/ 42;',  '*/', 42)
-    assert_unop('-  42;',   '-', 42)
-    assert_unop('#  42;',   '#', 42)
-    assert_unop('@  42;',   '@', 42)
-    assert_unop('!true;', 'not', True)
-    assert_unop('1337!;', 'fac', 1337)
+def test_unop():
+    assert_unop('+/ 42;',  '+/', 'int', 42)
+    assert_unop('*/ 42;',  '*/', 'int', 42)
+    assert_unop('-  42;',   '-', 'int', 42)
+    assert_unop('#  42;',   '#', 'int', 42)
+    assert_unop('@  42;',   '@', 'int', 42)
+    assert_unop('!true;', 'not', 'bool', True)
+    assert_unop('1337!;', 'fac', 'int', 1337)
 
 def test_more_than_one_operand():
     assert_binop_triade('4 + 2 + 0;', '+', '+', 4, 2, 0)
@@ -236,56 +236,44 @@ def test_term_multi_arg():
     eq_(False, e2.value)
 
 def test_assignable_member_access():
-    """
-    Assignment: :=
-        MemberAccess:
-            Variable: foo
-            Variable: bar
-        Constant: int, 42
-    """
     assignment = parse_single_statement('foo.bar := true;')
-    member_access = assignment.left
-
-    assert_member_access_equals(member_access, 'foo', 'bar')
-
+    eq_(assignment.to_tuples(),
+        ('Assignment', ':=',
+         ('MemberAccess',
+          ('Variable', 'foo'),
+          ('Variable', 'bar')),
+         ('Constant', 'bool', True)))
 
 def test_assignable_member_access_chained():
-    """
-    Assignment: :=
-        MemberAccess:            #1
-            MemberAccess:        #2
-                Variable: foo
-                Variable: bar
-        Variable: baz
-        Constant: int, 42
-    """
     assignment = parse_single_statement('foo.bar.baz := 42;')
-    member_access1 = assignment.left
-    member_access2 = member_access1.obj
-
-    assert_member_access_equals(member_access2, 'foo', 'bar')
-    assert_member_access_equals(member_access1, field='baz')
+    eq_(assignment.to_tuples(),
+        ('Assignment', ':=',
+         ('MemberAccess',
+          ('MemberAccess',
+           ('Variable', 'foo'),
+           ('Variable', 'bar')),
+          ('Variable', 'baz')),
+         ('Constant', 'int', 42)))
 
 def test_assignable_array_ref():
-    assignment = parse_single_statement('foo[0] := true;')
-    array_ref = assignment.left
-
-    assert_array_ref_equals(array_ref, 'foo', 0)
+    node = parse_single_statement('foo[0] := true;')
+    eq_(node.to_tuples(),
+        ('Assignment', ':=',
+         ('ArrayRef',
+          ('Variable', 'foo'),
+          ('Constant', 'int', 0)),
+         ('Constant', 'bool', True)))
 
 def test_assignable_array_ref_chained():
-    """ 
-    ArrayRef:                    #1
-        ArrayRef:                #2
-            Variable: foo
-            Constant: int, 0
-        Constant: int, 1
-    """
-    assignment = parse_single_statement('foo[0][1] := true;')
-    array_ref1 = assignment.left
-    array_ref2 = array_ref1.obj
-
-    assert_array_ref_equals(array_ref2, 'foo', 0)
-    assert_array_ref_equals(array_ref1, subscript=1)
+    node = parse_single_statement('foo[0][1] := true;')
+    eq_(node.to_tuples(),
+        ('Assignment', ':=',
+         ('ArrayRef',
+          ('ArrayRef',
+           ('Variable', 'foo'),
+           ('Constant', 'int', 0)),
+          ('Constant', 'int', 1)),
+         ('Constant', 'bool', True)))
     
 def test_assignment():
     assert_assignment('foo := 42;', ':=',  'foo', 42)
@@ -313,13 +301,15 @@ def test_quantifier_all():
 
 def test_quantifier_exists():
     quantor =  parse_single_statement('exists (x in 1 | true);')
-    iterator = quantor.lhs
-    condition = quantor.cond
+    eq_(quantor.to_tuples(),
+        ('Quantor', 'any',
+         ('Iterator',
+          ('Variable', 'x'),
+          ('Constant', 'int', 1)),
+         ('Constant', 'bool', True)))
 
-    eq_(quantor.name, 'any')
-    eq_(iterator.assignable.name, 'x')
-    eq_(iterator.expression.value, 1)
-    eq_(condition.value, True)
-
+@nottest
+def test_quantifier_cray():
+    quantor = parse_single_statement('forall (n in [1..10] | n**2 <= 2**n);')
 
     
