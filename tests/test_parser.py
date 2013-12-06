@@ -149,19 +149,32 @@ def test_should_be_creatable():
 
 def test_atomic_value_int():
     node = parse_single_statement('42;')
-    eq_(node.value, 42)
+    eq_(node.to_tuples(), ('Constant', 'int', 42))
 
 def test_atomic_value_double():
     node = parse_single_statement('42.0;')
-    assert abs(node.value - 42.0) < .001
+    eq_(node.to_tuples(), ('Constant', 'double', 42.0))
 
 def test_atomic_value_true():
     node = parse_single_statement('true;')
-    eq_(node.value, True)
+    eq_(node.to_tuples(), ('Constant', 'bool', True))
 
 def test_atomic_value_false():
     node = parse_single_statement('false;')
-    eq_(node.value,  False)
+    eq_(node.to_tuples(), ('Constant', 'bool', False))
+
+# Statements
+
+def test_more_than_one_statement_simple():
+    stmts = parse_statements('1 + 2; 3 * 4;')
+    eq_(stmts.to_tuples(),
+        ('FileAST',
+         ('BinaryOp', '+',
+          ('Constant', 'int', 1),
+          ('Constant', 'int', 2)),
+         ('BinaryOp', '*',
+          ('Constant', 'int', 3),
+          ('Constant', 'int', 4))))
 
 # Binary Operations
 
@@ -215,25 +228,38 @@ def test_more_than_one_operand():
     assert_binop_triade('true && false && true;', '&&', '&&', True, False, True)
     assert_binop_triade('4 % 2 * 0;', '%', '*', 4, 2, 0)
     assert_binop_triade('4 +/ 2 */ 0;', '+/', '*/', 4, 2, 0)
-
-def test_more_than_one_statement_simple():
-    nodes = parse_statements('1 + 2; 3 * 4;')
-    stmt1,stmt2 = nodes.stmts
-    assert_binop_from_node(stmt1, '+', 1, 2)
-    assert_binop_from_node(stmt2, '*', 3, 4)   
-
+        
+# Terms
+    
 def test_term_single_arg():
-    node = parse_single_statement('F(true);')
-    eq_(True, isinstance(node, Term))
-    expression = node.args
-    eq_(True, expression.value)
+    term = parse_single_statement('F(true);')
+    eq_(term.to_tuples(),
+        ('Term', 'F',
+         ('Constant', 'bool', True)))
 
 def test_term_multi_arg():
-    node = parse_single_statement('F(true, false);')
-    eq_(True, isinstance(node, Term))
-    e1, e2 = node.args.exprs
-    eq_(True, e1.value)
-    eq_(False, e2.value)
+    term = parse_single_statement('F(true, false);')
+    eq_(term.to_tuples(),
+        ('Term', 'F',
+         ('ExprList', 
+          ('Constant', 'bool', True),
+          ('Constant', 'bool', False))))
+
+# Assignments
+
+def test_assignment():
+    assert_assignment('foo := 42;', ':=',  'foo', 42)
+    assert_assignment('_ := true;', ':=',  'unused', True)
+    assert_assignment('foo += 42;', '+=',  'foo', 42)
+    assert_assignment('foo -= 1;',  '-=',  'foo', 1)
+    assert_assignment('foo *= 2;',  '*=',  'foo', 2)
+    assert_assignment('foo /= 2;',  '/=',  'foo', 2)
+    assert_assignment('foo \\= 3;', '\\=', 'foo', 3)
+    assert_assignment('foo %= 10;', '%=',  'foo', 10)
+
+def test_assignment_explicit():
+    assert_assignment('[foo] := 42;', ':=', 'foo', 42)
+    assert_assignment_explicit('[foo, bar] := 42;', ':=', ['foo', 'bar'], 42)    
 
 def test_assignable_member_access():
     assignment = parse_single_statement('foo.bar := true;')
@@ -274,20 +300,8 @@ def test_assignable_array_ref_chained():
            ('Constant', 'int', 0)),
           ('Constant', 'int', 1)),
          ('Constant', 'bool', True)))
-    
-def test_assignment():
-    assert_assignment('foo := 42;', ':=',  'foo', 42)
-    assert_assignment('_ := true;', ':=',  'unused', True)
-    assert_assignment('foo += 42;', '+=',  'foo', 42)
-    assert_assignment('foo -= 1;',  '-=',  'foo', 1)
-    assert_assignment('foo *= 2;',  '*=',  'foo', 2)
-    assert_assignment('foo /= 2;',  '/=',  'foo', 2)
-    assert_assignment('foo \\= 3;', '\\=', 'foo', 3)
-    assert_assignment('foo %= 10;', '%=',  'foo', 10)
 
-def test_assignment_explicit():
-    assert_assignment('[foo] := 42;', ':=', 'foo', 42)
-    assert_assignment_explicit('[foo, bar] := 42;', ':=', ['foo', 'bar'], 42)
+# Quantifier    
 
 def test_quantifier_all():
     quantor =  parse_single_statement('forall (x in 1 | true);')
