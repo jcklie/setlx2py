@@ -101,6 +101,7 @@ class Lexer():
         'return'    : 'RETURN',
         'assert'    : 'ASSERT',
         'if'        : 'IF',
+        'else'      : 'ELSE',
     }
     
     tokens = [

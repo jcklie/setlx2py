@@ -77,6 +77,7 @@ def assert_keywords():
     assert_token_type('exit', 'EXIT')
     assert_token_type('return', 'RETURN')
     assert_token_type('if', 'IF')
+    assert_token_type('else', 'ELSE')
 
 def test_constants_integer():
     assert_token_types('1337', ['INTEGER'])

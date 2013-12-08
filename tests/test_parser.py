@@ -164,7 +164,6 @@ def test_if_no_else_longer_block():
            ('Constant', 'string', 'Let it snow!')),
           ('Return', ('Variable', 'prediction')))))
 
-@nottest
 def test_if_single_else():
     s = """
     if(i % 2 == 0) {
@@ -175,7 +174,14 @@ def test_if_single_else():
     """
     node = parse_single_statement(s)
     eq_(node.to_tuples(),
-        ())
+        ('If',
+         ('BinaryOp', '==',
+          ('BinaryOp', '%',
+           ('Variable', 'i'),
+           ('Constant', 'int', 2)),
+          ('Constant', 'int', 0)),
+         ('Block', ('Return', ('Constant', 'string', 'Even'))),
+         ('Block', ('Return', ('Constant', 'string', 'Odd')))))
 
 # Binary Operations
 
