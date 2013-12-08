@@ -66,6 +66,7 @@ class Parser():
 
     def p_statement_1(self, p):
         """ statement : if_statement
+                      | while_loop
                       | jump_statement SEMICOLON
                       | assert_statement SEMICOLON
                       | assignment_direct SEMICOLON
@@ -113,6 +114,14 @@ class Parser():
         """ condition : expr """
         p[0] = p[1]
 
+    ##
+    ## Loops
+    ##
+
+    def p_while_loop(self, p):
+        """ while_loop : WHILE LPAREN condition RPAREN LBRACE block RBRACE """
+        p[0] = While(p[3], p[6], p[3].coord)
+        
     ##
     ## If Statements
     ##

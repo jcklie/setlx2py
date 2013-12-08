@@ -66,7 +66,7 @@ def test_operators_boolean():
     assert_token_types('>', ['GT'])
     assert_token_types('>=', ['GE'])
 
-def assert_keywords():
+def test_keywords():
     assert_token_type('in', 'IN')
     assert_token_type('notin', 'NOTIN')
     assert_token_type('forall', 'FORALL')
@@ -78,6 +78,11 @@ def assert_keywords():
     assert_token_type('return', 'RETURN')
     assert_token_type('if', 'IF')
     assert_token_type('else', 'ELSE')
+
+def test_assert_keyword_loops():
+    assert_token_type('while', 'WHILE')
+    assert_token_type('do', 'DO')
+    assert_token_type('for', 'FOR')
 
 def test_constants_integer():
     assert_token_types('1337', ['INTEGER'])

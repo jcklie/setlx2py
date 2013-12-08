@@ -430,3 +430,17 @@ class Variable(Node):
 
     attr_names = ('name',)
 
+class While(Node):
+    def __init__(self, cond, body, coord=None):
+        self.cond = cond
+        self.body = body
+        self.coord = coord
+
+    def children(self):
+        nodelist = []
+        if self.cond is not None: nodelist.append(("cond", self.cond))
+        if self.body is not None: nodelist.append(("body", self.body))
+        return tuple(nodelist)
+
+    attr_names = ()
+

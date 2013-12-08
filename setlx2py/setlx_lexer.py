@@ -102,6 +102,9 @@ class Lexer():
         'assert'    : 'ASSERT',
         'if'        : 'IF',
         'else'      : 'ELSE',
+        'for'       : 'FOR',
+        'do'        : 'DO',
+        'while'     : 'WHILE',
     }
     
     tokens = [

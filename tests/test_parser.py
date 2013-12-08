@@ -183,6 +183,14 @@ def test_if_single_else():
          ('Block', ('Return', ('Constant', 'string', 'Even'))),
          ('Block', ('Return', ('Constant', 'string', 'Odd')))))
 
+def test_if_single_else_empty():
+    node = parse_single_statement("if(foo) {} else {}")
+    eq_(node.to_tuples(),
+        ('If',
+         ('Variable', 'foo'),
+         ('Block',),
+         ('Block',)))
+    
 def test_if_else_if_else_simple():
     s = """
     if(isGreen) {
@@ -223,19 +231,26 @@ def test_if_four_else_if_else():
     }
     """
     node = parse_single_statement(s)
-    cond = lambda x: ('BinaryOp', '==', ('Variable', 'grade'), ('Constant', 'string', x))
-    ret = lambda x: ('Block', ('Return', ('Constant', 'string', x)))
     eq_(node.to_tuples(), 
-         ('If',
-          ('BinaryOp', '==', ('Variable', 'grade'), ('Constant', 'string', 'A')),
+         ('If', ('BinaryOp', '==',
+                 ('Variable', 'grade'),
+                 ('Constant', 'string', 'A')),
           ('Block', ('Return', ('Constant', 'string', 'Excellent'))),
-          ('If', ('BinaryOp', '==', ('Variable', 'grade'), ('Constant', 'string', 'B')),
+          ('If', ('BinaryOp', '==',
+                  ('Variable', 'grade'),
+                  ('Constant', 'string', 'B')),
            ('Block', ('Return', ('Constant', 'string', 'Good'))),
-           ('If', ('BinaryOp', '==', ('Variable', 'grade'), ('Constant', 'string', 'C')),
+           ('If', ('BinaryOp', '==',
+                   ('Variable', 'grade'),
+                   ('Constant', 'string', 'C')),
             ('Block', ('Return', ('Constant', 'string', 'Satisfactory'))),
-            ('If', ('BinaryOp', '==', ('Variable', 'grade'), ('Constant', 'string', 'D')),
+            ('If', ('BinaryOp', '==',
+                    ('Variable', 'grade'),
+                    ('Constant', 'string', 'D')),
              ('Block', ('Return', ('Constant', 'string', 'Pass'))),
-             ('If', ('BinaryOp', '==', ('Variable', 'grade'), ('Constant', 'string', 'F')),
+             ('If', ('BinaryOp', '==',
+                     ('Variable', 'grade'),
+                     ('Constant', 'string', 'F')),
               ('Block', ('Return', ('Constant', 'string', 'Fail'))),
               ('Block', ('Return', ('Constant', 'string', 'Invalid input')))))))))
 
@@ -261,6 +276,24 @@ def test_if_nested_else():
            ('BinaryOp', '>', ('Variable', 'num1'), ('Variable', 'num2')),
            ('Block', ('Return', ('Constant', 'string', 'Num1 greater'))),
            ('Block', ('Return', ('Constant', 'string', 'Num2 greater')))))))
+
+# Loops
+
+def test_while_minimal():
+    node = parse_single_statement("while(!empty) {}")
+    eq_(node.to_tuples(),
+        ('While',
+         ('UnaryOp', 'not', ('Variable', 'empty')),
+         ('Block',)))
+
+def test_while_bigger_body():
+    node = parse_single_statement('while(i < n) { x *= 2; i -= 1;}')
+    eq_(node.to_tuples(),
+        ('While',
+         ('BinaryOp', '<', ('Variable', 'i'), ('Variable', 'n')),
+         ('Block',
+          ('Assignment', '*=', ('Variable', 'x'), ('Constant', 'int', 2)),
+          ('Assignment', '-=', ('Variable', 'i'), ('Constant', 'int', 1)))))
     
 # Binary Operations
 
