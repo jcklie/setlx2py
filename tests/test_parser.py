@@ -50,32 +50,6 @@ def assert_binop(text, operator, left, right):
     node = parse_single_statement(text)
     assert_binop_from_node(node, operator, left, right)
 
-def assert_binop_triade(text, op1, op2, left, middle, right):
-    """
-    Asserts whether an expression of three operands
-    and two binary operations are parsed as expected.
-
-    The tree representation tested looks like the following:
-
-    BinaryOp: op2
-      BinaryOp: op1
-        Constant: left
-        Constant: middle
-      Constant: right
-    """
-    binop1 = parse_single_statement(text)
-    binop2 = binop1.left
-    const = binop1.right
-    try:
-        eq_(binop1.op, op2)
-        eq_(binop2.op, op1)
-        eq_(binop2.left.value, left)
-        eq_(binop2.right.value, middle)
-        eq_(binop1.right.value, right)
-    except AssertionError as e:
-        binop1.show()
-        raise e
-
 def assert_assignment(text, operator, left, right):
     """ Asserts that a given assignment has the
     expected operator, left- and ride hand side.
@@ -97,41 +71,6 @@ def assert_assignment(text, operator, left, right):
         node.show()
         raise e
 
-def assert_member_access_equals(node, obj=None, field=None):
-    """ Asserts that a given member access (e.g. foo.bar,
-    where name=foo, bar=field) has the expected name and
-    field.
-
-    Args:
-        node: The MemberAccess AST node
-        obj: Name of the object accessed
-        field: Name of the field accessed
-    Raises:
-        AssertionError: if result != expected
-    """
-
-    if obj is not None: eq_(node.obj.name, obj)
-    if field is not None: eq_(node.field.name, field)
-
-def assert_array_ref_equals(node, obj=None, subscript=None):
-    """ Asserts that a given array reference (e.g. foo[0],
-    where name=foo, subscript=0), has the expected name
-    and subscript.
-
-    Args:
-        node: The ArrayRef AST node
-        obj: The object which is accessed by subscript
-        subscript: The subscript of the access
-    Raises:
-        AssertionError: if result != expected
-    """
-    try:
-        if obj is not None: eq_(node.obj.name, obj)
-        if subscript is not None: eq_(node.subscript.value, subscript)
-    except AssertionError as e:
-        node.show()
-        raise e
-
 def assert_assignment_explicit(text, operator, left, right):
     node = parse_single_statement(text)
     eq_(node.op, operator)
@@ -146,6 +85,8 @@ def assert_assignment_explicit(text, operator, left, right):
 @with_setup(setup_func, teardown_func)        
 def test_should_be_creatable():
     assert parser is not None
+
+# Atomic Values
 
 def test_atomic_value_int():
     node = parse_single_statement('42;')
@@ -163,6 +104,22 @@ def test_atomic_value_false():
     node = parse_single_statement('false;')
     eq_(node.to_tuples(), ('Constant', 'bool', False))
 
+# Variables
+
+def test_variables():
+    node = parse_single_statement('foo;')
+    eq_(node.to_tuples(),
+        ('Variable', 'foo'))     
+    
+# Assert
+
+def test_condition_simple():
+    assert_stmt = parse_single_statement('assert(isOverflown, false);')
+    eq_(assert_stmt.to_tuples(),
+        ('Assert',
+         ('Variable', 'isOverflown'),
+         ('Constant', 'bool', False)))
+
 # Statements
 
 def test_more_than_one_statement_simple():
@@ -175,6 +132,50 @@ def test_more_than_one_statement_simple():
          ('BinaryOp', '*',
           ('Constant', 'int', 3),
           ('Constant', 'int', 4))))
+
+# If statements
+
+def test_if_no_else():
+    node = parse_single_statement('if(x >= 5) { return true; }')
+    eq_(node.to_tuples(),
+        ('If',
+         ('BinaryOp', '>=',
+          ('Variable', 'x'),
+          ('Constant', 'int', 5)),
+         ('Block',
+          ('Return', ('Constant', 'bool', True)))))
+
+def test_if_no_else_longer_block():
+    s = """
+    if(isRaining && isCold) {
+        prediction := "Let it snow!";
+        return prediction;
+    }
+    """
+    node = parse_single_statement(s)
+    eq_(node.to_tuples(),
+        ('If',
+         ('BinaryOp', '&&',
+          ('Variable', 'isRaining'),
+          ('Variable', 'isCold')),
+         ('Block',
+          ('Assignment', ':=',
+           ('Variable', 'prediction'),
+           ('Constant', 'string', 'Let it snow!')),
+          ('Return', ('Variable', 'prediction')))))
+
+@nottest
+def test_if_single_else():
+    s = """
+    if(i % 2 == 0) {
+        return "Even";
+    } else {
+        return "Odd";
+    }
+    """
+    node = parse_single_statement(s)
+    eq_(node.to_tuples(),
+        ())
 
 # Binary Operations
 
@@ -211,6 +212,46 @@ def test_binop_reduce():
     assert_binop('42 +/ 43;', '+/', 42, 43)
     assert_binop('42 */ 43;', '*/', 42, 43)
 
+def test_expr_paren_simple():
+    node = parse_single_statement('(foo + bar);')
+    eq_(node.to_tuples(),
+        ('BinaryOp', '+',
+         ('Variable', 'foo'),
+         ('Variable', 'bar')))
+
+# Precedence
+
+def test_three_operands_precedence_and_or():
+    node = parse_single_statement('true && false || true;')
+    eq_(node.to_tuples(),
+        ('BinaryOp', '||',
+         ('BinaryOp', '&&',
+          ('Constant', 'bool', True),
+          ('Constant', 'bool', False)),
+         ('Constant', 'bool', True)))
+
+def test_three_operands_precedence_minus_divide():
+    node = parse_single_statement('8 - 4 / 2.0;')
+    eq_(node.to_tuples(),
+        ('BinaryOp', '-',
+         ('Constant', 'int', 8),
+         ('BinaryOp', '/',
+          ('Constant', 'int', 4 ),
+          ('Constant', 'double', 2.0 ))))
+
+def test_precendce_arithmetic():
+    node = parse_single_statement('a + b  * c / ( d - e );')
+    eq_(node.to_tuples(),
+        ('BinaryOp', '+',
+         ('Variable', 'a'),
+         ('BinaryOp', '/',
+          ('BinaryOp', '*',
+           ('Variable', 'b'),
+           ('Variable', 'c')),
+          ('BinaryOp', '-',
+           ('Variable', 'd'),
+           ('Variable', 'e')))))    
+          
 # Unary operations
 
 def test_unop():
@@ -221,13 +262,6 @@ def test_unop():
     assert_unop('@  42;',   '@', 'int', 42)
     assert_unop('!true;', 'not', 'bool', True)
     assert_unop('1337!;', 'fac', 'int', 1337)
-
-def test_more_than_one_operand():
-    assert_binop_triade('4 + 2 + 0;', '+', '+', 4, 2, 0)
-    assert_binop_triade('true || false || true;', '||', '||', True, False, True)
-    assert_binop_triade('true && false && true;', '&&', '&&', True, False, True)
-    assert_binop_triade('4 % 2 * 0;', '%', '*', 4, 2, 0)
-    assert_binop_triade('4 +/ 2 */ 0;', '+/', '*/', 4, 2, 0)
         
 # Terms
     
@@ -245,6 +279,47 @@ def test_term_multi_arg():
           ('Constant', 'bool', True),
           ('Constant', 'bool', False))))
 
+# Jump statements
+
+def test_jump_statement_backtrack():
+    node = parse_single_statement('backtrack;')
+    eq_(node.to_tuples(),
+        ('Backtrack',))
+    
+def test_jump_statement_break():
+    node = parse_single_statement('break;')
+    eq_(node.to_tuples(),
+        ('Break',))
+
+def test_jump_statement_continue():
+    node = parse_single_statement('continue;')
+    eq_(node.to_tuples(),
+        ('Continue',))
+
+def test_jump_statement_break():
+    node = parse_single_statement('exit;')
+    eq_(node.to_tuples(),
+        ('Exit',))
+
+def test_jump_statement_return_void():
+    node = parse_single_statement('return;')
+    eq_(node.to_tuples(),
+        ('Return',))
+
+def test_jump_statement_return_expr_const():
+    node = parse_single_statement('return 42;')
+    eq_(node.to_tuples(),
+        ('Return',
+         ('Constant', 'int', 42)))
+
+def test_jump_statement_return_expr_calc():
+    node = parse_single_statement('return 42 ** 2;')
+    eq_(node.to_tuples(),
+        ('Return',
+         ('BinaryOp', '**',
+          ('Constant', 'int', 42),
+          ('Constant', 'int', 2))))
+    
 # Assignments
 
 def test_assignment():
@@ -265,7 +340,7 @@ def test_assignable_member_access():
     assignment = parse_single_statement('foo.bar := true;')
     eq_(assignment.to_tuples(),
         ('Assignment', ':=',
-         ('MemberAccess',
+        ('MemberAccess',
           ('Variable', 'foo'),
           ('Variable', 'bar')),
          ('Constant', 'bool', True)))

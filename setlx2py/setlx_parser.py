@@ -33,7 +33,8 @@ class Parser():
         if t is None:
             raise SyntaxError("unexpected token", self.lexer, None)
         else:
-            msg = "unexpected token: '{}' - Line: {} - Pos: {}".format(t.value, t.lineno, t.lexpos)
+            msg = "unexpected token: '{}' - Line: {} - Pos: {}" \
+            .format(t.value, t.lineno, t.lexpos)
             raise SyntaxError(msg, self.lexer, t.value, t.lineno, t.lexpos)
 
     ##
@@ -64,11 +65,41 @@ class Parser():
         p[0] = p[1]
 
     def p_statement_1(self, p):
-        """ statement : expr SEMICOLON 
+        """ statement : if_statement
+                      | jump_statement SEMICOLON
+                      | assert_statement SEMICOLON
                       | assignment_direct SEMICOLON
                       | assignment_other  SEMICOLON
+                      | expr SEMICOLON 
         """
         p[0] = [p[1]]
+
+    ##
+    ## Block
+    ##
+
+    def p_block(self, p):
+        """ block : stmt_list
+                  | epsilon
+        """
+        if p[1] is None:
+            p[0] = Block([])
+        else:
+            p[0] = Block(p[1])
+
+    def p_stmt_list_1(self, p):
+        """ stmt_list : statement  """
+        p[0] = p[1]
+
+    def p_stmt_list_2(self, p):
+        """ stmt_list : stmt_list statement  """
+        if p[2] is not None:
+            p[1].extend(p[2])
+        p[0] = p[1]
+
+    ##
+    ## Misc
+    ##
 
     # Variable
 
@@ -78,9 +109,54 @@ class Parser():
 
     ## Condition
 
-#    def p_condition(self, p):
-#        """ condition : expr """
-#        p[0] = p[1]
+    def p_condition(self, p):
+        """ condition : expr """
+        p[0] = p[1]
+
+    ##
+    ## If Statements
+    ##
+
+    def p_if_statement_1(self, p):
+        """ if_statement : IF LPAREN condition RPAREN LBRACE block RBRACE """
+        p[0] = If(p[3], p[6], None, p[3].coord)
+
+    ## 
+    ## Jump Statements
+    ##
+
+    def p_jump_statement_1(self, p):
+        """ jump_statement : BACKTRACK """
+        p[0] = Backtrack()
+
+    def p_jump_statement_2(self, p):
+        """ jump_statement : BREAK """
+        p[0] = Break()
+
+    def p_jump_statement_3(self, p):
+        """ jump_statement : CONTINUE """
+        p[0] = Continue()
+
+    def p_jump_statement_4(self, p):
+        """ jump_statement : EXIT """
+        p[0] = Exit()
+
+    def p_jump_statement_5(self, p):
+        """ jump_statement : RETURN """
+        p[0] = Return(None)
+
+    def p_jump_statement_6(self, p):
+        """ jump_statement : RETURN expr """
+        p[0] = Return(p[2], p[2].coord)
+
+    
+    ##
+    ## Assert
+    ##
+
+    def p_assert_statement(self, p):
+        """ assert_statement : ASSERT LPAREN condition COMMA expr RPAREN """
+        p[0] = Assert(p[3], p[5], p[3].coord)
 
     ##
     ## Assignment
@@ -89,7 +165,7 @@ class Parser():
     ## Assignment Direct
     def p_assignment_direct_1(self, p):
         """ assignment_direct : assignable ASSIGN expr """
-        p[0] = Assignment(p[2], p[1], p[3])
+        p[0] = Assignment(p[2], p[1], p[3],  p[1].coord)
 
     ## Assignment Other
     def p_assignment_other(self, p):
@@ -100,7 +176,7 @@ class Parser():
                              | assignable IDIVIDE_EQUAL expr
                              | assignable MOD_EQUAL     expr
         """
-        p[0] = Assignment(p[2], p[1], p[3])
+        p[0] = Assignment(p[2], p[1], p[3], p[1].coord)
         
     ## Assignable
 
@@ -157,12 +233,6 @@ class Parser():
         if not isinstance(p[1], ExprList):
             p[1] = ExprList([p[1]], p[1].coord)
         p[1].exprs.append(p[3])
-        p[0] = p[1]
-
-    ## Condition
-
-    def p_condition(self, p):
-        """ condition : expr """
         p[0] = p[1]
 
     ## Implication
@@ -297,7 +367,15 @@ class Parser():
 
     def p_factor_6(self, p):
         """ factor : EXISTS LPAREN iterator_chain PIPE condition RPAREN """
-        p[0] = Quantor('any', p[3], p[5], p[3].coord)    
+        p[0] = Quantor('any', p[3], p[5], p[3].coord)
+
+    def p_factor_7(self, p):
+        """ factor : LPAREN expr RPAREN """
+        p[0] = p[2]
+
+    def p_factor_8(self, p):
+        """ factor : variable """
+        p[0] = p[1]
 
     ##
     ## Term
@@ -342,7 +420,7 @@ class Parser():
 
     def p_value_2(self, p):
         """ value : STRING """
-        p[0] = Constant('string', str(p[1]), p[1].coord)
+        p[0] = Constant('string', str(p[1]))
 
     def p_value_3(self, p):
         """ value : LITERAL """

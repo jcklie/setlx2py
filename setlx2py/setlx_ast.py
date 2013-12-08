@@ -165,6 +165,20 @@ class ArrayRef(Node):
 
     attr_names = ()
 
+class Assert(Node):
+    def __init__(self, cond, expr, coord=None):
+        self.cond = cond
+        self.expr = expr
+        self.coord = coord
+
+    def children(self):
+        nodelist = []
+        if self.cond is not None: nodelist.append(("cond", self.cond))
+        if self.expr is not None: nodelist.append(("expr", self.expr))
+        return tuple(nodelist)
+
+    attr_names = ()
+
 class Assignment(Node):
     def __init__(self, op, left, right, coord=None):
         self.op = op
@@ -208,6 +222,46 @@ class BinaryOp(Node):
 
     attr_names = ('op',)
 
+class Backtrack(Node):
+    def __init__(self, coord=None):
+        self.coord = coord
+
+    def children(self):
+        return ()
+
+    attr_names = ()
+
+class Block(Node):
+    def __init__(self, stmts, coord=None):
+        self.stmts = stmts
+        self.coord = coord
+
+    def children(self):
+        nodelist = []
+        for i, child in enumerate(self.stmts or []):
+            nodelist.append(("stmts[%d]" % i, child))
+        return tuple(nodelist)
+
+    attr_names = ()
+
+class Break(Node):
+    def __init__(self, coord=None):
+        self.coord = coord
+
+    def children(self):
+        return ()
+
+    attr_names = ()
+
+class Continue(Node):
+    def __init__(self, coord=None):
+        self.coord = coord
+
+    def children(self):
+        return ()
+
+    attr_names = ()
+
 class Constant(Node):
     def __init__(self, type, value, coord=None):
         self.type = type
@@ -219,6 +273,15 @@ class Constant(Node):
         return tuple(nodelist)
 
     attr_names = ('type','value',)
+
+class Exit(Node):
+    def __init__(self, coord=None):
+        self.coord = coord
+
+    def children(self):
+        return ()
+
+    attr_names = ()
 
 class ExprList(Node):
     def __init__(self, exprs, coord=None):
@@ -242,6 +305,22 @@ class FileAST(Node):
         nodelist = []
         for i, child in enumerate(self.stmts or []):
             nodelist.append(("stmts[%d]" % i, child))
+        return tuple(nodelist)
+
+    attr_names = ()
+
+class If(Node):
+    def __init__(self, cond, iftrue, iffalse, coord=None):
+        self.cond = cond
+        self.iftrue = iftrue
+        self.iffalse = iffalse
+        self.coord = coord
+
+    def children(self):
+        nodelist = []
+        if self.cond is not None: nodelist.append(("cond", self.cond))
+        if self.iftrue is not None: nodelist.append(("iftrue", self.iftrue))
+        if self.iffalse is not None: nodelist.append(("iffalse", self.iffalse))
         return tuple(nodelist)
 
     attr_names = ()
@@ -301,6 +380,18 @@ class Quantor(Node):
         return tuple(nodelist)
 
     attr_names = ('name',)
+
+class Return (Node):
+    def __init__(self, expr, coord=None):
+        self.expr = expr
+        self.coord = coord
+
+    def children(self):
+        nodelist = []
+        if self.expr is not None: nodelist.append(("expr", self.expr))
+        return tuple(nodelist)
+
+    attr_names = ()
 
 class Term(Node):
     def __init__(self, name, args, coord=None):

@@ -88,12 +88,19 @@ class Lexer():
     ##
  
     keywords = {
-        'true'  : 'TRUE',
-        'false' : 'FALSE',
-        'in'    : 'IN',
-        'notin' : 'NOTIN',
-        'forall': 'FORALL',
-        'exists': 'EXISTS',
+        'true'      : 'TRUE',
+        'false'     : 'FALSE',
+        'in'        : 'IN',
+        'notin'     : 'NOTIN',
+        'forall'    : 'FORALL',
+        'exists'    : 'EXISTS',
+        'backtrack' : 'BACKTRACK',
+        'break'     : 'BREAK',
+        'continue'  : 'CONTINUE',
+        'exit'      : 'EXIT',
+        'return'    : 'RETURN',
+        'assert'    : 'ASSERT',
+        'if'        : 'IF',
     }
     
     tokens = [
@@ -122,8 +129,9 @@ class Lexer():
 
         # Delimiter
         'SEMICOLON', 'COMMA', 'DOT',
-        'LPAREN', 'RPAREN',
-        'LBRACKET', 'RBRACKET',
+        'LPAREN', 'RPAREN',             # ()
+        'LBRACKET', 'RBRACKET',         # []
+        'LBRACE', 'RBRACE',
         'PIPE',
 
         # Assign
@@ -179,6 +187,8 @@ class Lexer():
     t_RPAREN        = r'\)'
     t_LBRACKET      = r'\['
     t_RBRACKET      = r'\]'
+    t_LBRACE        = r'{'
+    t_RBRACE        = r'}'
 
     # Assign
 

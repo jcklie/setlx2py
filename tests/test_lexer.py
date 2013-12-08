@@ -71,6 +71,12 @@ def assert_keywords():
     assert_token_type('notin', 'NOTIN')
     assert_token_type('forall', 'FORALL')
     assert_token_type('exists', 'EXISTS')
+    assert_token_type('backtrack', 'BACKTRACK')
+    assert_token_type('break', 'BREAK')
+    assert_token_type('continue', 'CONTINUE')
+    assert_token_type('exit', 'EXIT')
+    assert_token_type('return', 'RETURN')
+    assert_token_type('if', 'IF')
 
 def test_constants_integer():
     assert_token_types('1337', ['INTEGER'])
@@ -123,7 +129,8 @@ def test_delimiter():
     assert_token_type(',', 'COMMA')
     assert_token_type('.', 'DOT')
     assert_token_types('()', ['LPAREN', 'RPAREN'])
-    assert_token_types('[]', ['LBRACKET', 'RBRACKET'])    
+    assert_token_types('[]', ['LBRACKET', 'RBRACKET'])
+    assert_token_types('{}', ['LBRACE', 'RBRACE'])
 
 def test_assign():
     assert_token_type(':=',  'ASSIGN')
