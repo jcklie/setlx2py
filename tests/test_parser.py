@@ -237,8 +237,31 @@ def test_if_four_else_if_else():
              ('Block', ('Return', ('Constant', 'string', 'Pass'))),
              ('If', ('BinaryOp', '==', ('Variable', 'grade'), ('Constant', 'string', 'F')),
               ('Block', ('Return', ('Constant', 'string', 'Fail'))),
-              ('Block', ('Return', ('Constant', 'string', 'Invalid input')))))))))   
+              ('Block', ('Return', ('Constant', 'string', 'Invalid input')))))))))
 
+def test_if_nested_else():
+    s = """
+    if(num1 == num2) {
+        return "Equal";
+    } else {
+        if(num1 > num2) { 
+            return "Num1 greater";
+        } else {
+            return "Num2 greater";
+        }
+    }
+    """
+    node = parse_single_statement(s)
+    eq_(node.to_tuples(),
+        ('If',
+         ('BinaryOp', '==', ('Variable', 'num1'), ('Variable', 'num2')), 
+         ('Block', ('Return', ('Constant', 'string', 'Equal'))),  
+         ('Block',
+          ('If',
+           ('BinaryOp', '>', ('Variable', 'num1'), ('Variable', 'num2')),
+           ('Block', ('Return', ('Constant', 'string', 'Num1 greater'))),
+           ('Block', ('Return', ('Constant', 'string', 'Num2 greater')))))))
+    
 # Binary Operations
 
 def test_binop_boolean():
