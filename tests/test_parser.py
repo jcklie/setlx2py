@@ -574,3 +574,31 @@ def test_procedure_max():
             ('BinaryOp', '>', ('Variable', 'a'), ('Variable', 'b')),
             ('Block', ('Return', ('Variable', 'a'))),
             ('Block', ('Return', ('Variable', 'b'))))))))
+
+def test_procedure_fac():
+    s = """
+    fac := procedure(n) {
+        i := 1;
+        while(n >= 1) {
+            i *= n;
+            n -= 1;
+        }
+        return i;
+    };
+    """
+    node = parse_single_statement(s)
+    eq_(node.to_tuples(),
+        ('Assignment', ':=',
+         ('Variable', 'fac'),
+         ('Procedure',
+          ('ParamList', ('Param', 'n')),
+          ('Block',
+           ('Assignment', ':=', ('Variable', 'i'), ('Constant', 'int', 1)),
+           ('While',
+            ('BinaryOp', '>=', ('Variable', 'n'), ('Constant', 'int', 1)),
+            ('Block',
+             ('Assignment', '*=', ('Variable', 'i'), ('Variable', 'n')),
+             ('Assignment', '-=', ('Variable', 'n'), ('Constant', 'int', 1)))),
+            ('Return', ('Variable', 'i'))))))
+
+    
