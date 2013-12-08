@@ -380,6 +380,44 @@ class MemberAccess(Node):
 
     attr_names = ()
 
+class Param (Node):
+    def __init__(self, name, coord=None):
+        self.name = name
+        self.coord = coord
+
+    def children(self):
+        nodelist = []
+        return tuple(nodelist)
+
+    attr_names = ('name',)
+
+class ParamList (Node):
+    def __init__(self, params, coord=None):
+        self.params = params
+        self.coord = coord
+
+    def children(self):
+        nodelist = []
+        for i, child in enumerate(self.params or []):
+            nodelist.append(("params[%d]" % i, child))
+        return tuple(nodelist)
+
+    attr_names = ()
+
+class Procedure(Node):
+    def __init__(self, params, body, coord=None):
+        self.params = params
+        self.body = body
+        self.coord = coord
+
+    def children(self):
+        nodelist = []
+        if self.params is not None: nodelist.append(("params", self.params))
+        if self.body is not None: nodelist.append(("body", self.body))
+        return tuple(nodelist)
+
+    attr_names = ()
+
 class Quantor(Node):
     def __init__(self, name, lhs, cond, coord=None):
         self.name = name

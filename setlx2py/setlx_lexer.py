@@ -105,6 +105,7 @@ class Lexer():
         'for'       : 'FOR',
         'do'        : 'DO',
         'while'     : 'WHILE',
+        'procedure' : 'PROCEDURE',
     }
     
     tokens = [

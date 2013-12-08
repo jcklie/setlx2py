@@ -403,7 +403,9 @@ class Parser():
         p[0] = p[2]
 
     def p_factor_8(self, p):
-        """ factor : variable """
+        """ factor : variable
+                   | procedure_definition
+        """
         p[0] = p[1]
 
     ##
@@ -416,6 +418,36 @@ class Parser():
         """
         p[0] = p[1] if p[1] is not None else ExprList([])
 
+    ##
+    ## Procedure
+    ##
+    def p_procedure_definition(self, p):
+        """ procedure_definition : procedure
+        """
+        p[0] = p[1]
+
+    def p_procedure(self, p):
+        """ procedure : PROCEDURE LPAREN parameter_list RPAREN \
+                        LBRACE block RBRACE
+        """
+        p[0] = Procedure(p[3], p[6], p[3].coord)
+
+    def p_parameter_list(self, p):
+        """ parameter_list : procedure_param
+                           | parameter_list COMMA procedure_param
+                           | epsilon
+        """
+        if len(p) == 2:
+            if p[1] is None: p[0] = ParamList([])
+            else: p[0] = ParamList([p[1]], p[1].coord)
+        else:
+            p[1].params.append(p[3])
+            p[0] = p[1]
+
+    def p_procedure_param(self, p):
+        """ procedure_param : variable """
+        p[0] = Param(p[1].name, p[1].coord)
+        
     ##
     ## Iterator
     ##

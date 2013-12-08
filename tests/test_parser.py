@@ -312,7 +312,6 @@ def test_do_while_bigger_body():
          ('Block',
           ('Assignment', '*=', ('Variable', 'x'), ('Constant', 'int', 2)),
           ('Assignment', '-=', ('Variable', 'i'), ('Constant', 'int', 1)))))
-
     
 # Binary Operations
 
@@ -538,4 +537,40 @@ def test_quantifier_exists():
 def test_quantifier_cray():
     quantor = parse_single_statement('forall (n in [1..10] | n**2 <= 2**n);')
 
-    
+# Procedures
+
+def test_procedure_minimal():
+    node = parse_single_statement('procedure() {};')
+    eq_(node.to_tuples(), ('Procedure', ('ParamList',), ('Block',)))
+
+def test_procedure_square():
+    node = parse_single_statement('procedure(x) { return x ** x; };')
+    eq_(node.to_tuples(),
+        ('Procedure',
+         ('ParamList', ('Param', 'x')),
+         ('Block', ('Return',
+           ('BinaryOp', '**',
+            ('Variable', 'x'),
+            ('Variable', 'x'))))))
+
+def test_procedure_max():
+    s = """
+    max := procedure(a, b) {
+        if(a > b) {
+            return a;
+        } else {
+            return b;
+        }
+    };
+    """
+    node = parse_single_statement(s)
+    eq_(node.to_tuples(),
+        ('Assignment', ':=',
+         ('Variable', 'max'),
+         ('Procedure',
+          ('ParamList', ('Param', 'a'), ('Param', 'b')),
+          ('Block',
+           ('If',
+            ('BinaryOp', '>', ('Variable', 'a'), ('Variable', 'b')),
+            ('Block', ('Return', ('Variable', 'a'))),
+            ('Block', ('Return', ('Variable', 'b'))))))))
