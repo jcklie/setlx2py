@@ -277,7 +277,7 @@ def test_if_nested_else():
            ('Block', ('Return', ('Constant', 'string', 'Num1 greater'))),
            ('Block', ('Return', ('Constant', 'string', 'Num2 greater')))))))
 
-# Loops
+# While-Loop
 
 def test_while_minimal():
     node = parse_single_statement("while(!empty) {}")
@@ -294,6 +294,25 @@ def test_while_bigger_body():
          ('Block',
           ('Assignment', '*=', ('Variable', 'x'), ('Constant', 'int', 2)),
           ('Assignment', '-=', ('Variable', 'i'), ('Constant', 'int', 1)))))
+
+# Do- While-Loop
+
+def test_do_while_minimal():
+    node = parse_single_statement("do {} while(!empty); ")
+    eq_(node.to_tuples(),
+        ('DoWhile',
+         ('UnaryOp', 'not', ('Variable', 'empty')),
+         ('Block',)))
+
+def test_do_while_bigger_body():
+    node = parse_single_statement('do { x *= 2; i -= 1;} while(i < n);')
+    eq_(node.to_tuples(),
+        ('DoWhile',
+         ('BinaryOp', '<', ('Variable', 'i'), ('Variable', 'n')),
+         ('Block',
+          ('Assignment', '*=', ('Variable', 'x'), ('Constant', 'int', 2)),
+          ('Assignment', '-=', ('Variable', 'i'), ('Constant', 'int', 1)))))
+
     
 # Binary Operations
 

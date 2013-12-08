@@ -274,6 +274,20 @@ class Constant(Node):
 
     attr_names = ('type','value',)
 
+class DoWhile(Node):
+    def __init__(self, cond, body, coord=None):
+        self.cond = cond
+        self.body = body
+        self.coord = coord
+
+    def children(self):
+        nodelist = []
+        if self.cond is not None: nodelist.append(("cond", self.cond))
+        if self.body is not None: nodelist.append(("body", self.body))
+        return tuple(nodelist)
+
+    attr_names = ()
+
 class Exit(Node):
     def __init__(self, coord=None):
         self.coord = coord
