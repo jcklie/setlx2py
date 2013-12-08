@@ -127,6 +127,12 @@ class Parser():
                            ELSE LBRACE block RBRACE """
         p[0] = If(p[3], p[6], p[10], p[3].coord)
         
+    def p_if_statement_3(self, p):
+        """ if_statement : IF LPAREN condition RPAREN \
+                           LBRACE block RBRACE \
+                           ELSE if_statement  """
+        p[0] = If(p[3], p[6], p[9], p[3].coord)
+        
 
     ## 
     ## Jump Statements

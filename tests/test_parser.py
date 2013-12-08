@@ -183,6 +183,30 @@ def test_if_single_else():
          ('Block', ('Return', ('Constant', 'string', 'Even'))),
          ('Block', ('Return', ('Constant', 'string', 'Odd')))))
 
+def test_if_else_if_else_simple():
+    s = """
+    if(isGreen) {
+        return "Green";
+    } else if(isRed) {
+        return "Red";
+    } else {
+        return "Not green nor red";
+    }
+    """
+    node = parse_single_statement(s)
+    eq_(node.to_tuples(),
+        ('If',
+         ('Variable', 'isGreen'),
+         ('Block',
+          ('Return', ('Constant', 'string', 'Green'))),
+         ('If',
+          ('Variable', 'isRed'),
+          ('Block',
+           ('Return', ('Constant', 'string', 'Red'))),
+          ('Block',
+           ('Return', ('Constant', 'string', 'Not green nor red'))))))
+          
+
 # Binary Operations
 
 def test_binop_boolean():
