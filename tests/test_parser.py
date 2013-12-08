@@ -205,7 +205,39 @@ def test_if_else_if_else_simple():
            ('Return', ('Constant', 'string', 'Red'))),
           ('Block',
            ('Return', ('Constant', 'string', 'Not green nor red'))))))
-          
+
+def test_if_four_else_if_else():
+    s = """
+    if(grade == "A") {
+        return "Excellent";
+    } else if(grade == "B") {
+        return "Good";
+    } else if(grade == "C") {
+        return "Satisfactory";
+    } else if(grade == "D") {
+        return "Pass";
+    } else if(grade == "F") {
+        return "Fail";
+    } else {
+        return "Invalid input";
+    }
+    """
+    node = parse_single_statement(s)
+    cond = lambda x: ('BinaryOp', '==', ('Variable', 'grade'), ('Constant', 'string', x))
+    ret = lambda x: ('Block', ('Return', ('Constant', 'string', x)))
+    eq_(node.to_tuples(), 
+         ('If',
+          ('BinaryOp', '==', ('Variable', 'grade'), ('Constant', 'string', 'A')),
+          ('Block', ('Return', ('Constant', 'string', 'Excellent'))),
+          ('If', ('BinaryOp', '==', ('Variable', 'grade'), ('Constant', 'string', 'B')),
+           ('Block', ('Return', ('Constant', 'string', 'Good'))),
+           ('If', ('BinaryOp', '==', ('Variable', 'grade'), ('Constant', 'string', 'C')),
+            ('Block', ('Return', ('Constant', 'string', 'Satisfactory'))),
+            ('If', ('BinaryOp', '==', ('Variable', 'grade'), ('Constant', 'string', 'D')),
+             ('Block', ('Return', ('Constant', 'string', 'Pass'))),
+             ('If', ('BinaryOp', '==', ('Variable', 'grade'), ('Constant', 'string', 'F')),
+              ('Block', ('Return', ('Constant', 'string', 'Fail'))),
+              ('Block', ('Return', ('Constant', 'string', 'Invalid input')))))))))   
 
 # Binary Operations
 
