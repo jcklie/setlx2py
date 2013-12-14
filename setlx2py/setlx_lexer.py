@@ -71,9 +71,9 @@ class Lexer():
 
     # character sequences
 
-    char_sequence = r'(\\.|[^"])*' # 
-    string = '"' + char_sequence + '"'
-    literal= "'" + char_sequence + "'"
+    char_sequence = r'' 
+    string = '''"(\\.|[^"])*"'''
+    literal= """'(\\.|[^'])*'"""
     
     # integer constants    
     integer_constant = '0|([1-9][0-9]*)'
@@ -102,6 +102,9 @@ class Lexer():
         'assert'    : 'ASSERT',
         'if'        : 'IF',
         'else'      : 'ELSE',
+        'switch'    : 'SWITCH',
+        'case'      : 'CASE',
+        'default'   : 'DEFAULT',
         'for'       : 'FOR',
         'do'        : 'DO',
         'while'     : 'WHILE',
@@ -133,7 +136,7 @@ class Lexer():
         'HASH', 'AT',
 
         # Delimiter
-        'SEMICOLON', 'COMMA', 'DOT',
+        'SEMICOLON', 'COMMA', 'COLON', 'DOT',
         'LPAREN', 'RPAREN',             # ()
         'LBRACKET', 'RBRACKET',         # []
         'LBRACE', 'RBRACE',
@@ -186,6 +189,7 @@ class Lexer():
 
     t_SEMICOLON     = r';'
     t_COMMA         = r','
+    t_COLON         = r':'
     t_DOT           = r'\.'
     t_PIPE          = r'\|'
     t_LPAREN        = r'\('

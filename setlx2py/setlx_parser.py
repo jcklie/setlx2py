@@ -64,8 +64,9 @@ class Parser():
             p[1].extend(p[2])
         p[0] = p[1]
 
-    def p_statement_1(self, p):
+    def p_statement(self, p):
         """ statement : if_statement
+                      | switch_statement
                       | while_loop
                       | do_while_loop
                       | for_loop
@@ -76,6 +77,18 @@ class Parser():
                       | expr SEMICOLON 
         """
         p[0] = [p[1]]
+
+    ##
+    ## Variable/Condition
+    ##
+
+    def p_variable(self, p):
+        """ variable : IDENTIFIER """
+        p[0] = Variable(p[1])
+
+    def p_condition(self, p):
+        """ condition : expr """
+        p[0] = p[1]
 
     ##
     ## Block
@@ -98,22 +111,6 @@ class Parser():
         """ stmt_list : stmt_list statement  """
         if p[2] is not None:
             p[1].extend(p[2])
-        p[0] = p[1]
-
-    ##
-    ## Misc
-    ##
-
-    # Variable
-
-    def p_variable(self, p):
-        """ variable : IDENTIFIER """
-        p[0] = Variable(p[1])
-
-    ## Condition
-
-    def p_condition(self, p):
-        """ condition : expr """
         p[0] = p[1]
 
     ##
@@ -153,7 +150,46 @@ class Parser():
                            LBRACE block RBRACE \
                            ELSE if_statement  """
         p[0] = If(p[3], p[6], p[9], p[3].coord)
-        
+
+    ##
+    ## Switch Statement
+    ##
+
+    def p_switch_statement(self, p):
+        """ switch_statement : SWITCH LBRACE case_statements default_case RBRACE """
+        p[0] = Switch(p[3], p[4], p[3].coord)
+
+    def p_case_statements(self, p):
+        """ case_statements : case_list
+                            | epsilon
+        """
+        if p[1] is None:
+            p[0] = CaseList([])
+        else:
+            p[0] = CaseList(p[1])
+
+    def p_case_list_1(self, p):
+        """ case_list : case_statement  """
+        p[0] = [p[1]]
+
+    def p_case_list_2(self, p):
+        """ case_list : case_list case_statement  """
+        if p[2] is not None:
+            p[1].append(p[2])
+        p[0] = p[1]
+
+    def p_case_statement(self, p):
+        """ case_statement : CASE condition COLON block """
+        p[0] = Case(p[2], p[4], p[2].coord)
+
+    def p_default_case_1(self, p):
+        """ default_case : DEFAULT COLON block """
+        p[0] = DefaultCase(p[3], p[3].coord)
+
+    def p_default_case_2(self, p):
+        """ default_case : epsilon """
+        p[0] = None
+
 
     ## 
     ## Jump Statements

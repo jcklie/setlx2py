@@ -1,10 +1,22 @@
+#------------------------------------------------------------------------------
+# setlx2py: test_parser.py
+#
+# Unit tests for the Parser class in setlx_parser.py
+# Beware: Only syntax is tested here!
+#
+# Copyright (C) 2013, Jan-Christoph Klie
+# License: Apache v2
+#------------------------------------------------------------------------------
+
 from nose.tools import eq_, with_setup, nottest
 
 from setlx2py.setlx_lexer import Lexer
 from setlx2py.setlx_parser import Parser
 from setlx2py.setlx_ast import *
 
-######################--   TEST UTIL --######################
+##
+## Test housekeeping
+##
 
 parser = Parser()
 
@@ -29,6 +41,7 @@ def parse_statements(text):
     root = parser.parse(text) # FileAST
     return root # List of statements
 
+@with_setup(setup_func, teardown_func)    
 def parse_single_statement(text):
     return parse_statements(text).stmts[0] # first statement after FileAST
 
@@ -78,15 +91,20 @@ def assert_assignment_explicit(text, operator, left, right):
         eq_(var.name, l)
     eq_(node.right.value, right)
 
-##
-## Tests
-##
-
+#    _______       _
+#   |__   __|     | |
+#      | | ___ ___| |_ ___
+#      | |/ _ / __| __/ __|
+#      | |  __\__ | |_\__ \
+#      |_|\___|___/\__|___/
+                                       
 @with_setup(setup_func, teardown_func)        
 def test_should_be_creatable():
     assert parser is not None
-
-# Atomic Values
+    
+##
+## Atomic Values
+##    
 
 def test_atomic_value_int():
     node = parse_single_statement('42;')
@@ -103,25 +121,30 @@ def test_atomic_value_true():
 def test_atomic_value_false():
     node = parse_single_statement('false;')
     eq_(node.to_tuples(), ('Constant', 'bool', False))
-
-# Variables
-
+    
+##
+## Variables
+##
+    
 def test_variables():
     node = parse_single_statement('foo;')
     eq_(node.to_tuples(),
-        ('Variable', 'foo'))     
+        ('Variable', 'foo'))
     
-# Assert
-
+##    
+## Assert
+##
+    
 def test_condition_simple():
     assert_stmt = parse_single_statement('assert(isOverflown, false);')
     eq_(assert_stmt.to_tuples(),
         ('Assert',
          ('Variable', 'isOverflown'),
          ('Constant', 'bool', False)))
-
-# Statements
-
+##
+## Statements
+##
+    
 def test_more_than_one_statement_simple():
     stmts = parse_statements('1 + 2; 3 * 4;')
     eq_(stmts.to_tuples(),
@@ -132,9 +155,11 @@ def test_more_than_one_statement_simple():
          ('BinaryOp', '*',
           ('Constant', 'int', 3),
           ('Constant', 'int', 4))))
-
-# If statements
-
+    
+##
+## If statements
+##
+    
 def test_if_no_else():
     node = parse_single_statement('if(x >= 5) { return true; }')
     eq_(node.to_tuples(),
@@ -277,8 +302,77 @@ def test_if_nested_else():
            ('Block', ('Return', ('Constant', 'string', 'Num1 greater'))),
            ('Block', ('Return', ('Constant', 'string', 'Num2 greater')))))))
 
-# While-Loop
+##
+## Switch/Case
+##
 
+def test_switch_case_minimal():
+    node = parse_single_statement('switch {}')
+    eq_(node.to_tuples(),
+        ('Switch',
+         ('CaseList', )))
+    pass
+
+def test_switch_case_simple_no_default():
+    s = """
+    // Check whether an integer n is even
+    switch {
+        case n % 2 == 0 : return 'Even';
+        case n % 2 == 1 : return 'Odd';
+    }
+    """
+    node = parse_single_statement(s)
+    eq_(node.to_tuples(),
+        ('Switch',
+         ('CaseList',
+          ('Case',
+           ('BinaryOp', '==',
+            ('BinaryOp', '%', ('Variable', 'n'), ('Constant', 'int', 2)),
+            ('Constant', 'int', 0)),
+           ('Block', ('Return', ('Constant', 'literal', 'Even')))),
+          ('Case',
+           ('BinaryOp', '==',
+            ('BinaryOp', '%', ('Variable', 'n'), ('Constant', 'int', 2)),
+            ('Constant', 'int', 1)),
+           ('Block', ('Return', ('Constant', 'literal', 'Odd')))))))
+    
+
+def test_switch_case_with_default():
+    s = """
+    switch {
+        case grade == 'A' : return 'Excellent';
+        case grade == 'B' : return 'Good';
+        case grade == 'C' : return 'Satisfactory';
+        case grade == 'D' : return 'Pass';
+        case grade == 'F' : return 'Fail';
+        default           : return 'Invalid input';
+    }
+    """
+    node = parse_single_statement(s)
+    eq_(node.to_tuples(),
+        ('Switch',
+         ('CaseList',
+          ('Case',
+           ('BinaryOp', '==', ('Variable', 'grade'), ('Constant', 'literal', 'A')),
+          ('Block', ('Return', ('Constant', 'literal', 'Excellent')))),
+          ('Case',
+           ('BinaryOp', '==', ('Variable', 'grade'), ('Constant', 'literal', 'B')),
+          ('Block', ('Return', ('Constant', 'literal', 'Good')))),
+          ('Case',
+           ('BinaryOp', '==', ('Variable', 'grade'), ('Constant', 'literal', 'C')),
+          ('Block', ('Return', ('Constant', 'literal', 'Satisfactory')))),
+          ('Case',
+           ('BinaryOp', '==', ('Variable', 'grade'), ('Constant', 'literal', 'D')),
+          ('Block', ('Return', ('Constant', 'literal', 'Pass')))),
+          ('Case',
+           ('BinaryOp', '==', ('Variable', 'grade'), ('Constant', 'literal', 'F')),
+          ('Block', ('Return', ('Constant', 'literal', 'Fail'))))),
+          ('DefaultCase', ('Block', ('Return', ('Constant', 'literal', 'Invalid input'))))))
+
+##
+## While-Loop
+##
+    
 def test_while_minimal():
     node = parse_single_statement("while(!empty) {}")
     eq_(node.to_tuples(),
@@ -294,9 +388,10 @@ def test_while_bigger_body():
          ('Block',
           ('Assignment', '*=', ('Variable', 'x'), ('Constant', 'int', 2)),
           ('Assignment', '-=', ('Variable', 'i'), ('Constant', 'int', 1)))))
-
-# Do-While-Loop
-
+##
+## Do-While-Loop
+##
+    
 def test_do_while_loop_minimal():
     node = parse_single_statement("do {} while(!empty); ")
     eq_(node.to_tuples(),
@@ -313,8 +408,10 @@ def test_do_while_loop_bigger_body():
           ('Assignment', '*=', ('Variable', 'x'), ('Constant', 'int', 2)),
           ('Assignment', '-=', ('Variable', 'i'), ('Constant', 'int', 1)))))
 
-# For-Loop
-
+##
+## For-Loop
+##
+    
 def test_for_loop_minimal():
     node = parse_single_statement("for(x in primes) {}")
     eq_(node.to_tuples(),
@@ -368,23 +465,22 @@ def test_for_loop_three_iterators():
             ('Variable', 'i')),
            ('Constant', 'string', "$street$ $street_number$")))))
            
-          
-
+##    
+## Binary Operations
+##
     
-# Binary Operations
-
 def test_binop_boolean():
     assert_binop('true <==> true;', '<==>', True, True)
     assert_binop('true <!=> true;', '<!=>', True, True)    
-    assert_binop('true => true;', '=>', True, True)    
-    assert_binop('true || false;', '||', True, False)
-    assert_binop('true && false;', '&&', True, False)
-    assert_binop('true == false;', '==', True, False)
-    assert_binop('true != false;', '!=', True, False)
-    assert_binop('true <  false;',  '<', True, False)
-    assert_binop('true <= false;', '<=', True, False)
-    assert_binop('true >  false;',  '>', True, False)
-    assert_binop('true >= false;', '>=', True, False)
+    assert_binop('true => true;',     '=>', True, True)    
+    assert_binop('true || false;',    '||', True, False)
+    assert_binop('true && false;',    '&&', True, False)
+    assert_binop('"foo" == \'bar\';', '==', "foo", "bar")
+    assert_binop('true != false;',    '!=', True, False)
+    assert_binop('1 <  2;',            '<', 1, 2)
+    assert_binop('true <= false;',    '<=', True, False)
+    assert_binop('true >  false;',     '>', True, False)
+    assert_binop('true >= false;',    '>=', True, False)    
 
 def test_binop_contain():
     assert_binop('true    in false;',    'in', True, False)
@@ -413,7 +509,9 @@ def test_expr_paren_simple():
          ('Variable', 'foo'),
          ('Variable', 'bar')))
 
-# Precedence
+##    
+## Precedence
+##
 
 def test_three_operands_precedence_and_or():
     node = parse_single_statement('true && false || true;')
@@ -445,9 +543,11 @@ def test_precendce_arithmetic():
           ('BinaryOp', '-',
            ('Variable', 'd'),
            ('Variable', 'e')))))    
-          
-# Unary operations
 
+##
+## Unary operations
+##
+    
 def test_unop():
     assert_unop('+/ 42;',  '+/', 'int', 42)
     assert_unop('*/ 42;',  '*/', 'int', 42)
@@ -456,8 +556,10 @@ def test_unop():
     assert_unop('@  42;',   '@', 'int', 42)
     assert_unop('!true;', 'not', 'bool', True)
     assert_unop('1337!;', 'fac', 'int', 1337)
-        
-# Terms
+
+##    
+## Terms
+##
     
 def test_term_single_arg():
     term = parse_single_statement('F(true);')
@@ -473,7 +575,9 @@ def test_term_multi_arg():
           ('Constant', 'bool', True),
           ('Constant', 'bool', False))))
 
-# Jump statements
+##
+## Jump statements
+##
 
 def test_jump_statement_backtrack():
     node = parse_single_statement('backtrack;')
@@ -514,7 +618,9 @@ def test_jump_statement_return_expr_calc():
           ('Constant', 'int', 42),
           ('Constant', 'int', 2))))
     
-# Assignments
+##
+## Assignments
+##
 
 def test_assignment():
     assert_assignment('foo := 42;', ':=',  'foo', 42)
@@ -570,7 +676,9 @@ def test_assignable_array_ref_chained():
           ('Constant', 'int', 1)),
          ('Constant', 'bool', True)))
 
-# Quantifier    
+##
+## Quantifier
+##
 
 def test_quantifier_all():
     quantor =  parse_single_statement('forall (x in 1 | true);')
@@ -595,7 +703,9 @@ def test_quantifier_exists():
 def test_quantifier_cray():
     quantor = parse_single_statement('forall (n in [1..10] | n**2 <= 2**n);')
 
-# Procedures
+##
+## Procedures
+##
 
 def test_procedure_minimal():
     node = parse_single_statement('procedure() {};')

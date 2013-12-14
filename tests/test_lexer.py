@@ -2,7 +2,9 @@ from nose.tools import with_setup, eq_, nottest
 
 from setlx2py.setlx_lexer import Lexer
 
-######################--   TEST UTIL --######################
+##
+## Test housekeeping
+##
 
 def create_lexer():
     lexer = Lexer()
@@ -15,7 +17,9 @@ def token_list(lexer):
 def token_types(lexer):
     return [i.type for i in token_list(lexer)]
 
-######################--   ASSERTS   --######################  
+##
+## Custom asserts
+##
 
 def assert_token_types(text, expected_types):
     lexer = create_lexer()
@@ -26,7 +30,9 @@ def assert_token_types(text, expected_types):
 def assert_token_type(text, expected_type):
     assert_token_types(text, [expected_type])
 
-######################--   TESTS     --######################
+##
+## Tests
+##
 
 def test_should_be_creatable():
     lexer = Lexer()
@@ -79,7 +85,12 @@ def test_keywords():
     assert_token_type('if', 'IF')
     assert_token_type('else', 'ELSE')
 
-def test_keyword_loops():
+def test_keywords_switch():
+    assert_token_type('switch', 'SWITCH')
+    assert_token_type('case', 'CASE')
+    assert_token_type('default', 'DEFAULT')
+
+def test_keywords_loops():
     assert_token_type('while', 'WHILE')
     assert_token_type('do', 'DO')
     assert_token_type('for', 'FOR')
@@ -136,6 +147,7 @@ def test_unused():
 def test_delimiter():
     assert_token_type(';', 'SEMICOLON')
     assert_token_type(',', 'COMMA')
+    assert_token_type(':', 'COLON')
     assert_token_type('.', 'DOT')
     assert_token_types('()', ['LPAREN', 'RPAREN'])
     assert_token_types('[]', ['LBRACKET', 'RBRACKET'])
@@ -149,4 +161,13 @@ def test_assign():
     assert_token_type('/=',  'DIVIDE_EQUAL')
     assert_token_type('\\=', 'IDIVIDE_EQUAL')
     assert_token_type('%=',  'MOD_EQUAL')
+
+##
+## More complex examples
+##
+
+def test_case_statements():
+    assert_token_types("case grade == 'A' : return 'Excellent';",
+                       ['CASE', 'IDENTIFIER', 'EQ', 'LITERAL', 'COLON',
+                        'RETURN', 'LITERAL', 'SEMICOLON'])
     

@@ -253,6 +253,33 @@ class Break(Node):
 
     attr_names = ()
 
+class Case(Node):
+    def __init__(self, cond, block, coord=None):
+        self.cond = cond
+        self.block = block
+        self.coord = coord
+
+    def children(self):
+        nodelist = []
+        if self.cond is not None: nodelist.append(("cond", self.cond))
+        if self.block is not None: nodelist.append(("block", self.block))
+        return tuple(nodelist)
+
+    attr_names = ()
+
+class CaseList (Node):
+    def __init__(self, cases, coord=None):
+        self.cases = cases
+        self.coord = coord
+
+    def children(self):
+        nodelist = []
+        for i, child in enumerate(self.cases or []):
+            nodelist.append(("cases[%d]" % i, child))
+        return tuple(nodelist)
+
+    attr_names = ()
+
 class Continue(Node):
     def __init__(self, coord=None):
         self.coord = coord
@@ -273,6 +300,18 @@ class Constant(Node):
         return tuple(nodelist)
 
     attr_names = ('type','value',)
+
+class DefaultCase(Node):
+    def __init__(self, block, coord=None):
+        self.block = block
+        self.coord = coord
+
+    def children(self):
+        nodelist = []
+        if self.block is not None: nodelist.append(("block", self.block))
+        return tuple(nodelist)
+
+    attr_names = ()
 
 class DoWhile(Node):
     def __init__(self, cond, body, coord=None):
@@ -455,6 +494,20 @@ class Return (Node):
     def children(self):
         nodelist = []
         if self.expr is not None: nodelist.append(("expr", self.expr))
+        return tuple(nodelist)
+
+    attr_names = ()
+
+class Switch (Node):
+    def __init__(self, case_list, default, coord=None):
+        self.case_list = case_list
+        self.default = default
+        self.coord = coord
+
+    def children(self):
+        nodelist = []
+        if self.case_list is not None: nodelist.append(("case_list", self.case_list))
+        if self.default is not None: nodelist.append(("default", self.default))
         return tuple(nodelist)
 
     attr_names = ()
