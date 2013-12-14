@@ -323,6 +323,20 @@ class FileAST(Node):
 
     attr_names = ()
 
+class For(Node):
+    def __init__(self, iterator_chain, body, coord=None):
+        self.iterator_chain = iterator_chain
+        self.body = body
+        self.coord = coord
+
+    def children(self):
+        nodelist = []
+        if self.iterator_chain is not None: nodelist.append(("iterator_chain", self.iterator_chain))
+        if self.body is not None: nodelist.append(("body", self.body))
+        return tuple(nodelist)
+
+    attr_names = ()
+
 class If(Node):
     def __init__(self, cond, iftrue, iffalse, coord=None):
         self.cond = cond

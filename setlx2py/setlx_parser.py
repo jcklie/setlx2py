@@ -68,6 +68,7 @@ class Parser():
         """ statement : if_statement
                       | while_loop
                       | do_while_loop
+                      | for_loop
                       | jump_statement SEMICOLON
                       | assert_statement SEMICOLON
                       | assignment_direct SEMICOLON
@@ -128,6 +129,10 @@ class Parser():
                             WHILE LPAREN condition RPAREN SEMICOLON
         """
         p[0] = DoWhile(p[7], p[3], p[3].coord)
+
+    def p_for_loop(self, p):
+        """ for_loop : FOR LPAREN iterator_chain  RPAREN LBRACE block RBRACE """
+        p[0] = For(p[3], p[6], p[3].coord)
         
     ##
     ## If Statements

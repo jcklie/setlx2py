@@ -295,16 +295,16 @@ def test_while_bigger_body():
           ('Assignment', '*=', ('Variable', 'x'), ('Constant', 'int', 2)),
           ('Assignment', '-=', ('Variable', 'i'), ('Constant', 'int', 1)))))
 
-# Do- While-Loop
+# Do-While-Loop
 
-def test_do_while_minimal():
+def test_do_while_loop_minimal():
     node = parse_single_statement("do {} while(!empty); ")
     eq_(node.to_tuples(),
         ('DoWhile',
          ('UnaryOp', 'not', ('Variable', 'empty')),
          ('Block',)))
 
-def test_do_while_bigger_body():
+def test_do_while_loop_bigger_body():
     node = parse_single_statement('do { x *= 2; i -= 1;} while(i < n);')
     eq_(node.to_tuples(),
         ('DoWhile',
@@ -312,6 +312,64 @@ def test_do_while_bigger_body():
          ('Block',
           ('Assignment', '*=', ('Variable', 'x'), ('Constant', 'int', 2)),
           ('Assignment', '-=', ('Variable', 'i'), ('Constant', 'int', 1)))))
+
+# For-Loop
+
+def test_for_loop_minimal():
+    node = parse_single_statement("for(x in primes) {}")
+    eq_(node.to_tuples(),
+        ('For',
+         ('Iterator',
+          ('Variable', 'x'),
+          ('Variable', 'primes')),
+         ('Block', )))
+
+def test_for_loop_bigger_body():
+    s = """
+    // Finds the first vowel in a list of characters
+    // and returns it
+    for(c in characters) {
+        if(c in vowels) {
+            return c;
+        }
+    }
+
+    """
+    node = parse_single_statement(s)
+    eq_(node.to_tuples(),
+        ('For',
+         ('Iterator',
+          ('Variable', 'c'),
+          ('Variable', 'characters')),
+         ('Block',
+          ('If',
+           ('BinaryOp', 'in',
+            ('Variable', 'c'),
+            ('Variable', 'vowels')),
+           ('Block', ('Return', ('Variable', 'c')))))))
+
+def test_for_loop_three_iterators():
+    s = """
+    for(i in uids, s in street, n in street_number) {
+        address[i] := "$street$ $street_number$";
+    }
+    """
+    node = parse_single_statement(s)
+    eq_(node.to_tuples(),
+        ('For',
+         ('IteratorChain',
+          ('Iterator', ('Variable', 'i'), ('Variable', 'uids')),
+          ('Iterator', ('Variable', 's'), ('Variable', 'street')),
+          ('Iterator', ('Variable', 'n'), ('Variable', 'street_number'))),
+         ('Block',
+          ('Assignment', ':=',
+           ('ArrayRef',
+            ('Variable', 'address'),
+            ('Variable', 'i')),
+           ('Constant', 'string', "$street$ $street_number$")))))
+           
+          
+
     
 # Binary Operations
 
