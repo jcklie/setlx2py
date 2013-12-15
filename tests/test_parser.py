@@ -769,4 +769,70 @@ def test_procedure_fac():
              ('Assignment', '-=', ('Variable', 'n'), ('Constant', 'int', 1)))),
             ('Return', ('Variable', 'i'))))))
 
+##
+## Cached procedures
+##
+
+def test_cached_procedure_minimal():
+    node = parse_single_statement('cachedProcedure() {};')
+    eq_(node.to_tuples(), ('CachedProcedure', ('ParamList',), ('Block',)))
+
+def test_cached_procedure_square():
+    node = parse_single_statement('cachedProcedure(x) { return x ** x; };')
+    eq_(node.to_tuples(),
+        ('CachedProcedure',
+         ('ParamList', ('Param', 'x')),
+         ('Block', ('Return',
+           ('BinaryOp', '**',
+            ('Variable', 'x'),
+            ('Variable', 'x'))))))
+
+def test_cached_procedure_max():
+    s = """
+    max := cachedProcedure(a, b) {
+        if(a > b) {
+            return a;
+        } else {
+            return b;
+        }
+    };
+    """
+    node = parse_single_statement(s)
+    eq_(node.to_tuples(),
+        ('Assignment', ':=',
+         ('Variable', 'max'),
+         ('CachedProcedure',
+          ('ParamList', ('Param', 'a'), ('Param', 'b')),
+          ('Block',
+           ('If',
+            ('BinaryOp', '>', ('Variable', 'a'), ('Variable', 'b')),
+            ('Block', ('Return', ('Variable', 'a'))),
+            ('Block', ('Return', ('Variable', 'b'))))))))
+
+def test_cached_procedure_fac():
+    s = """
+    fac := cachedProcedure(n) {
+        i := 1;
+        while(n >= 1) {
+            i *= n;
+            n -= 1;
+        }
+        return i;
+    };
+    """
+    node = parse_single_statement(s)
+    eq_(node.to_tuples(),
+        ('Assignment', ':=',
+         ('Variable', 'fac'),
+         ('CachedProcedure',
+          ('ParamList', ('Param', 'n')),
+          ('Block',
+           ('Assignment', ':=', ('Variable', 'i'), ('Constant', 'int', 1)),
+           ('While',
+            ('BinaryOp', '>=', ('Variable', 'n'), ('Constant', 'int', 1)),
+            ('Block',
+             ('Assignment', '*=', ('Variable', 'i'), ('Variable', 'n')),
+             ('Assignment', '-=', ('Variable', 'n'), ('Constant', 'int', 1)))),
+            ('Return', ('Variable', 'i'))))))
+
     

@@ -460,18 +460,24 @@ class Parser():
         p[0] = p[1] if p[1] is not None else ExprList([])
 
     ##
-    ## Procedure
+    ## Procedures
     ##
     def p_procedure_definition(self, p):
         """ procedure_definition : procedure
         """
         p[0] = p[1]
 
-    def p_procedure(self, p):
+    def p_procedure_1(self, p):
         """ procedure : PROCEDURE LPAREN parameter_list RPAREN \
                         LBRACE block RBRACE
         """
         p[0] = Procedure(p[3], p[6], p[3].coord)
+
+    def p_procedure_2(self, p):
+        """ procedure : CPROCEDURE LPAREN parameter_list RPAREN \
+                        LBRACE block RBRACE
+        """
+        p[0] = CachedProcedure(p[3], p[6], p[3].coord)
 
     def p_parameter_list(self, p):
         """ parameter_list : procedure_param
@@ -488,7 +494,7 @@ class Parser():
     def p_procedure_param(self, p):
         """ procedure_param : variable """
         p[0] = Param(p[1].name, p[1].coord)
-        
+
     ##
     ## Iterator
     ##

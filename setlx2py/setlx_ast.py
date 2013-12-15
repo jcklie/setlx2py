@@ -253,6 +253,20 @@ class Break(Node):
 
     attr_names = ()
 
+class CachedProcedure(Node):
+    def __init__(self, params, body, coord=None):
+        self.params = params
+        self.body = body
+        self.coord = coord
+
+    def children(self):
+        nodelist = []
+        if self.params is not None: nodelist.append(("params", self.params))
+        if self.body is not None: nodelist.append(("body", self.body))
+        return tuple(nodelist)
+
+    attr_names = ()
+
 class Case(Node):
     def __init__(self, cond, block, coord=None):
         self.cond = cond

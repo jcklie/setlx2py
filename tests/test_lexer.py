@@ -97,6 +97,7 @@ def test_keywords_loops():
 
 def test_keywords_procedures():
     assert_token_type('procedure', 'PROCEDURE')
+    assert_token_type('cachedProcedure', 'CPROCEDURE')
 
 def test_constants_integer():
     assert_token_types('1337', ['INTEGER'])
