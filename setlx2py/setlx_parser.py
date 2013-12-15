@@ -184,7 +184,7 @@ class Parser():
 
     def p_default_case_1(self, p):
         """ default_case : DEFAULT COLON block """
-        p[0] = DefaultCase(p[3], p[3].coord)
+        p[0] = Default(p[3], p[3].coord)
 
     def p_default_case_2(self, p):
         """ default_case : epsilon """
@@ -426,33 +426,44 @@ class Parser():
         p[0] = UnaryOp('fac', p[1], p[1].coord)
 
     def p_factor_4(self, p):
-        """ factor : TERM LPAREN term_arguments RPAREN """
-        p[0] = Term(p[1], p[3], p[3].coord)
+        """ factor : term """
+        p[0] = p[1]
 
-    ## Quantor
-
-    def p_factor_5(self, p):
-        """ factor : FORALL LPAREN iterator_chain PIPE condition RPAREN """
-        p[0] = Quantor('all', p[3], p[5], p[3].coord)
+    def p_facto_5(self, p):
+        """ factor : quantor """
+        p[0] = p[1]
 
     def p_factor_6(self, p):
-        """ factor : EXISTS LPAREN iterator_chain PIPE condition RPAREN """
-        p[0] = Quantor('any', p[3], p[5], p[3].coord)
-
-    def p_factor_7(self, p):
         """ factor : LPAREN expr RPAREN """
         p[0] = p[2]
 
-    def p_factor_8(self, p):
+    def p_factor_7(self, p):
         """ factor : variable
                    | procedure_definition
         """
         p[0] = p[1]
 
+        
+    ## Quantor
+
+    def p_quantor_1(self, p):
+        """ quantor : FORALL LPAREN iterator_chain PIPE condition RPAREN """
+        p[0] = Quantor('all', p[3], p[5], p[3].coord)
+
+    def p_quantor_2(self, p):
+        """ quantor : EXISTS LPAREN iterator_chain PIPE condition RPAREN """
+        p[0] = Quantor('any', p[3], p[5], p[3].coord)
+
+
     ##
     ## Term
     ##
 
+    def p_term(self, p):
+        """ term : TERM LPAREN term_arguments RPAREN """
+        p[0] = Term(p[1], p[3], p[3].coord)
+
+        
     def p_term_arguments(self, p):
         """ term_arguments : expr_list
                            | epsilon
@@ -513,7 +524,7 @@ class Parser():
             p[1] = IteratorChain([p[1]], p[1].coord)
         p[1].iterators.append(p[3])
         p[0] = p[1]
-
+        
     ##
     ## Values
     ##

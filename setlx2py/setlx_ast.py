@@ -315,7 +315,7 @@ class Constant(Node):
 
     attr_names = ('type','value',)
 
-class DefaultCase(Node):
+class Default(Node):
     def __init__(self, block, coord=None):
         self.block = block
         self.coord = coord

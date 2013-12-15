@@ -367,7 +367,7 @@ def test_switch_case_with_default():
           ('Case',
            ('BinaryOp', '==', ('Variable', 'grade'), ('Constant', 'literal', 'F')),
           ('Block', ('Return', ('Constant', 'literal', 'Fail'))))),
-          ('DefaultCase', ('Block', ('Return', ('Constant', 'literal', 'Invalid input'))))))
+          ('Default', ('Block', ('Return', ('Constant', 'literal', 'Invalid input'))))))
 
 ##
 ## While-Loop
