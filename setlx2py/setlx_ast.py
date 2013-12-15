@@ -433,6 +433,20 @@ class IteratorChain(Node):
 
     attr_names = ()
 
+class Lambda(Node):
+    def __init__(self, params, body, coord=None):
+        self.params = params
+        self.body = body
+        self.coord = coord
+
+    def children(self):
+        nodelist = []
+        if self.params is not None: nodelist.append(("params", self.params))
+        if self.body is not None: nodelist.append(("body", self.body))
+        return tuple(nodelist)
+
+    attr_names = ()
+
 class MemberAccess(Node):
     def __init__(self, obj, field, coord=None):
         self.obj = obj

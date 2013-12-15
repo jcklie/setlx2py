@@ -162,6 +162,7 @@ def test_assign():
     assert_token_type('/=',  'DIVIDE_EQUAL')
     assert_token_type('\\=', 'IDIVIDE_EQUAL')
     assert_token_type('%=',  'MOD_EQUAL')
+    assert_token_type('|->', 'LAMBDADEF')
 
 ##
 ## More complex examples

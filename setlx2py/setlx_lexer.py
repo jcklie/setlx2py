@@ -140,7 +140,7 @@ class Lexer():
         'SEMICOLON', 'COMMA', 'COLON', 'DOT',
         'LPAREN', 'RPAREN',             # ()
         'LBRACKET', 'RBRACKET',         # []
-        'LBRACE', 'RBRACE',
+        'LBRACE', 'RBRACE',             # {}
         'PIPE',
 
         # Assign
@@ -148,6 +148,7 @@ class Lexer():
         'PLUS_EQUAL', 'MINUS_EQUAL',
         'TIMES_EQUAL', 'MOD_EQUAL',
         'DIVIDE_EQUAL', 'IDIVIDE_EQUAL',
+        'LAMBDADEF',
 
     ] + list(keywords.values())           
 
@@ -209,6 +210,7 @@ class Lexer():
     t_DIVIDE_EQUAL  = r'/='
     t_IDIVIDE_EQUAL = r'\\='
     t_MOD_EQUAL     = r'%='
+    t_LAMBDADEF     = r'\|->'
 
     # Unused
     t_UNUSED        = r'_'

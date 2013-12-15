@@ -285,7 +285,9 @@ class Parser():
     ##
 
     def p_expr_1(self, p):
-        """ expr : implication """
+        """ expr : implication
+                 | lambda_definition
+        """
         p[0] = p[1]
 
     def p_expr_2(self, p):
@@ -443,9 +445,10 @@ class Parser():
         """
         p[0] = p[1]
 
-        
+    ##
     ## Quantor
-
+    ##
+    
     def p_quantor_1(self, p):
         """ quantor : FORALL LPAREN iterator_chain PIPE condition RPAREN """
         p[0] = Quantor('all', p[3], p[5], p[3].coord)
@@ -505,6 +508,24 @@ class Parser():
     def p_procedure_param(self, p):
         """ procedure_param : variable """
         p[0] = Param(p[1].name, p[1].coord)
+
+    ##
+    ## Lambda Definitions
+    ##
+
+    def p_lambda_definition(self, p):
+        """ lambda_definition : lambda_parameters LAMBDADEF expr """
+        p[0] = Lambda(p[1], p[3], p[1].coord)
+
+    def p_lambda_parameters(self, p):
+        """ lambda_parameters : variable
+                              | LT parameter_list GT
+        """
+        if len(p) == 2:
+            param = Param(p[1].name)
+            p[0] = ParamList([param], p[1].coord)
+        else:
+            p[0] = p[2]
 
     ##
     ## Iterator
