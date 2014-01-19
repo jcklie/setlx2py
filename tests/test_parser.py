@@ -28,11 +28,6 @@ def teardown_func():
     parser = None
 
 ##
-## Misc helper
-##
-
-
-##
 ## Parse helper
 ##
 
@@ -125,350 +120,16 @@ def test_atomic_value_false():
 ##
 ## Variables
 ##
-    
+
 def test_variables():
     node = parse_single_statement('foo;')
     eq_(node.to_tuples(),
-        ('Variable', 'foo'))
-    
-##    
-## Assert
-##
-    
-def test_condition_simple():
-    assert_stmt = parse_single_statement('assert(isOverflown, false);')
-    eq_(assert_stmt.to_tuples(),
-        ('Assert',
-         ('Variable', 'isOverflown'),
-         ('Constant', 'bool', False)))
-##
-## Statements
-##
-    
-def test_more_than_one_statement_simple():
-    stmts = parse_statements('1 + 2; 3 * 4;')
-    eq_(stmts.to_tuples(),
-        ('FileAST',
-         ('BinaryOp', '+',
-          ('Constant', 'int', 1),
-          ('Constant', 'int', 2)),
-         ('BinaryOp', '*',
-          ('Constant', 'int', 3),
-          ('Constant', 'int', 4))))
-    
-##
-## If statements
-##
-    
-def test_if_no_else():
-    node = parse_single_statement('if(x >= 5) { return true; }')
-    eq_(node.to_tuples(),
-        ('If',
-         ('BinaryOp', '>=',
-          ('Variable', 'x'),
-          ('Constant', 'int', 5)),
-         ('Block',
-          ('Return', ('Constant', 'bool', True)))))
+        ('Identifier', 'foo'))
 
-def test_if_no_else_longer_block():
-    s = """
-    if(isRaining && isCold) {
-        prediction := "Let it snow!";
-        return prediction;
-    }
-    """
-    node = parse_single_statement(s)
-    eq_(node.to_tuples(),
-        ('If',
-         ('BinaryOp', '&&',
-          ('Variable', 'isRaining'),
-          ('Variable', 'isCold')),
-         ('Block',
-          ('Assignment', ':=',
-           ('Variable', 'prediction'),
-           ('Constant', 'string', 'Let it snow!')),
-          ('Return', ('Variable', 'prediction')))))
-
-def test_if_single_else():
-    s = """
-    if(i % 2 == 0) {
-        return "Even";
-    } else {
-        return "Odd";
-    }
-    """
-    node = parse_single_statement(s)
-    eq_(node.to_tuples(),
-        ('If',
-         ('BinaryOp', '==',
-          ('BinaryOp', '%',
-           ('Variable', 'i'),
-           ('Constant', 'int', 2)),
-          ('Constant', 'int', 0)),
-         ('Block', ('Return', ('Constant', 'string', 'Even'))),
-         ('Block', ('Return', ('Constant', 'string', 'Odd')))))
-
-def test_if_single_else_empty():
-    node = parse_single_statement("if(foo) {} else {}")
-    eq_(node.to_tuples(),
-        ('If',
-         ('Variable', 'foo'),
-         ('Block',),
-         ('Block',)))
-    
-def test_if_else_if_else_simple():
-    s = """
-    if(isGreen) {
-        return "Green";
-    } else if(isRed) {
-        return "Red";
-    } else {
-        return "Not green nor red";
-    }
-    """
-    node = parse_single_statement(s)
-    eq_(node.to_tuples(),
-        ('If',
-         ('Variable', 'isGreen'),
-         ('Block',
-          ('Return', ('Constant', 'string', 'Green'))),
-         ('If',
-          ('Variable', 'isRed'),
-          ('Block',
-           ('Return', ('Constant', 'string', 'Red'))),
-          ('Block',
-           ('Return', ('Constant', 'string', 'Not green nor red'))))))
-
-def test_if_four_else_if_else():
-    s = """
-    if(grade == "A") {
-        return "Excellent";
-    } else if(grade == "B") {
-        return "Good";
-    } else if(grade == "C") {
-        return "Satisfactory";
-    } else if(grade == "D") {
-        return "Pass";
-    } else if(grade == "F") {
-        return "Fail";
-    } else {
-        return "Invalid input";
-    }
-    """
-    node = parse_single_statement(s)
-    eq_(node.to_tuples(), 
-         ('If', ('BinaryOp', '==',
-                 ('Variable', 'grade'),
-                 ('Constant', 'string', 'A')),
-          ('Block', ('Return', ('Constant', 'string', 'Excellent'))),
-          ('If', ('BinaryOp', '==',
-                  ('Variable', 'grade'),
-                  ('Constant', 'string', 'B')),
-           ('Block', ('Return', ('Constant', 'string', 'Good'))),
-           ('If', ('BinaryOp', '==',
-                   ('Variable', 'grade'),
-                   ('Constant', 'string', 'C')),
-            ('Block', ('Return', ('Constant', 'string', 'Satisfactory'))),
-            ('If', ('BinaryOp', '==',
-                    ('Variable', 'grade'),
-                    ('Constant', 'string', 'D')),
-             ('Block', ('Return', ('Constant', 'string', 'Pass'))),
-             ('If', ('BinaryOp', '==',
-                     ('Variable', 'grade'),
-                     ('Constant', 'string', 'F')),
-              ('Block', ('Return', ('Constant', 'string', 'Fail'))),
-              ('Block', ('Return', ('Constant', 'string', 'Invalid input')))))))))
-
-def test_if_nested_else():
-    s = """
-    if(num1 == num2) {
-        return "Equal";
-    } else {
-        if(num1 > num2) { 
-            return "Num1 greater";
-        } else {
-            return "Num2 greater";
-        }
-    }
-    """
-    node = parse_single_statement(s)
-    eq_(node.to_tuples(),
-        ('If',
-         ('BinaryOp', '==', ('Variable', 'num1'), ('Variable', 'num2')), 
-         ('Block', ('Return', ('Constant', 'string', 'Equal'))),  
-         ('Block',
-          ('If',
-           ('BinaryOp', '>', ('Variable', 'num1'), ('Variable', 'num2')),
-           ('Block', ('Return', ('Constant', 'string', 'Num1 greater'))),
-           ('Block', ('Return', ('Constant', 'string', 'Num2 greater')))))))
-
-##
-## Switch/Case
-##
-
-def test_switch_case_minimal():
-    node = parse_single_statement('switch {}')
-    eq_(node.to_tuples(),
-        ('Switch',
-         ('CaseList', )))
-    pass
-
-def test_switch_case_simple_no_default():
-    s = """
-    // Check whether an integer n is even
-    switch {
-        case n % 2 == 0 : return 'Even';
-        case n % 2 == 1 : return 'Odd';
-    }
-    """
-    node = parse_single_statement(s)
-    eq_(node.to_tuples(),
-        ('Switch',
-         ('CaseList',
-          ('Case',
-           ('BinaryOp', '==',
-            ('BinaryOp', '%', ('Variable', 'n'), ('Constant', 'int', 2)),
-            ('Constant', 'int', 0)),
-           ('Block', ('Return', ('Constant', 'literal', 'Even')))),
-          ('Case',
-           ('BinaryOp', '==',
-            ('BinaryOp', '%', ('Variable', 'n'), ('Constant', 'int', 2)),
-            ('Constant', 'int', 1)),
-           ('Block', ('Return', ('Constant', 'literal', 'Odd')))))))
-    
-
-def test_switch_case_with_default():
-    s = """
-    switch {
-        case grade == 'A' : return 'Excellent';
-        case grade == 'B' : return 'Good';
-        case grade == 'C' : return 'Satisfactory';
-        case grade == 'D' : return 'Pass';
-        case grade == 'F' : return 'Fail';
-        default           : return 'Invalid input';
-    }
-    """
-    node = parse_single_statement(s)
-    eq_(node.to_tuples(),
-        ('Switch',
-         ('CaseList',
-          ('Case',
-           ('BinaryOp', '==', ('Variable', 'grade'), ('Constant', 'literal', 'A')),
-          ('Block', ('Return', ('Constant', 'literal', 'Excellent')))),
-          ('Case',
-           ('BinaryOp', '==', ('Variable', 'grade'), ('Constant', 'literal', 'B')),
-          ('Block', ('Return', ('Constant', 'literal', 'Good')))),
-          ('Case',
-           ('BinaryOp', '==', ('Variable', 'grade'), ('Constant', 'literal', 'C')),
-          ('Block', ('Return', ('Constant', 'literal', 'Satisfactory')))),
-          ('Case',
-           ('BinaryOp', '==', ('Variable', 'grade'), ('Constant', 'literal', 'D')),
-          ('Block', ('Return', ('Constant', 'literal', 'Pass')))),
-          ('Case',
-           ('BinaryOp', '==', ('Variable', 'grade'), ('Constant', 'literal', 'F')),
-          ('Block', ('Return', ('Constant', 'literal', 'Fail'))))),
-          ('Default', ('Block', ('Return', ('Constant', 'literal', 'Invalid input'))))))
-
-##
-## While-Loop
-##
-    
-def test_while_minimal():
-    node = parse_single_statement("while(!empty) {}")
-    eq_(node.to_tuples(),
-        ('While',
-         ('UnaryOp', 'not', ('Variable', 'empty')),
-         ('Block',)))
-
-def test_while_bigger_body():
-    node = parse_single_statement('while(i < n) { x *= 2; i -= 1;}')
-    eq_(node.to_tuples(),
-        ('While',
-         ('BinaryOp', '<', ('Variable', 'i'), ('Variable', 'n')),
-         ('Block',
-          ('Assignment', '*=', ('Variable', 'x'), ('Constant', 'int', 2)),
-          ('Assignment', '-=', ('Variable', 'i'), ('Constant', 'int', 1)))))
-##
-## Do-While-Loop
-##
-    
-def test_do_while_loop_minimal():
-    node = parse_single_statement("do {} while(!empty); ")
-    eq_(node.to_tuples(),
-        ('DoWhile',
-         ('UnaryOp', 'not', ('Variable', 'empty')),
-         ('Block',)))
-
-def test_do_while_loop_bigger_body():
-    node = parse_single_statement('do { x *= 2; i -= 1;} while(i < n);')
-    eq_(node.to_tuples(),
-        ('DoWhile',
-         ('BinaryOp', '<', ('Variable', 'i'), ('Variable', 'n')),
-         ('Block',
-          ('Assignment', '*=', ('Variable', 'x'), ('Constant', 'int', 2)),
-          ('Assignment', '-=', ('Variable', 'i'), ('Constant', 'int', 1)))))
-
-##
-## For-Loop
-##
-    
-def test_for_loop_minimal():
-    node = parse_single_statement("for(x in primes) {}")
-    eq_(node.to_tuples(),
-        ('For',
-         ('Iterator',
-          ('Variable', 'x'),
-          ('Variable', 'primes')),
-         ('Block', )))
-
-def test_for_loop_bigger_body():
-    s = """
-    // Finds the first vowel in a list of characters
-    // and returns it
-    for(c in characters) {
-        if(c in vowels) {
-            return c;
-        }
-    }
-
-    """
-    node = parse_single_statement(s)
-    eq_(node.to_tuples(),
-        ('For',
-         ('Iterator',
-          ('Variable', 'c'),
-          ('Variable', 'characters')),
-         ('Block',
-          ('If',
-           ('BinaryOp', 'in',
-            ('Variable', 'c'),
-            ('Variable', 'vowels')),
-           ('Block', ('Return', ('Variable', 'c')))))))
-
-def test_for_loop_three_iterators():
-    s = """
-    for(i in uids, s in street, n in street_number) {
-        address[i] := "$street$ $street_number$";
-    }
-    """
-    node = parse_single_statement(s)
-    eq_(node.to_tuples(),
-        ('For',
-         ('IteratorChain',
-          ('Iterator', ('Variable', 'i'), ('Variable', 'uids')),
-          ('Iterator', ('Variable', 's'), ('Variable', 'street')),
-          ('Iterator', ('Variable', 'n'), ('Variable', 'street_number'))),
-         ('Block',
-          ('Assignment', ':=',
-           ('ArrayRef',
-            ('Variable', 'address'),
-            ('Variable', 'i')),
-           ('Constant', 'string', "$street$ $street_number$")))))
-           
 ##    
 ## Binary Operations
 ##
-    
+
 def test_binop_boolean():
     assert_binop('true <==> true;', '<==>', True, True)
     assert_binop('true <!=> true;', '<!=>', True, True)    
@@ -501,13 +162,13 @@ def test_binop_product():
 def test_binop_reduce():
     assert_binop('42 +/ 43;', '+/', 42, 43)
     assert_binop('42 */ 43;', '*/', 42, 43)
-
+@nottest
 def test_expr_paren_simple():
     node = parse_single_statement('(foo + bar);')
     eq_(node.to_tuples(),
         ('BinaryOp', '+',
-         ('Variable', 'foo'),
-         ('Variable', 'bar')))
+         ('Identifier', 'foo'),
+         ('Identifier', 'bar')))
 
 ##    
 ## Precedence
@@ -530,19 +191,19 @@ def test_three_operands_precedence_minus_divide():
          ('BinaryOp', '/',
           ('Constant', 'int', 4 ),
           ('Constant', 'double', 2.0 ))))
-
+@nottest
 def test_precendce_arithmetic():
     node = parse_single_statement('a + b  * c / ( d - e );')
     eq_(node.to_tuples(),
         ('BinaryOp', '+',
-         ('Variable', 'a'),
+         ('Identifier', 'a'),
          ('BinaryOp', '/',
           ('BinaryOp', '*',
-           ('Variable', 'b'),
-           ('Variable', 'c')),
+           ('Identifier', 'b'),
+           ('Identifier', 'c')),
           ('BinaryOp', '-',
-           ('Variable', 'd'),
-           ('Variable', 'e')))))    
+           ('Identifier', 'd'),
+           ('Identifier', 'e')))))    
 
 ##
 ## Unary operations
@@ -556,17 +217,362 @@ def test_unop():
     assert_unop('@  42;',   '@', 'int', 42)
     assert_unop('!true;', 'not', 'bool', True)
     assert_unop('1337!;', 'fac', 'int', 1337)
+    
+##    
+## Assert
+##
+
+@nottest    
+def test_condition_simple():
+    assert_stmt = parse_single_statement('assert(isOverflown, false);')
+    eq_(assert_stmt.to_tuples(),
+        ('Assert',
+         ('Identifier', 'isOverflown'),
+         ('Constant', 'bool', False)))
+##
+## Statements
+##
+ 
+@nottest   
+def test_more_than_one_statement_simple():
+    stmts = parse_statements('1 + 2; 3 * 4;')
+    eq_(stmts.to_tuples(),
+        ('FileAST',
+         ('BinaryOp', '+',
+          ('Constant', 'int', 1),
+          ('Constant', 'int', 2)),
+         ('BinaryOp', '*',
+          ('Constant', 'int', 3),
+          ('Constant', 'int', 4))))
+    
+##
+## If statements
+##
+
+@nottest    
+def test_if_no_else():
+    node = parse_single_statement('if(x >= 5) { return true; }')
+    eq_(node.to_tuples(),
+        ('If',
+         ('BinaryOp', '>=',
+          ('Identifier', 'x'),
+          ('Constant', 'int', 5)),
+         ('Block',
+          ('Return', ('Constant', 'bool', True)))))
+
+@nottest
+def test_if_no_else_longer_block():
+    s = """
+    if(isRaining && isCold) {
+        prediction := "Let it snow!";
+        return prediction;
+    }
+    """
+    node = parse_single_statement(s)
+    eq_(node.to_tuples(),
+        ('If',
+         ('BinaryOp', '&&',
+          ('Identifier', 'isRaining'),
+          ('Identifier', 'isCold')),
+         ('Block',
+          ('Assignment', ':=',
+           ('Identifier', 'prediction'),
+           ('Constant', 'string', 'Let it snow!')),
+          ('Return', ('Identifier', 'prediction')))))
+
+@nottest
+def test_if_single_else():
+    s = """
+    if(i % 2 == 0) {
+        return "Even";
+    } else {
+        return "Odd";
+    }
+    """
+    node = parse_single_statement(s)
+    eq_(node.to_tuples(),
+        ('If',
+         ('BinaryOp', '==',
+          ('BinaryOp', '%',
+           ('Identifier', 'i'),
+           ('Constant', 'int', 2)),
+          ('Constant', 'int', 0)),
+         ('Block', ('Return', ('Constant', 'string', 'Even'))),
+         ('Block', ('Return', ('Constant', 'string', 'Odd')))))
+
+@nottest
+def test_if_single_else_empty():
+    node = parse_single_statement("if(foo) {} else {}")
+    eq_(node.to_tuples(),
+        ('If',
+         ('Identifier', 'foo'),
+         ('Block',),
+         ('Block',)))
+
+@nottest    
+def test_if_else_if_else_simple():
+    s = """
+    if(isGreen) {
+        return "Green";
+    } else if(isRed) {
+        return "Red";
+    } else {
+        return "Not green nor red";
+    }
+    """
+    node = parse_single_statement(s)
+    eq_(node.to_tuples(),
+        ('If',
+         ('Identifier', 'isGreen'),
+         ('Block',
+          ('Return', ('Constant', 'string', 'Green'))),
+         ('If',
+          ('Identifier', 'isRed'),
+          ('Block',
+           ('Return', ('Constant', 'string', 'Red'))),
+          ('Block',
+           ('Return', ('Constant', 'string', 'Not green nor red'))))))
+
+@nottest
+def test_if_four_else_if_else():
+    s = """
+    if(grade == "A") {
+        return "Excellent";
+    } else if(grade == "B") {
+        return "Good";
+    } else if(grade == "C") {
+        return "Satisfactory";
+    } else if(grade == "D") {
+        return "Pass";
+    } else if(grade == "F") {
+        return "Fail";
+    } else {
+        return "Invalid input";
+    }
+    """
+    node = parse_single_statement(s)
+    eq_(node.to_tuples(), 
+         ('If', ('BinaryOp', '==',
+                 ('Identifier', 'grade'),
+                 ('Constant', 'string', 'A')),
+          ('Block', ('Return', ('Constant', 'string', 'Excellent'))),
+          ('If', ('BinaryOp', '==',
+                  ('Identifier', 'grade'),
+                  ('Constant', 'string', 'B')),
+           ('Block', ('Return', ('Constant', 'string', 'Good'))),
+           ('If', ('BinaryOp', '==',
+                   ('Identifier', 'grade'),
+                   ('Constant', 'string', 'C')),
+            ('Block', ('Return', ('Constant', 'string', 'Satisfactory'))),
+            ('If', ('BinaryOp', '==',
+                    ('Identifier', 'grade'),
+                    ('Constant', 'string', 'D')),
+             ('Block', ('Return', ('Constant', 'string', 'Pass'))),
+             ('If', ('BinaryOp', '==',
+                     ('Identifier', 'grade'),
+                     ('Constant', 'string', 'F')),
+              ('Block', ('Return', ('Constant', 'string', 'Fail'))),
+              ('Block', ('Return', ('Constant', 'string', 'Invalid input')))))))))
+
+@nottest
+def test_if_nested_else():
+    s = """
+    if(num1 == num2) {
+        return "Equal";
+    } else {
+        if(num1 > num2) { 
+            return "Num1 greater";
+        } else {
+            return "Num2 greater";
+        }
+    }
+    """
+    node = parse_single_statement(s)
+    eq_(node.to_tuples(),
+        ('If',
+         ('BinaryOp', '==', ('Identifier', 'num1'), ('Identifier', 'num2')), 
+         ('Block', ('Return', ('Constant', 'string', 'Equal'))),  
+         ('Block',
+          ('If',
+           ('BinaryOp', '>', ('Identifier', 'num1'), ('Identifier', 'num2')),
+           ('Block', ('Return', ('Constant', 'string', 'Num1 greater'))),
+           ('Block', ('Return', ('Constant', 'string', 'Num2 greater')))))))
+
+##
+## Switch/Case
+##
+
+@nottest
+def test_switch_case_minimal():
+    node = parse_single_statement('switch {}')
+    eq_(node.to_tuples(),
+        ('Switch',
+         ('CaseList', )))
+    pass
+@nottest
+def test_switch_case_simple_no_default():
+    s = """
+    // Check whether an integer n is even
+    switch {
+        case n % 2 == 0 : return 'Even';
+        case n % 2 == 1 : return 'Odd';
+    }
+    """
+    node = parse_single_statement(s)
+    eq_(node.to_tuples(),
+        ('Switch',
+         ('CaseList',
+          ('Case',
+           ('BinaryOp', '==',
+            ('BinaryOp', '%', ('Identifier', 'n'), ('Constant', 'int', 2)),
+            ('Constant', 'int', 0)),
+           ('Block', ('Return', ('Constant', 'literal', 'Even')))),
+          ('Case',
+           ('BinaryOp', '==',
+            ('BinaryOp', '%', ('Identifier', 'n'), ('Constant', 'int', 2)),
+            ('Constant', 'int', 1)),
+           ('Block', ('Return', ('Constant', 'literal', 'Odd')))))))
+    
+@nottest
+def test_switch_case_with_default():
+    s = """
+    switch {
+        case grade == 'A' : return 'Excellent';
+        case grade == 'B' : return 'Good';
+        case grade == 'C' : return 'Satisfactory';
+        case grade == 'D' : return 'Pass';
+        case grade == 'F' : return 'Fail';
+        default           : return 'Invalid input';
+    }
+    """
+    node = parse_single_statement(s)
+    eq_(node.to_tuples(),
+        ('Switch',
+         ('CaseList',
+          ('Case',
+           ('BinaryOp', '==', ('Identifier', 'grade'), ('Constant', 'literal', 'A')),
+          ('Block', ('Return', ('Constant', 'literal', 'Excellent')))),
+          ('Case',
+           ('BinaryOp', '==', ('Identifier', 'grade'), ('Constant', 'literal', 'B')),
+          ('Block', ('Return', ('Constant', 'literal', 'Good')))),
+          ('Case',
+           ('BinaryOp', '==', ('Identifier', 'grade'), ('Constant', 'literal', 'C')),
+          ('Block', ('Return', ('Constant', 'literal', 'Satisfactory')))),
+          ('Case',
+           ('BinaryOp', '==', ('Identifier', 'grade'), ('Constant', 'literal', 'D')),
+          ('Block', ('Return', ('Constant', 'literal', 'Pass')))),
+          ('Case',
+           ('BinaryOp', '==', ('Identifier', 'grade'), ('Constant', 'literal', 'F')),
+          ('Block', ('Return', ('Constant', 'literal', 'Fail'))))),
+          ('Default', ('Block', ('Return', ('Constant', 'literal', 'Invalid input'))))))
+
+##
+## While-Loop
+##
+@nottest    
+def test_while_minimal():
+    node = parse_single_statement("while(!empty) {}")
+    eq_(node.to_tuples(),
+        ('While',
+         ('UnaryOp', 'not', ('Identifier', 'empty')),
+         ('Block',)))
+@nottest
+def test_while_bigger_body():
+    node = parse_single_statement('while(i < n) { x *= 2; i -= 1;}')
+    eq_(node.to_tuples(),
+        ('While',
+         ('BinaryOp', '<', ('Identifier', 'i'), ('Identifier', 'n')),
+         ('Block',
+          ('Assignment', '*=', ('Identifier', 'x'), ('Constant', 'int', 2)),
+          ('Assignment', '-=', ('Identifier', 'i'), ('Constant', 'int', 1)))))
+##
+## Do-While-Loop
+##
+@nottest    
+def test_do_while_loop_minimal():
+    node = parse_single_statement("do {} while(!empty); ")
+    eq_(node.to_tuples(),
+        ('DoWhile',
+         ('UnaryOp', 'not', ('Identifier', 'empty')),
+         ('Block',)))
+@nottest
+def test_do_while_loop_bigger_body():
+    node = parse_single_statement('do { x *= 2; i -= 1;} while(i < n);')
+    eq_(node.to_tuples(),
+        ('DoWhile',
+         ('BinaryOp', '<', ('Identifier', 'i'), ('Identifier', 'n')),
+         ('Block',
+          ('Assignment', '*=', ('Identifier', 'x'), ('Constant', 'int', 2)),
+          ('Assignment', '-=', ('Identifier', 'i'), ('Constant', 'int', 1)))))
+
+##
+## For-Loop
+##
+@nottest
+def test_for_loop_minimal():
+    node = parse_single_statement("for(x in primes) {}")
+    eq_(node.to_tuples(),
+        ('For',
+         ('Iterator',
+          ('Identifier', 'x'),
+          ('Identifier', 'primes')),
+         ('Block', )))
+@nottest
+def test_for_loop_bigger_body():
+    s = """
+    // Finds the first vowel in a list of characters
+    // and returns it
+    for(c in characters) {
+        if(c in vowels) {
+            return c;
+        }
+    }
+
+    """
+    node = parse_single_statement(s)
+    eq_(node.to_tuples(),
+        ('For',
+         ('Iterator',
+          ('Identifier', 'c'),
+          ('Identifier', 'characters')),
+         ('Block',
+          ('If',
+           ('BinaryOp', 'in',
+            ('Identifier', 'c'),
+            ('Identifier', 'vowels')),
+           ('Block', ('Return', ('Identifier', 'c')))))))
+@nottest
+def test_for_loop_three_iterators():
+    s = """
+    for(i in uids, s in street, n in street_number) {
+        address[i] := "$street$ $street_number$";
+    }
+    """
+    node = parse_single_statement(s)
+    eq_(node.to_tuples(),
+        ('For',
+         ('IteratorChain',
+          ('Iterator', ('Identifier', 'i'), ('Identifier', 'uids')),
+          ('Iterator', ('Identifier', 's'), ('Identifier', 'street')),
+          ('Iterator', ('Identifier', 'n'), ('Identifier', 'street_number'))),
+         ('Block',
+          ('Assignment', ':=',
+           ('ArrayRef',
+            ('Identifier', 'address'),
+            ('Identifier', 'i')),
+           ('Constant', 'string', "$street$ $street_number$")))))
+           
 
 ##    
 ## Terms
 ##
-    
+@nottest    
 def test_term_single_arg():
     term = parse_single_statement('F(true);')
     eq_(term.to_tuples(),
         ('Term', 'F',
          ('Constant', 'bool', True)))
-
+@nottest
 def test_term_multi_arg():
     term = parse_single_statement('F(true, false);')
     eq_(term.to_tuples(),
@@ -578,38 +584,38 @@ def test_term_multi_arg():
 ##
 ## Jump statements
 ##
-
+@nottest
 def test_jump_statement_backtrack():
     node = parse_single_statement('backtrack;')
     eq_(node.to_tuples(),
         ('Backtrack',))
-    
+@nottest    
 def test_jump_statement_break():
     node = parse_single_statement('break;')
     eq_(node.to_tuples(),
         ('Break',))
-
+@nottest
 def test_jump_statement_continue():
     node = parse_single_statement('continue;')
     eq_(node.to_tuples(),
         ('Continue',))
-
+@nottest
 def test_jump_statement_break():
     node = parse_single_statement('exit;')
     eq_(node.to_tuples(),
         ('Exit',))
-
+@nottest
 def test_jump_statement_return_void():
     node = parse_single_statement('return;')
     eq_(node.to_tuples(),
         ('Return',))
-
+@nottest
 def test_jump_statement_return_expr_const():
     node = parse_single_statement('return 42;')
     eq_(node.to_tuples(),
         ('Return',
          ('Constant', 'int', 42)))
-
+@nottest
 def test_jump_statement_return_expr_calc():
     node = parse_single_statement('return 42 ** 2;')
     eq_(node.to_tuples(),
@@ -621,7 +627,7 @@ def test_jump_statement_return_expr_calc():
 ##
 ## Assignments
 ##
-
+@nottest
 def test_assignment():
     assert_assignment('foo := 42;', ':=',  'foo', 42)
     assert_assignment('_ := true;', ':=',  'unused', True)
@@ -631,47 +637,47 @@ def test_assignment():
     assert_assignment('foo /= 2;',  '/=',  'foo', 2)
     assert_assignment('foo \\= 3;', '\\=', 'foo', 3)
     assert_assignment('foo %= 10;', '%=',  'foo', 10)
-
+@nottest
 def test_assignment_explicit():
     assert_assignment('[foo] := 42;', ':=', 'foo', 42)
     assert_assignment_explicit('[foo, bar] := 42;', ':=', ['foo', 'bar'], 42)    
-
+@nottest
 def test_assignable_member_access():
     assignment = parse_single_statement('foo.bar := true;')
     eq_(assignment.to_tuples(),
         ('Assignment', ':=',
         ('MemberAccess',
-          ('Variable', 'foo'),
-          ('Variable', 'bar')),
+          ('Identifier', 'foo'),
+          ('Identifier', 'bar')),
          ('Constant', 'bool', True)))
-
+@nottest
 def test_assignable_member_access_chained():
     assignment = parse_single_statement('foo.bar.baz := 42;')
     eq_(assignment.to_tuples(),
         ('Assignment', ':=',
          ('MemberAccess',
           ('MemberAccess',
-           ('Variable', 'foo'),
-           ('Variable', 'bar')),
-          ('Variable', 'baz')),
+           ('Identifier', 'foo'),
+           ('Identifier', 'bar')),
+          ('Identifier', 'baz')),
          ('Constant', 'int', 42)))
-
+@nottest
 def test_assignable_array_ref():
     node = parse_single_statement('foo[0] := true;')
     eq_(node.to_tuples(),
         ('Assignment', ':=',
          ('ArrayRef',
-          ('Variable', 'foo'),
+          ('Identifier', 'foo'),
           ('Constant', 'int', 0)),
          ('Constant', 'bool', True)))
-
+@nottest
 def test_assignable_array_ref_chained():
     node = parse_single_statement('foo[0][1] := true;')
     eq_(node.to_tuples(),
         ('Assignment', ':=',
          ('ArrayRef',
           ('ArrayRef',
-           ('Variable', 'foo'),
+           ('Identifier', 'foo'),
            ('Constant', 'int', 0)),
           ('Constant', 'int', 1)),
          ('Constant', 'bool', True)))
@@ -679,7 +685,7 @@ def test_assignable_array_ref_chained():
 ##
 ## Quantifier
 ##
-
+@nottest
 def test_quantifier_all():
     quantor =  parse_single_statement('forall (x in 1 | true);')
     iterator = quantor.lhs
@@ -689,13 +695,13 @@ def test_quantifier_all():
     eq_(iterator.assignable.name, 'x')
     eq_(iterator.expression.value, 1)
     eq_(condition.value, True)
-
+@nottest
 def test_quantifier_exists():
     quantor =  parse_single_statement('exists (x in 1 | true);')
     eq_(quantor.to_tuples(),
         ('Quantor', 'any',
          ('Iterator',
-          ('Variable', 'x'),
+          ('Identifier', 'x'),
           ('Constant', 'int', 1)),
          ('Constant', 'bool', True)))
 
@@ -706,11 +712,11 @@ def test_quantifier_cray():
 ##
 ## Procedures
 ##
-
+@nottest
 def test_procedure_minimal():
     node = parse_single_statement('procedure() {};')
     eq_(node.to_tuples(), ('Procedure', ('ParamList',), ('Block',)))
-
+@nottest
 def test_procedure_square():
     node = parse_single_statement('procedure(x) { return x ** x; };')
     eq_(node.to_tuples(),
@@ -718,9 +724,9 @@ def test_procedure_square():
          ('ParamList', ('Param', 'x')),
          ('Block', ('Return',
            ('BinaryOp', '**',
-            ('Variable', 'x'),
-            ('Variable', 'x'))))))
-
+            ('Identifier', 'x'),
+            ('Identifier', 'x'))))))
+@nottest
 def test_procedure_max():
     s = """
     max := procedure(a, b) {
@@ -734,15 +740,15 @@ def test_procedure_max():
     node = parse_single_statement(s)
     eq_(node.to_tuples(),
         ('Assignment', ':=',
-         ('Variable', 'max'),
+         ('Identifier', 'max'),
          ('Procedure',
           ('ParamList', ('Param', 'a'), ('Param', 'b')),
           ('Block',
            ('If',
-            ('BinaryOp', '>', ('Variable', 'a'), ('Variable', 'b')),
-            ('Block', ('Return', ('Variable', 'a'))),
-            ('Block', ('Return', ('Variable', 'b'))))))))
-
+            ('BinaryOp', '>', ('Identifier', 'a'), ('Identifier', 'b')),
+            ('Block', ('Return', ('Identifier', 'a'))),
+            ('Block', ('Return', ('Identifier', 'b'))))))))
+@nottest
 def test_procedure_fac():
     s = """
     fac := procedure(n) {
@@ -757,26 +763,26 @@ def test_procedure_fac():
     node = parse_single_statement(s)
     eq_(node.to_tuples(),
         ('Assignment', ':=',
-         ('Variable', 'fac'),
+         ('Identifier', 'fac'),
          ('Procedure',
           ('ParamList', ('Param', 'n')),
           ('Block',
-           ('Assignment', ':=', ('Variable', 'i'), ('Constant', 'int', 1)),
+           ('Assignment', ':=', ('Identifier', 'i'), ('Constant', 'int', 1)),
            ('While',
-            ('BinaryOp', '>=', ('Variable', 'n'), ('Constant', 'int', 1)),
+            ('BinaryOp', '>=', ('Identifier', 'n'), ('Constant', 'int', 1)),
             ('Block',
-             ('Assignment', '*=', ('Variable', 'i'), ('Variable', 'n')),
-             ('Assignment', '-=', ('Variable', 'n'), ('Constant', 'int', 1)))),
-            ('Return', ('Variable', 'i'))))))
+             ('Assignment', '*=', ('Identifier', 'i'), ('Identifier', 'n')),
+             ('Assignment', '-=', ('Identifier', 'n'), ('Constant', 'int', 1)))),
+            ('Return', ('Identifier', 'i'))))))
 
 ##
 ## Cached procedures
 ##
-
+@nottest
 def test_cached_procedure_minimal():
     node = parse_single_statement('cachedProcedure() {};')
     eq_(node.to_tuples(), ('CachedProcedure', ('ParamList',), ('Block',)))
-
+@nottest
 def test_cached_procedure_square():
     node = parse_single_statement('cachedProcedure(x) { return x ** x; };')
     eq_(node.to_tuples(),
@@ -784,9 +790,9 @@ def test_cached_procedure_square():
          ('ParamList', ('Param', 'x')),
          ('Block', ('Return',
            ('BinaryOp', '**',
-            ('Variable', 'x'),
-            ('Variable', 'x'))))))
-
+            ('Identifier', 'x'),
+            ('Identifier', 'x'))))))
+@nottest
 def test_cached_procedure_max():
     s = """
     max := cachedProcedure(a, b) {
@@ -800,15 +806,15 @@ def test_cached_procedure_max():
     node = parse_single_statement(s)
     eq_(node.to_tuples(),
         ('Assignment', ':=',
-         ('Variable', 'max'),
+         ('Identifier', 'max'),
          ('CachedProcedure',
           ('ParamList', ('Param', 'a'), ('Param', 'b')),
           ('Block',
            ('If',
-            ('BinaryOp', '>', ('Variable', 'a'), ('Variable', 'b')),
-            ('Block', ('Return', ('Variable', 'a'))),
-            ('Block', ('Return', ('Variable', 'b'))))))))
-
+            ('BinaryOp', '>', ('Identifier', 'a'), ('Identifier', 'b')),
+            ('Block', ('Return', ('Identifier', 'a'))),
+            ('Block', ('Return', ('Identifier', 'b'))))))))
+@nottest
 def test_cached_procedure_fac():
     s = """
     fac := cachedProcedure(n) {
@@ -823,22 +829,22 @@ def test_cached_procedure_fac():
     node = parse_single_statement(s)
     eq_(node.to_tuples(),
         ('Assignment', ':=',
-         ('Variable', 'fac'),
+         ('Identifier', 'fac'),
          ('CachedProcedure',
           ('ParamList', ('Param', 'n')),
           ('Block',
-           ('Assignment', ':=', ('Variable', 'i'), ('Constant', 'int', 1)),
+           ('Assignment', ':=', ('Identifier', 'i'), ('Constant', 'int', 1)),
            ('While',
-            ('BinaryOp', '>=', ('Variable', 'n'), ('Constant', 'int', 1)),
+            ('BinaryOp', '>=', ('Identifier', 'n'), ('Constant', 'int', 1)),
             ('Block',
-             ('Assignment', '*=', ('Variable', 'i'), ('Variable', 'n')),
-             ('Assignment', '-=', ('Variable', 'n'), ('Constant', 'int', 1)))),
-            ('Return', ('Variable', 'i'))))))
+             ('Assignment', '*=', ('Identifier', 'i'), ('Identifier', 'n')),
+             ('Assignment', '-=', ('Identifier', 'n'), ('Constant', 'int', 1)))),
+            ('Return', ('Identifier', 'i'))))))
 
 ##
 ## Lambda
 ##
-
+@nottest
 def test_lambda_minimal_zero_params():
     node = parse_single_statement('< > |-> true;')
     eq_(node.to_tuples(),
@@ -846,29 +852,29 @@ def test_lambda_minimal_zero_params():
          ('ParamList', ),
          ('Constant', 'bool', True)))
 
-
+@nottest
 def test_lamba_minimal_one_param_no_brackets():
     node = parse_single_statement("foo |-> 'bar';")
     eq_(node.to_tuples(),
         ('Lambda',
          ('ParamList', ('Param', 'foo')),
          ('Constant', 'literal', 'bar')))
-    
+@nottest    
 def test_lambda_minimal_one_param_brackets():
     node = parse_single_statement('x |-> x ** x;')
     eq_(node.to_tuples(),
         ('Lambda',
          ('ParamList', ('Param', 'x')),
          ('BinaryOp', '**',
-          ('Variable', 'x'),
-          ('Variable', 'x'))))
-
+          ('Identifier', 'x'),
+          ('Identifier', 'x'))))
+@nottest
 def test_lambda_two_params():
     node = parse_single_statement('<x,y> |-> x+y;')
     eq_(node.to_tuples(),
         ('Lambda',
          ('ParamList', ('Param', 'x'), ('Param', 'y')),
          ('BinaryOp', '+',
-          ('Variable', 'x'),
-          ('Variable', 'y'))))
+          ('Identifier', 'x'),
+          ('Identifier', 'y'))))
     

@@ -13,6 +13,8 @@ from ply import yacc
 from setlx2py.setlx_lexer import Lexer
 from setlx2py.setlx_ast import *
 
+
+
 class Parser():
 
     tokens = Lexer.tokens
@@ -24,7 +26,7 @@ class Parser():
         self.lexer.build()
 
         # Parser
-        self.parser = yacc.yacc(module=self, start='init_block_or_epsilon')
+        self.parser = yacc.yacc(module=self, start='file_input')
 
     def parse(self, text):
         return self.parser.parse(input=text, lexer=self.lexer)
@@ -48,264 +50,62 @@ class Parser():
     ## Implementation of the BNF defined in Pure.g of setlx interpreter 
     ##
 
-    def p_init_block_or_epsilon(self, p):
-        """ init_block_or_epsilon : init_block
-                                  | epsilon
-        """
+    def p_file_input(self, p):
+        """ file_input : statement_list """
         p[0] = FileAST([]) if p[1] is None else FileAST(p[1])
 
-    def p_init_block_1(self, p):
-        """ init_block : statement  """
+    ##
+    ## Statements
+    ##
+
+    def p_statement_list_1(self, p):
+        """ statement_list : statement  """
         p[0] = p[1]
 
-    def p_init_block_2(self, p):
-        """ init_block : init_block statement """
+    def p_statement_list_2(self, p):
+        """ statement_list : statement_list statement  """
         if p[2] is not None:
             p[1].extend(p[2])
         p[0] = p[1]
 
     def p_statement(self, p):
-        """ statement : if_statement
-                      | switch_statement
-                      | while_loop
-                      | do_while_loop
-                      | for_loop
-                      | jump_statement SEMICOLON
-                      | assert_statement SEMICOLON
-                      | assignment_direct SEMICOLON
-                      | assignment_other  SEMICOLON
-                      | expr SEMICOLON 
-        """
+        """ statement : simple_statement SEMICOLON """
         p[0] = [p[1]]
 
-    ##
-    ## Variable/Condition
-    ##
-
-    def p_variable(self, p):
-        """ variable : IDENTIFIER """
-        p[0] = Variable(p[1])
-
-    def p_condition(self, p):
-        """ condition : expr """
+    def p_simple_statement(self, p):
+        """ simple_statement : expression_statement """
         p[0] = p[1]
 
-    ##
-    ## Block
-    ##
-
-    def p_block(self, p):
-        """ block : stmt_list
-                  | epsilon
-        """
-        if p[1] is None:
-            p[0] = Block([])
-        else:
-            p[0] = Block(p[1])
-
-    def p_stmt_list_1(self, p):
-        """ stmt_list : statement  """
-        p[0] = p[1]
-
-    def p_stmt_list_2(self, p):
-        """ stmt_list : stmt_list statement  """
-        if p[2] is not None:
-            p[1].extend(p[2])
-        p[0] = p[1]
-
-    ##
-    ## Loops
-    ##
-
-    def p_while_loop(self, p):
-        """ while_loop : WHILE LPAREN condition RPAREN LBRACE block RBRACE """
-        p[0] = While(p[3], p[6], p[3].coord)
-
-    def p_do_while_loop(self, p):
-        """ do_while_loop : DO LBRACE block RBRACE \
-                            WHILE LPAREN condition RPAREN SEMICOLON
-        """
-        p[0] = DoWhile(p[7], p[3], p[3].coord)
-
-    def p_for_loop(self, p):
-        """ for_loop : FOR LPAREN iterator_chain  RPAREN LBRACE block RBRACE """
-        p[0] = For(p[3], p[6], p[3].coord)
-        
-    ##
-    ## If Statements
-    ##
-
-    def p_if_statement_1(self, p):
-        """ if_statement : IF LPAREN condition RPAREN LBRACE block RBRACE """
-        p[0] = If(p[3], p[6], None, p[3].coord)
-
-    def p_if_statement_2(self, p):
-        """ if_statement : IF LPAREN condition RPAREN \
-                           LBRACE block RBRACE \
-                           ELSE LBRACE block RBRACE """
-        p[0] = If(p[3], p[6], p[10], p[3].coord)
-        
-    def p_if_statement_3(self, p):
-        """ if_statement : IF LPAREN condition RPAREN \
-                           LBRACE block RBRACE \
-                           ELSE if_statement  """
-        p[0] = If(p[3], p[6], p[9], p[3].coord)
-
-    ##
-    ## Switch Statement
-    ##
-
-    def p_switch_statement(self, p):
-        """ switch_statement : SWITCH LBRACE case_statements default_case RBRACE """
-        p[0] = Switch(p[3], p[4], p[3].coord)
-
-    def p_case_statements(self, p):
-        """ case_statements : case_list
-                            | epsilon
-        """
-        if p[1] is None:
-            p[0] = CaseList([])
-        else:
-            p[0] = CaseList(p[1])
-
-    def p_case_list_1(self, p):
-        """ case_list : case_statement  """
-        p[0] = [p[1]]
-
-    def p_case_list_2(self, p):
-        """ case_list : case_list case_statement  """
-        if p[2] is not None:
-            p[1].append(p[2])
-        p[0] = p[1]
-
-    def p_case_statement(self, p):
-        """ case_statement : CASE condition COLON block """
-        p[0] = Case(p[2], p[4], p[2].coord)
-
-    def p_default_case_1(self, p):
-        """ default_case : DEFAULT COLON block """
-        p[0] = Default(p[3], p[3].coord)
-
-    def p_default_case_2(self, p):
-        """ default_case : epsilon """
-        p[0] = None
-
-
-    ## 
-    ## Jump Statements
-    ##
-
-    def p_jump_statement_1(self, p):
-        """ jump_statement : BACKTRACK """
-        p[0] = Backtrack()
-
-    def p_jump_statement_2(self, p):
-        """ jump_statement : BREAK """
-        p[0] = Break()
-
-    def p_jump_statement_3(self, p):
-        """ jump_statement : CONTINUE """
-        p[0] = Continue()
-
-    def p_jump_statement_4(self, p):
-        """ jump_statement : EXIT """
-        p[0] = Exit()
-
-    def p_jump_statement_5(self, p):
-        """ jump_statement : RETURN """
-        p[0] = Return(None)
-
-    def p_jump_statement_6(self, p):
-        """ jump_statement : RETURN expr """
-        p[0] = Return(p[2], p[2].coord)
-
-    
-    ##
-    ## Assert
-    ##
-
-    def p_assert_statement(self, p):
-        """ assert_statement : ASSERT LPAREN condition COMMA expr RPAREN """
-        p[0] = Assert(p[3], p[5], p[3].coord)
-
-    ##
-    ## Assignment
-    ##
-
-    ## Assignment Direct
-    def p_assignment_direct_1(self, p):
-        """ assignment_direct : assignable ASSIGN expr """
-        p[0] = Assignment(p[2], p[1], p[3],  p[1].coord)
-
-    ## Assignment Other
-    def p_assignment_other(self, p):
-        """ assignment_other : assignable PLUS_EQUAL    expr
-                             | assignable MINUS_EQUAL   expr
-                             | assignable TIMES_EQUAL   expr
-                             | assignable DIVIDE_EQUAL  expr
-                             | assignable IDIVIDE_EQUAL expr
-                             | assignable MOD_EQUAL     expr
-        """
-        p[0] = Assignment(p[2], p[1], p[3], p[1].coord)
-        
-    ## Assignable
-
-    def p_assignable_1(self, p):
-        """ assignable : variable
-                       | unused
-        """
-        p[0] = p[1]
-
-    def p_assignable_2(self, p):
-        """ assignable : assignable DOT variable """
-        p[0] = MemberAccess(p[1], p[3], p[1].coord)
-
-    def p_assignable_3(self, p):
-        """ assignable : assignable LBRACKET expr RBRACKET """
-        p[0] = ArrayRef(p[1], p[3], p[1].coord)
-
-    def p_assignable_4(self, p):
-        """ assignable : LBRACKET explicit_assign_list RBRACKET
-        """
-        p[0] = p[2]
-
-    def p_explicit_assign_list_1(self, p):
-        """ explicit_assign_list : assignable """
-        p[0] = p[1]
-
-    def p_explicit_assign_list_2(self, p):
-        """ explicit_assign_list : explicit_assign_list COMMA assignable """
-        if not isinstance(p[1], AssignmentList):
-            p[1] = AssignmentList([p[1]], p[1].coord)
-        p[1].assignments.append(p[3])
+    def p_expression_statement(self, p):
+        """ expression_statement : expression """
         p[0] = p[1]
 
     ##
     ## Expressions
     ##
 
-    def p_expr_1(self, p):
-        """ expr : implication
-                 | lambda_definition
+    # TODO : lambda
+    def p_expression_1(self, p):
+        """ expression : implication
         """
         p[0] = p[1]
 
-    def p_expr_2(self, p):
-        """ expr : implication EQUIVALENT implication
-                 | implication ANTIVALENT implication
+    def p_expression_2(self, p):
+        """ expression : implication EQUIVALENT implication
+                       | implication ANTIVALENT implication
         """
         p[0] = BinaryOp(p[2], p[1], p[3], p[1].coord)
 
-    def p_expr_list_1(self, p):
-        """ expr_list : expr  """
-        p[0] = p[1]
+#    def p_expr_list_1(self, p):
+#        """ expr_list : expr  """
+#        p[0] = p[1]
 
-    def p_expr_list_2(self, p):
-        """ expr_list : expr_list COMMA expr """
-        if not isinstance(p[1], ExprList):
-            p[1] = ExprList([p[1]], p[1].coord)
-        p[1].exprs.append(p[3])
-        p[0] = p[1]
+#    def p_expr_list_2(self, p):
+#        """ expr_list : expr_list COMMA expr """
+#        if not isinstance(p[1], ExprList):
+#            p[1] = ExprList([p[1]], p[1].coord)
+#        p[1].exprs.append(p[3])
+#        p[0] = p[1]
 
     ## Implication
         
@@ -385,209 +185,474 @@ class Parser():
     ## Reduce
         
     def p_reduce_1(self, p):
-        """ reduce : prefix_operation """
+        """ reduce : unary_expression """
         p[0] = p[1]
 
     def p_reduce_2(self, p):
-        """ reduce : reduce SUM prefix_operation
-                   | reduce PRODUCT prefix_operation
+        """ reduce : reduce SUM unary_expression
+                   | reduce PRODUCT unary_expression
         """
         p[0] = BinaryOp(p[2], p[1], p[3], p[1].coord)
 
     ## Prefix Operation
         
-    def p_prefix_operation_1(self, p):
-        """ prefix_operation : factor """
+    def p_unary_expression_1(self, p):
+        """ unary_expression : power """
         p[0] = p[1]
 
-    def p_prefix_operation_2(self, p):
-        """ prefix_operation : SUM     prefix_operation
-                             | PRODUCT prefix_operation
-                             | HASH    prefix_operation
-                             | MINUS   prefix_operation
-                             | AT      prefix_operation
+    def p_unary_expression_2(self, p):
+        """ unary_expression : SUM     unary_expression
+                             | PRODUCT unary_expression
+                             | HASH    unary_expression
+                             | MINUS   unary_expression
+                             | AT      unary_expression
         """
         p[0] = UnaryOp(p[1], p[2], p[2].coord)
 
-    def p_prefix_operation_3(self, p):
-        """ prefix_operation : factor POW prefix_operation """
-        p[0] = BinaryOp(p[2], p[1], p[3], p[1].coord)
-
-    ## Factor
-        
-    def p_factor_1(self, p):
-        """ factor  : value """
-        p[0] = p[1]
-
-    def p_factor_2(self, p):
-        """ factor : BANG factor """
+    def p_unary_expression_3(self, p):
+        """ unary_expression : BANG unary_expression """
         p[0] = UnaryOp('not', p[2], p[2].coord)
 
-    def p_factor_3(self, p):
-        """ factor : value BANG """
+    def p_power_1(self, p):
+        """ power : primary """
+        p[0] = p[1]
+
+    def p_power_2(self, p):
+        """ power : primary POW unary_expression """
+        p[0] = BinaryOp(p[2], p[1], p[3], p[1].coord)
+
+    ## Primary
+        
+    def p_primary_1(self, p):
+        """ primary  : atom
+        """
+        p[0] = p[1]
+
+    def p_primary_2(self, p):
+        """ primary : primary BANG """
         p[0] = UnaryOp('fac', p[1], p[1].coord)
 
-    def p_factor_4(self, p):
-        """ factor : term """
-        p[0] = p[1]
+    # Atom
 
-    def p_facto_5(self, p):
-        """ factor : quantor """
-        p[0] = p[1]
-
-    def p_factor_6(self, p):
-        """ factor : LPAREN expr RPAREN """
-        p[0] = p[2]
-
-    def p_factor_7(self, p):
-        """ factor : variable
-                   | procedure_definition
+    def p_atom(self, p):
+        """ atom : identifier
+                 | literal
         """
         p[0] = p[1]
 
-    ##
-    ## Quantor
-    ##
-    
-    def p_quantor_1(self, p):
-        """ quantor : FORALL LPAREN iterator_chain PIPE condition RPAREN """
-        p[0] = Quantor('all', p[3], p[5], p[3].coord)
-
-    def p_quantor_2(self, p):
-        """ quantor : EXISTS LPAREN iterator_chain PIPE condition RPAREN """
-        p[0] = Quantor('any', p[3], p[5], p[3].coord)
-
+    def p_variable(self, p):
+        """ identifier : IDENTIFIER """
+        p[0] = Identifier(p[1])
 
     ##
-    ## Term
+    ## Literals
     ##
 
-    def p_term(self, p):
-        """ term : TERM LPAREN term_arguments RPAREN """
-        p[0] = Term(p[1], p[3], p[3].coord)
-
-        
-    def p_term_arguments(self, p):
-        """ term_arguments : expr_list
-                           | epsilon
-        """
-        p[0] = p[1] if p[1] is not None else ExprList([])
-
-    ##
-    ## Procedures
-    ##
-    def p_procedure_definition(self, p):
-        """ procedure_definition : procedure
+    def p_literal(self, p):
+        """ literal : stringliteral
+                    | integer
+                    | floatnumber
+                    | boolean
         """
         p[0] = p[1]
 
-    def p_procedure_1(self, p):
-        """ procedure : PROCEDURE LPAREN parameter_list RPAREN \
-                        LBRACE block RBRACE
-        """
-        p[0] = Procedure(p[3], p[6], p[3].coord)
+    # String constants
 
-    def p_procedure_2(self, p):
-        """ procedure : CPROCEDURE LPAREN parameter_list RPAREN \
-                        LBRACE block RBRACE
-        """
-        p[0] = CachedProcedure(p[3], p[6], p[3].coord)
-
-    def p_parameter_list(self, p):
-        """ parameter_list : procedure_param
-                           | parameter_list COMMA procedure_param
-                           | epsilon
-        """
-        if len(p) == 2:
-            if p[1] is None: p[0] = ParamList([])
-            else: p[0] = ParamList([p[1]], p[1].coord)
-        else:
-            p[1].params.append(p[3])
-            p[0] = p[1]
-
-    def p_procedure_param(self, p):
-        """ procedure_param : variable """
-        p[0] = Param(p[1].name, p[1].coord)
-
-    ##
-    ## Lambda Definitions
-    ##
-
-    def p_lambda_definition(self, p):
-        """ lambda_definition : lambda_parameters LAMBDADEF expr """
-        p[0] = Lambda(p[1], p[3], p[1].coord)
-
-    def p_lambda_parameters(self, p):
-        """ lambda_parameters : variable
-                              | LT parameter_list GT
-        """
-        if len(p) == 2:
-            param = Param(p[1].name)
-            p[0] = ParamList([param], p[1].coord)
-        else:
-            p[0] = p[2]
-
-    ##
-    ## Iterator
-    ##
-
-    def p_iterator(self, p):
-        """ iterator : assignable IN expr """
-        p[0] = Iterator(p[1], p[3], p[1].coord)
-
-    def p_iterator_chain_1(self, p):
-        """ iterator_chain : iterator """
-        p[0] = p[1]
-
-    def p_iterator_chain_2(self, p):
-        """ iterator_chain : iterator_chain COMMA iterator """
-        if not isinstance(p[1], IteratorChain):
-            p[1] = IteratorChain([p[1]], p[1].coord)
-        p[1].iterators.append(p[3])
-        p[0] = p[1]
-        
-    ##
-    ## Values
-    ##
-
-    def p_unused(self, p):
-        """ unused : UNUSED """
-        p[0] = Variable('unused', 'unused')
-        
-    def p_value_1(self, p):
-        """ value : atomic_value """
-        p[0] = p[1]
-
-    def p_value_2(self, p):
-        """ value : STRING """
+    def p_string_literal_1(self, p):
+        """ stringliteral : STRING """
         p[0] = Constant('string', str(p[1]))
 
-    def p_value_3(self, p):
-        """ value : LITERAL """
+    def p_string_literal_2(self, p):
+        """ stringliteral : LITERAL """
         p[0] = Constant('literal', str(p[1]))
 
-    def p_value_4(self, p):
-        """ value : unused """
-        p[0] = p[1]
+    # Numerical constants
 
-    ## Atomic Value
-        
-    def p_atomic_value_1(self, p):
-        """ atomic_value  : INTEGER """
+    def p_integer(self, p):
+        """ integer  : INTEGER """
         p[0] = Constant('int', int(p[1]))
 
-    def p_atomic_value_2(self, p):
-        """ atomic_value : DOUBLE """
+    def p_floatnumber(self, p):
+        """ floatnumber : DOUBLE """
         p[0] = Constant('double', float(p[1]))
 
-    def p_atomic_value_3(self, p):
-        """ atomic_value : TRUE """
+    def p_boolean_1(self, p):
+        """ boolean : TRUE """
         p[0] = Constant('bool', True)
 
-    def p_atomic_value_4(self, p):
-        """ atomic_value : FALSE """
+    def p_boolean_2(self, p):
+        """ boolean : FALSE """
         p[0] = Constant('bool', False)
 
-    def p_epsilon(self, p):
-        """ epsilon : """
-        p[0] = None
+    # def p_init_block_or_epsilon(self, p):
+    #     """ init_block_or_epsilon : init_block
+    #                               | epsilon
+    #     """
+    #     p[0] = FileAST([]) if p[1] is None else FileAST(p[1])
+
+    # def p_init_block_1(self, p):
+    #     """ init_block : statement  """
+    #     p[0] = p[1]
+
+    # def p_init_block_2(self, p):
+    #     """ init_block : init_block statement """
+    #     if p[2] is not None:
+    #         p[1].extend(p[2])
+    #     p[0] = p[1]
+
+    # def p_statement(self, p):
+    #     """ statement : if_statement
+    #                   | switch_statement
+    #                   | while_loop
+    #                   | do_while_loop
+    #                   | for_loop
+    #                   | jump_statement SEMICOLON
+    #                   | assert_statement SEMICOLON
+    #                   | assignment_direct SEMICOLON
+    #                   | assignment_other  SEMICOLON
+    #                   | expr SEMICOLON 
+    #     """
+    #     p[0] = [p[1]]
+
+    # ##
+    # ## Variable/Condition
+    # ##
+
+
+    # def p_condition(self, p):
+    #     """ condition : expr """
+    #     p[0] = p[1]
+
+    # ##
+    # ## Block
+    # ##
+
+    # def p_block(self, p):
+    #     """ block : stmt_list
+    #               | epsilon
+    #     """
+    #     if p[1] is None:
+    #         p[0] = Block([])
+    #     else:
+    #         p[0] = Block(p[1])
+
+    
+    # ##
+    # ## Loops
+    # ##
+
+    # def p_while_loop(self, p):
+    #     """ while_loop : WHILE LPAREN condition RPAREN LBRACE block RBRACE """
+    #     p[0] = While(p[3], p[6], p[3].coord)
+
+    # def p_do_while_loop(self, p):
+    #     """ do_while_loop : DO LBRACE block RBRACE \
+    #                         WHILE LPAREN condition RPAREN SEMICOLON
+    #     """
+    #     p[0] = DoWhile(p[7], p[3], p[3].coord)
+
+    # def p_for_loop(self, p):
+    #     """ for_loop : FOR LPAREN iterator_chain  RPAREN LBRACE block RBRACE """
+    #     p[0] = For(p[3], p[6], p[3].coord)
+        
+    # ##
+    # ## If Statements
+    # ##
+
+    # def p_if_statement_1(self, p):
+    #     """ if_statement : IF LPAREN condition RPAREN LBRACE block RBRACE """
+    #     p[0] = If(p[3], p[6], None, p[3].coord)
+
+    # def p_if_statement_2(self, p):
+    #     """ if_statement : IF LPAREN condition RPAREN \
+    #                        LBRACE block RBRACE \
+    #                        ELSE LBRACE block RBRACE """
+    #     p[0] = If(p[3], p[6], p[10], p[3].coord)
+        
+    # def p_if_statement_3(self, p):
+    #     """ if_statement : IF LPAREN condition RPAREN \
+    #                        LBRACE block RBRACE \
+    #                        ELSE if_statement  """
+    #     p[0] = If(p[3], p[6], p[9], p[3].coord)
+
+    # ##
+    # ## Switch Statement
+    # ##
+
+    # def p_switch_statement(self, p):
+    #     """ switch_statement : SWITCH LBRACE case_statements default_case RBRACE """
+    #     p[0] = Switch(p[3], p[4], p[3].coord)
+
+    # def p_case_statements(self, p):
+    #     """ case_statements : case_list
+    #                         | epsilon
+    #     """
+    #     if p[1] is None:
+    #         p[0] = CaseList([])
+    #     else:
+    #         p[0] = CaseList(p[1])
+
+    # def p_case_list_1(self, p):
+    #     """ case_list : case_statement  """
+    #     p[0] = [p[1]]
+
+    # def p_case_list_2(self, p):
+    #     """ case_list : case_list case_statement  """
+    #     if p[2] is not None:
+    #         p[1].append(p[2])
+    #     p[0] = p[1]
+
+    # def p_case_statement(self, p):
+    #     """ case_statement : CASE condition COLON block """
+    #     p[0] = Case(p[2], p[4], p[2].coord)
+
+    # def p_default_case_1(self, p):
+    #     """ default_case : DEFAULT COLON block """
+    #     p[0] = Default(p[3], p[3].coord)
+
+    # def p_default_case_2(self, p):
+    #     """ default_case : epsilon """
+    #     p[0] = None
+
+
+    # ## 
+    # ## Jump Statements
+    # ##
+
+    # def p_jump_statement_1(self, p):
+    #     """ jump_statement : BACKTRACK """
+    #     p[0] = Backtrack()
+
+    # def p_jump_statement_2(self, p):
+    #     """ jump_statement : BREAK """
+    #     p[0] = Break()
+
+    # def p_jump_statement_3(self, p):
+    #     """ jump_statement : CONTINUE """
+    #     p[0] = Continue()
+
+    # def p_jump_statement_4(self, p):
+    #     """ jump_statement : EXIT """
+    #     p[0] = Exit()
+
+    # def p_jump_statement_5(self, p):
+    #     """ jump_statement : RETURN """
+    #     p[0] = Return(None)
+
+    # def p_jump_statement_6(self, p):
+    #     """ jump_statement : RETURN expr """
+    #     p[0] = Return(p[2], p[2].coord)
+
+    
+    # ##
+    # ## Assert
+    # ##
+
+    # def p_assert_statement(self, p):
+    #     """ assert_statement : ASSERT LPAREN condition COMMA expr RPAREN """
+    #     p[0] = Assert(p[3], p[5], p[3].coord)
+
+    # ##
+    # ## Assignment
+    # ##
+
+    # ## Assignment Direct
+    # def p_assignment_direct_1(self, p):
+    #     """ assignment_direct : assignable ASSIGN expr """
+    #     p[0] = Assignment(p[2], p[1], p[3],  p[1].coord)
+
+    # ## Assignment Other
+    # def p_assignment_other(self, p):
+    #     """ assignment_other : assignable PLUS_EQUAL    expr
+    #                          | assignable MINUS_EQUAL   expr
+    #                          | assignable TIMES_EQUAL   expr
+    #                          | assignable DIVIDE_EQUAL  expr
+    #                          | assignable IDIVIDE_EQUAL expr
+    #                          | assignable MOD_EQUAL     expr
+    #     """
+    #     p[0] = Assignment(p[2], p[1], p[3], p[1].coord)
+        
+    # ## Assignable
+
+    # def p_assignable_1(self, p):
+    #     """ assignable : variable
+    #                    | unused
+    #     """
+    #     p[0] = p[1]
+
+    # def p_assignable_2(self, p):
+    #     """ assignable : assignable DOT variable """
+    #     p[0] = MemberAccess(p[1], p[3], p[1].coord)
+
+    # def p_assignable_3(self, p):
+    #     """ assignable : assignable LBRACKET expr RBRACKET """
+    #     p[0] = ArrayRef(p[1], p[3], p[1].coord)
+
+    # def p_assignable_4(self, p):
+    #     """ assignable : LBRACKET explicit_assign_list RBRACKET
+    #     """
+    #     p[0] = p[2]
+
+    # def p_explicit_assign_list_1(self, p):
+    #     """ explicit_assign_list : assignable """
+    #     p[0] = p[1]
+
+    # def p_explicit_assign_list_2(self, p):
+    #     """ explicit_assign_list : explicit_assign_list COMMA assignable """
+    #     if not isinstance(p[1], AssignmentList):
+    #         p[1] = AssignmentList([p[1]], p[1].coord)
+    #     p[1].assignments.append(p[3])
+    #     p[0] = p[1]
+
+
+
+    # def p_factor_2(self, p):
+    #     """ factor : BANG factor """
+    #     p[0] = UnaryOp('not', p[2], p[2].coord)
+
+    # def p_factor_3(self, p):
+    #     """ factor : value BANG """
+    #     p[0] = UnaryOp('fac', p[1], p[1].coord)
+
+    # def p_factor_4(self, p):
+    #     """ factor : term """
+    #     p[0] = p[1]
+
+    # def p_facto_5(self, p):
+    #     """ factor : quantor """
+    #     p[0] = p[1]
+
+    # def p_factor_6(self, p):
+    #     """ factor : LPAREN expr RPAREN """
+    #     p[0] = p[2]
+
+    # def p_factor_7(self, p):
+    #     """ factor : variable
+    #                | procedure_definition
+    #     """
+    #     p[0] = p[1]
+
+    # ##
+    # ## Quantor
+    # ##
+    
+    # def p_quantor_1(self, p):
+    #     """ quantor : FORALL LPAREN iterator_chain PIPE condition RPAREN """
+    #     p[0] = Quantor('all', p[3], p[5], p[3].coord)
+
+    # def p_quantor_2(self, p):
+    #     """ quantor : EXISTS LPAREN iterator_chain PIPE condition RPAREN """
+    #     p[0] = Quantor('any', p[3], p[5], p[3].coord)
+
+
+    # ##
+    # ## Term
+    # ##
+
+    # def p_term(self, p):
+    #     """ term : TERM LPAREN term_arguments RPAREN """
+    #     p[0] = Term(p[1], p[3], p[3].coord)
+
+        
+    # def p_term_arguments(self, p):
+    #     """ term_arguments : expr_list
+    #                        | epsilon
+    #     """
+    #     p[0] = p[1] if p[1] is not None else ExprList([])
+
+    # ##
+    # ## Procedures
+    # ##
+    # def p_procedure_definition(self, p):
+    #     """ procedure_definition : procedure
+    #     """
+    #     p[0] = p[1]
+
+    # def p_procedure_1(self, p):
+    #     """ procedure : PROCEDURE LPAREN parameter_list RPAREN \
+    #                     LBRACE block RBRACE
+    #     """
+    #     p[0] = Procedure(p[3], p[6], p[3].coord)
+
+    # def p_procedure_2(self, p):
+    #     """ procedure : CPROCEDURE LPAREN parameter_list RPAREN \
+    #                     LBRACE block RBRACE
+    #     """
+    #     p[0] = CachedProcedure(p[3], p[6], p[3].coord)
+
+    # def p_parameter_list(self, p):
+    #     """ parameter_list : procedure_param
+    #                        | parameter_list COMMA procedure_param
+    #                        | epsilon
+    #     """
+    #     if len(p) == 2:
+    #         if p[1] is None: p[0] = ParamList([])
+    #         else: p[0] = ParamList([p[1]], p[1].coord)
+    #     else:
+    #         p[1].params.append(p[3])
+    #         p[0] = p[1]
+
+    # def p_procedure_param(self, p):
+    #     """ procedure_param : variable """
+    #     p[0] = Param(p[1].name, p[1].coord)
+
+    # ##
+    # ## Lambda Definitions
+    # ##
+
+    # def p_lambda_definition(self, p):
+    #     """ lambda_definition : lambda_parameters LAMBDADEF expr """
+    #     p[0] = Lambda(p[1], p[3], p[1].coord)
+
+    # def p_lambda_parameters(self, p):
+    #     """ lambda_parameters : variable
+    #                           | LT parameter_list GT
+    #     """
+    #     if len(p) == 2:
+    #         param = Param(p[1].name)
+    #         p[0] = ParamList([param], p[1].coord)
+    #     else:
+    #         p[0] = p[2]
+
+    # ##
+    # ## Iterator
+    # ##
+
+    # def p_iterator(self, p):
+    #     """ iterator : assignable IN expr """
+    #     p[0] = Iterator(p[1], p[3], p[1].coord)
+
+    # def p_iterator_chain_1(self, p):
+    #     """ iterator_chain : iterator """
+    #     p[0] = p[1]
+
+    # def p_iterator_chain_2(self, p):
+    #     """ iterator_chain : iterator_chain COMMA iterator """
+    #     if not isinstance(p[1], IteratorChain):
+    #         p[1] = IteratorChain([p[1]], p[1].coord)
+    #     p[1].iterators.append(p[3])
+    #     p[0] = p[1]
+        
+    # ##
+    # ## Values
+    # ##
+
+    # def p_unused(self, p):
+    #     """ unused : UNUSED """
+    #     p[0] = Variable('unused', 'unused')
+        
+    # def p_value_1(self, p):
+    #     """ value : atomic_value """
+    #     p[0] = p[1]
+
+
+    # def p_value_4(self, p):
+    #     """ value : unused """
+    #     p[0] = p[1]
+
+    # ## Atomic Value
+        
+
+    # def p_epsilon(self, p):
+    #     """ epsilon : """
+    #     p[0] = None

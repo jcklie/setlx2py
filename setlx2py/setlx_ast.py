@@ -566,7 +566,7 @@ class UnaryOp(Node):
 
     attr_names = ('op',)
 
-class Variable(Node):
+class Identifier(Node):
     def __init__(self, name, coord=None):
         self.name = name
         self.coord = coord
