@@ -162,7 +162,7 @@ def test_binop_product():
 def test_binop_reduce():
     assert_binop('42 +/ 43;', '+/', 42, 43)
     assert_binop('42 */ 43;', '*/', 42, 43)
-@nottest
+
 def test_expr_paren_simple():
     node = parse_single_statement('(foo + bar);')
     eq_(node.to_tuples(),
@@ -191,7 +191,7 @@ def test_three_operands_precedence_minus_divide():
          ('BinaryOp', '/',
           ('Constant', 'int', 4 ),
           ('Constant', 'double', 2.0 ))))
-@nottest
+
 def test_precendce_arithmetic():
     node = parse_single_statement('a + b  * c / ( d - e );')
     eq_(node.to_tuples(),
@@ -217,22 +217,13 @@ def test_unop():
     assert_unop('@  42;',   '@', 'int', 42)
     assert_unop('!true;', 'not', 'bool', True)
     assert_unop('1337!;', 'fac', 'int', 1337)
-    
-##    
-## Assert
-##
 
-@nottest    
-def test_condition_simple():
-    assert_stmt = parse_single_statement('assert(isOverflown, false);')
-    eq_(assert_stmt.to_tuples(),
-        ('Assert',
-         ('Identifier', 'isOverflown'),
-         ('Constant', 'bool', False)))
+####    
 ##
-## Statements
+## Simple Statements
 ##
- 
+####
+    
 @nottest   
 def test_more_than_one_statement_simple():
     stmts = parse_statements('1 + 2; 3 * 4;')
@@ -244,12 +235,90 @@ def test_more_than_one_statement_simple():
          ('BinaryOp', '*',
           ('Constant', 'int', 3),
           ('Constant', 'int', 4))))
+
+##    
+## Assert
+##
+
+def test_assert_simple():
+    assert_stmt = parse_single_statement('assert(isOverflown, false);')
+    eq_(assert_stmt.to_tuples(),
+        ('Assert',
+         ('Identifier', 'isOverflown'),
+         ('Constant', 'bool', False)))
+
+##
+## Jump statements
+##
+
+def test_backtrack_statement():
+    node = parse_single_statement('backtrack;')
+    eq_(node.to_tuples(),
+        ('Backtrack',))
+
+def test_break_statement():
+    node = parse_single_statement('break;')
+    eq_(node.to_tuples(),
+        ('Break',))
+
+def test_continue_statement():
+    node = parse_single_statement('continue;')
+    eq_(node.to_tuples(),
+        ('Continue',))
+
+def test_break_statement():
+    node = parse_single_statement('exit;')
+    eq_(node.to_tuples(),
+        ('Exit',))
+
+def test_return_statement_void():
+    node = parse_single_statement('return;')
+    eq_(node.to_tuples(),
+        ('Return',))
+
+def test_return_statement_const():
+    node = parse_single_statement('return 42;')
+    eq_(node.to_tuples(),
+        ('Return',
+         ('Constant', 'int', 42)))
+
+def test_return_statement_binop():
+    node = parse_single_statement('return 42 ** 2;')
+    eq_(node.to_tuples(),
+        ('Return',
+         ('BinaryOp', '**',
+          ('Constant', 'int', 42),
+          ('Constant', 'int', 2))))
+
+##    
+## Terms
+##
+
+def test_term_single_arg():
+    term = parse_single_statement('F(true);')
+    eq_(term.to_tuples(),
+        ('Term', 'F',
+         ('Constant', 'bool', True)))
+
+def test_term_multi_arg():
+    term = parse_single_statement('F(true, false);')
+    eq_(term.to_tuples(),
+        ('Term', 'F',
+         ('ExprList', 
+          ('Constant', 'bool', True),
+          ('Constant', 'bool', False))))
+    
+####
+##
+## Compound Statements
+##
+####
+    
     
 ##
 ## If statements
 ##
 
-@nottest    
 def test_if_no_else():
     node = parse_single_statement('if(x >= 5) { return true; }')
     eq_(node.to_tuples(),
@@ -280,7 +349,6 @@ def test_if_no_else_longer_block():
            ('Constant', 'string', 'Let it snow!')),
           ('Return', ('Identifier', 'prediction')))))
 
-@nottest
 def test_if_single_else():
     s = """
     if(i % 2 == 0) {
@@ -300,7 +368,6 @@ def test_if_single_else():
          ('Block', ('Return', ('Constant', 'string', 'Even'))),
          ('Block', ('Return', ('Constant', 'string', 'Odd')))))
 
-@nottest
 def test_if_single_else_empty():
     node = parse_single_statement("if(foo) {} else {}")
     eq_(node.to_tuples(),
@@ -309,7 +376,7 @@ def test_if_single_else_empty():
          ('Block',),
          ('Block',)))
 
-@nottest    
+
 def test_if_else_if_else_simple():
     s = """
     if(isGreen) {
@@ -333,7 +400,7 @@ def test_if_else_if_else_simple():
           ('Block',
            ('Return', ('Constant', 'string', 'Not green nor red'))))))
 
-@nottest
+
 def test_if_four_else_if_else():
     s = """
     if(grade == "A") {
@@ -374,7 +441,7 @@ def test_if_four_else_if_else():
               ('Block', ('Return', ('Constant', 'string', 'Fail'))),
               ('Block', ('Return', ('Constant', 'string', 'Invalid input')))))))))
 
-@nottest
+
 def test_if_nested_else():
     s = """
     if(num1 == num2) {
@@ -402,14 +469,13 @@ def test_if_nested_else():
 ## Switch/Case
 ##
 
-@nottest
 def test_switch_case_minimal():
     node = parse_single_statement('switch {}')
     eq_(node.to_tuples(),
         ('Switch',
          ('CaseList', )))
     pass
-@nottest
+
 def test_switch_case_simple_no_default():
     s = """
     // Check whether an integer n is even
@@ -433,7 +499,6 @@ def test_switch_case_simple_no_default():
             ('Constant', 'int', 1)),
            ('Block', ('Return', ('Constant', 'literal', 'Odd')))))))
     
-@nottest
 def test_switch_case_with_default():
     s = """
     switch {
@@ -469,14 +534,15 @@ def test_switch_case_with_default():
 ##
 ## While-Loop
 ##
-@nottest    
+
 def test_while_minimal():
     node = parse_single_statement("while(!empty) {}")
     eq_(node.to_tuples(),
         ('While',
          ('UnaryOp', 'not', ('Identifier', 'empty')),
          ('Block',)))
-@nottest
+
+@nottest    
 def test_while_bigger_body():
     node = parse_single_statement('while(i < n) { x *= 2; i -= 1;}')
     eq_(node.to_tuples(),
@@ -488,7 +554,7 @@ def test_while_bigger_body():
 ##
 ## Do-While-Loop
 ##
-@nottest    
+
 def test_do_while_loop_minimal():
     node = parse_single_statement("do {} while(!empty); ")
     eq_(node.to_tuples(),
@@ -563,66 +629,7 @@ def test_for_loop_three_iterators():
            ('Constant', 'string', "$street$ $street_number$")))))
            
 
-##    
-## Terms
-##
-@nottest    
-def test_term_single_arg():
-    term = parse_single_statement('F(true);')
-    eq_(term.to_tuples(),
-        ('Term', 'F',
-         ('Constant', 'bool', True)))
-@nottest
-def test_term_multi_arg():
-    term = parse_single_statement('F(true, false);')
-    eq_(term.to_tuples(),
-        ('Term', 'F',
-         ('ExprList', 
-          ('Constant', 'bool', True),
-          ('Constant', 'bool', False))))
 
-##
-## Jump statements
-##
-@nottest
-def test_jump_statement_backtrack():
-    node = parse_single_statement('backtrack;')
-    eq_(node.to_tuples(),
-        ('Backtrack',))
-@nottest    
-def test_jump_statement_break():
-    node = parse_single_statement('break;')
-    eq_(node.to_tuples(),
-        ('Break',))
-@nottest
-def test_jump_statement_continue():
-    node = parse_single_statement('continue;')
-    eq_(node.to_tuples(),
-        ('Continue',))
-@nottest
-def test_jump_statement_break():
-    node = parse_single_statement('exit;')
-    eq_(node.to_tuples(),
-        ('Exit',))
-@nottest
-def test_jump_statement_return_void():
-    node = parse_single_statement('return;')
-    eq_(node.to_tuples(),
-        ('Return',))
-@nottest
-def test_jump_statement_return_expr_const():
-    node = parse_single_statement('return 42;')
-    eq_(node.to_tuples(),
-        ('Return',
-         ('Constant', 'int', 42)))
-@nottest
-def test_jump_statement_return_expr_calc():
-    node = parse_single_statement('return 42 ** 2;')
-    eq_(node.to_tuples(),
-        ('Return',
-         ('BinaryOp', '**',
-          ('Constant', 'int', 42),
-          ('Constant', 'int', 2))))
     
 ##
 ## Assignments

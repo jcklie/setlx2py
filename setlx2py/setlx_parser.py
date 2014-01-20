@@ -54,6 +54,10 @@ class Parser():
         """ file_input : statement_list """
         p[0] = FileAST([]) if p[1] is None else FileAST(p[1])
 
+    def p_epsilon(self, p):
+        """ epsilon : """
+        p[0] = None
+
     ##
     ## Statements
     ##
@@ -68,21 +72,76 @@ class Parser():
             p[1].extend(p[2])
         p[0] = p[1]
 
-    def p_statement(self, p):
-        """ statement : simple_statement SEMICOLON """
+    def p_statement_1(self, p):
+        """ statement : simple_statement SEMICOLON
+        """
         p[0] = [p[1]]
 
+    def p_statement_2(self, p):
+        """ statement : compound_statement """
+        p[0] = [p[1]]
+
+    ####
+    ##
+    ## Simple statements
+    ##
+    ####
+        
     def p_simple_statement(self, p):
-        """ simple_statement : expression_statement """
+        """ simple_statement : expression_statement
+                             | assert_statement
+                             | backtrack_statement        
+                             | break_statement
+                             | continue_statement
+                             | exit_statement
+                             | return_statement
+                             | term
+        """
         p[0] = p[1]
 
     def p_expression_statement(self, p):
         """ expression_statement : expression """
         p[0] = p[1]
 
+    def p_backtrack_statement(self, p):
+        """ backtrack_statement : BACKTRACK """
+        p[0] = Backtrack()
+
+    def p_break_statement(self, p):
+        """ break_statement : BREAK """
+        p[0] = Break()
+
+    def p_continue_statement(self, p):
+        """ continue_statement : CONTINUE """
+        p[0] = Continue()
+
+    def p_exit_statement(self, p):
+        """ exit_statement : EXIT """
+        p[0] = Exit()
+
+    def p_return_statement_1(self, p):
+        """ return_statement : RETURN """
+        p[0] = Return(None)
+
+    def p_return_statement_2(self, p):
+        """ return_statement : RETURN expression """
+        p[0] = Return(p[2], p[2].coord)
+    
     ##
     ## Expressions
     ##
+
+    def p_expression_list_1(self, p):
+        """ expression_list : expression  """
+        p[0] = p[1]
+
+    def p_expression_list_2(self, p):
+        """ expression_list : expression_list COMMA expression """
+        if not isinstance(p[1], ExprList):
+            p[1] = ExprList([p[1]], p[1].coord)
+        p[1].exprs.append(p[3])
+        p[0] = p[1]
+        
 
     # TODO : lambda
     def p_expression_1(self, p):
@@ -96,18 +155,8 @@ class Parser():
         """
         p[0] = BinaryOp(p[2], p[1], p[3], p[1].coord)
 
-#    def p_expr_list_1(self, p):
-#        """ expr_list : expr  """
-#        p[0] = p[1]
 
-#    def p_expr_list_2(self, p):
-#        """ expr_list : expr_list COMMA expr """
-#        if not isinstance(p[1], ExprList):
-#            p[1] = ExprList([p[1]], p[1].coord)
-#        p[1].exprs.append(p[3])
-#        p[0] = p[1]
-
-    ## Implication
+    # Implication
         
     def p_implication_1(self, p):
         """ implication : disjunction """
@@ -117,7 +166,7 @@ class Parser():
         """ implication : disjunction IMPLICATES disjunction """
         p[0] = BinaryOp(p[2], p[1], p[3], p[1].coord)
 
-    ## Disjunction
+    # Disjunction
 
     def p_disjunction_1(self, p):
         """ disjunction : conjunction  """
@@ -127,7 +176,7 @@ class Parser():
         """ disjunction : disjunction OR conjunction """
         p[0] = BinaryOp(p[2], p[1], p[3], p[1].coord)
 
-    ## Conjunction
+    # Conjunction
 
     def p_conjunction_1(self, p):
         """ conjunction : comparison """
@@ -137,7 +186,7 @@ class Parser():
         """ conjunction : conjunction AND comparison """
         p[0] = BinaryOp(p[2], p[1], p[3], p[1].coord)
 
-    ## Comparison
+    # Comparison
 
     def p_comparison_1(self, p):
         """ comparison : sum """
@@ -155,7 +204,7 @@ class Parser():
         """
         p[0] = BinaryOp(p[2], p[1], p[3], p[1].coord)
 
-    ## Sum
+    # Sum
 
     def p_sum_1(self, p):
         """ sum : product """
@@ -167,7 +216,7 @@ class Parser():
         """
         p[0] = BinaryOp(p[2], p[1], p[3], p[1].coord)
 
-    ## Product
+    # Product
                 
     def p_product_1(self, p):
         """ product : reduce """
@@ -182,7 +231,7 @@ class Parser():
         """
         p[0] = BinaryOp(p[2], p[1], p[3], p[1].coord)
 
-    ## Reduce
+    # Reduce
         
     def p_reduce_1(self, p):
         """ reduce : unary_expression """
@@ -194,7 +243,7 @@ class Parser():
         """
         p[0] = BinaryOp(p[2], p[1], p[3], p[1].coord)
 
-    ## Prefix Operation
+    # Unary expression
         
     def p_unary_expression_1(self, p):
         """ unary_expression : power """
@@ -237,6 +286,7 @@ class Parser():
     def p_atom(self, p):
         """ atom : identifier
                  | literal
+                 | enclosure
         """
         p[0] = p[1]
 
@@ -284,6 +334,144 @@ class Parser():
         """ boolean : FALSE """
         p[0] = Constant('bool', False)
 
+    ##
+    ## Assert
+    ##
+
+    def p_assert_statement(self, p):
+        """ assert_statement : ASSERT LPAREN expression COMMA expression RPAREN """
+        p[0] = Assert(p[3], p[5], p[3].coord)
+
+    ##
+    ## Term
+    ##
+
+    def p_term(self, p):
+        """ term : TERM LPAREN term_arguments RPAREN """
+        p[0] = Term(p[1], p[3], p[3].coord)
+
+        
+    def p_term_arguments(self, p):
+        """ term_arguments : expression_list
+                           | epsilon
+        """
+        p[0] = p[1] if p[1] is not None else ExprList([])
+        
+        
+    ##
+    ##  Enclosures
+    ##
+
+    def p_enclosure(self, p):
+        """ enclosure : parenth_form """
+        p[0] = p[1]
+
+    def p_parenth_form(self, p):
+        """ parenth_form : LPAREN expression RPAREN """
+        p[0] = p[2]
+
+
+    ####
+    ##
+    ## Compound statement
+    ##
+    ####
+    def p_compound_statement(self, p):
+        """ compound_statement : if_statement
+                               | switch_statement
+                               | while_loop
+                               | do_while_loop
+         """
+        p[0] = p[1]
+        
+    def p_block(self, p):
+        """ block : statement_list
+                  | epsilon
+        """
+        if p[1] is None:
+            p[0] = Block([])
+        else:
+            p[0] = Block(p[1])
+      
+    ##
+    ## If Statements
+    ##
+
+    def p_if_statement_1(self, p):
+        """ if_statement : IF LPAREN expression RPAREN LBRACE block RBRACE """
+        p[0] = If(p[3], p[6], None, p[3].coord)
+
+    def p_if_statement_2(self, p):
+        """ if_statement : IF LPAREN expression RPAREN \
+                           LBRACE block RBRACE \
+                           ELSE LBRACE block RBRACE """
+        p[0] = If(p[3], p[6], p[10], p[3].coord)
+        
+    def p_if_statement_3(self, p):
+        """ if_statement : IF LPAREN expression RPAREN \
+                           LBRACE block RBRACE \
+                           ELSE if_statement  """
+        p[0] = If(p[3], p[6], p[9], p[3].coord)
+        
+    ##
+    ## Switch Statement
+    ##
+
+    def p_switch_statement(self, p):
+        """ switch_statement : SWITCH LBRACE case_statements default_case RBRACE """
+        p[0] = Switch(p[3], p[4], p[3].coord)
+
+    def p_case_statements(self, p):
+        """ case_statements : case_list
+                            | epsilon
+        """
+        if p[1] is None:
+            p[0] = CaseList([])
+        else:
+            p[0] = CaseList(p[1])
+
+    def p_case_list_1(self, p):
+        """ case_list : case_statement  """
+        p[0] = [p[1]]
+
+    def p_case_list_2(self, p):
+        """ case_list : case_list case_statement  """
+        if p[2] is not None:
+            p[1].append(p[2])
+        p[0] = p[1]
+
+    def p_case_statement(self, p):
+         """ case_statement : CASE expression COLON block """
+         p[0] = Case(p[2], p[4], p[2].coord)
+
+    def p_default_case_1(self, p):
+        """ default_case : DEFAULT COLON block """
+        p[0] = Default(p[3], p[3].coord)
+
+    def p_default_case_2(self, p):
+        """ default_case : epsilon """
+        p[0] = None
+        
+    ##
+    ## Loops
+    ##
+
+    def p_while_loop(self, p):
+        """ while_loop : WHILE LPAREN expression RPAREN LBRACE block RBRACE """
+        p[0] = While(p[3], p[6], p[3].coord)
+
+    def p_do_while_loop(self, p):
+        """ do_while_loop : DO LBRACE block RBRACE \
+                            WHILE LPAREN expression RPAREN SEMICOLON
+        """
+        p[0] = DoWhile(p[7], p[3], p[3].coord)
+
+        
+
+#    def p_for_loop(self, p):
+#        """ for_loop : FOR LPAREN iterator_chain  RPAREN LBRACE block RBRACE """
+#        p[0] = For(p[3], p[6], p[3].coord)
+        
     # def p_init_block_or_epsilon(self, p):
     #     """ init_block_or_epsilon : init_block
     #                               | epsilon
@@ -327,130 +515,16 @@ class Parser():
     # ## Block
     # ##
 
-    # def p_block(self, p):
-    #     """ block : stmt_list
-    #               | epsilon
-    #     """
-    #     if p[1] is None:
-    #         p[0] = Block([])
-    #     else:
-    #         p[0] = Block(p[1])
 
     
-    # ##
-    # ## Loops
-    # ##
-
-    # def p_while_loop(self, p):
-    #     """ while_loop : WHILE LPAREN condition RPAREN LBRACE block RBRACE """
-    #     p[0] = While(p[3], p[6], p[3].coord)
-
-    # def p_do_while_loop(self, p):
-    #     """ do_while_loop : DO LBRACE block RBRACE \
-    #                         WHILE LPAREN condition RPAREN SEMICOLON
-    #     """
-    #     p[0] = DoWhile(p[7], p[3], p[3].coord)
-
-    # def p_for_loop(self, p):
-    #     """ for_loop : FOR LPAREN iterator_chain  RPAREN LBRACE block RBRACE """
-    #     p[0] = For(p[3], p[6], p[3].coord)
         
-    # ##
-    # ## If Statements
-    # ##
-
-    # def p_if_statement_1(self, p):
-    #     """ if_statement : IF LPAREN condition RPAREN LBRACE block RBRACE """
-    #     p[0] = If(p[3], p[6], None, p[3].coord)
-
-    # def p_if_statement_2(self, p):
-    #     """ if_statement : IF LPAREN condition RPAREN \
-    #                        LBRACE block RBRACE \
-    #                        ELSE LBRACE block RBRACE """
-    #     p[0] = If(p[3], p[6], p[10], p[3].coord)
-        
-    # def p_if_statement_3(self, p):
-    #     """ if_statement : IF LPAREN condition RPAREN \
-    #                        LBRACE block RBRACE \
-    #                        ELSE if_statement  """
-    #     p[0] = If(p[3], p[6], p[9], p[3].coord)
-
-    # ##
-    # ## Switch Statement
-    # ##
-
-    # def p_switch_statement(self, p):
-    #     """ switch_statement : SWITCH LBRACE case_statements default_case RBRACE """
-    #     p[0] = Switch(p[3], p[4], p[3].coord)
-
-    # def p_case_statements(self, p):
-    #     """ case_statements : case_list
-    #                         | epsilon
-    #     """
-    #     if p[1] is None:
-    #         p[0] = CaseList([])
-    #     else:
-    #         p[0] = CaseList(p[1])
-
-    # def p_case_list_1(self, p):
-    #     """ case_list : case_statement  """
-    #     p[0] = [p[1]]
-
-    # def p_case_list_2(self, p):
-    #     """ case_list : case_list case_statement  """
-    #     if p[2] is not None:
-    #         p[1].append(p[2])
-    #     p[0] = p[1]
-
-    # def p_case_statement(self, p):
-    #     """ case_statement : CASE condition COLON block """
-    #     p[0] = Case(p[2], p[4], p[2].coord)
-
-    # def p_default_case_1(self, p):
-    #     """ default_case : DEFAULT COLON block """
-    #     p[0] = Default(p[3], p[3].coord)
-
-    # def p_default_case_2(self, p):
-    #     """ default_case : epsilon """
-    #     p[0] = None
 
 
-    # ## 
-    # ## Jump Statements
-    # ##
 
-    # def p_jump_statement_1(self, p):
-    #     """ jump_statement : BACKTRACK """
-    #     p[0] = Backtrack()
 
-    # def p_jump_statement_2(self, p):
-    #     """ jump_statement : BREAK """
-    #     p[0] = Break()
-
-    # def p_jump_statement_3(self, p):
-    #     """ jump_statement : CONTINUE """
-    #     p[0] = Continue()
-
-    # def p_jump_statement_4(self, p):
-    #     """ jump_statement : EXIT """
-    #     p[0] = Exit()
-
-    # def p_jump_statement_5(self, p):
-    #     """ jump_statement : RETURN """
-    #     p[0] = Return(None)
-
-    # def p_jump_statement_6(self, p):
-    #     """ jump_statement : RETURN expr """
-    #     p[0] = Return(p[2], p[2].coord)
 
     
-    # ##
-    # ## Assert
-    # ##
 
-    # def p_assert_statement(self, p):
-    #     """ assert_statement : ASSERT LPAREN condition COMMA expr RPAREN """
-    #     p[0] = Assert(p[3], p[5], p[3].coord)
 
     # ##
     # ## Assignment
@@ -545,20 +619,6 @@ class Parser():
     #     p[0] = Quantor('any', p[3], p[5], p[3].coord)
 
 
-    # ##
-    # ## Term
-    # ##
-
-    # def p_term(self, p):
-    #     """ term : TERM LPAREN term_arguments RPAREN """
-    #     p[0] = Term(p[1], p[3], p[3].coord)
-
-        
-    # def p_term_arguments(self, p):
-    #     """ term_arguments : expr_list
-    #                        | epsilon
-    #     """
-    #     p[0] = p[1] if p[1] is not None else ExprList([])
 
     # ##
     # ## Procedures
@@ -653,6 +713,3 @@ class Parser():
     # ## Atomic Value
         
 
-    # def p_epsilon(self, p):
-    #     """ epsilon : """
-    #     p[0] = None
