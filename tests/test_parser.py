@@ -224,7 +224,6 @@ def test_unop():
 ##
 ####
     
-@nottest   
 def test_more_than_one_statement_simple():
     stmts = parse_statements('1 + 2; 3 * 4;')
     eq_(stmts.to_tuples(),
@@ -235,6 +234,14 @@ def test_more_than_one_statement_simple():
          ('BinaryOp', '*',
           ('Constant', 'int', 3),
           ('Constant', 'int', 4))))
+
+##
+## Assignment
+##
+
+def test_assignment_plain():
+    assert_assignment('foo := 42;', ':=',  'foo', 42)
+    assert_assignment('_ := true;', ':=',  '_', True)
 
 ##    
 ## Assert
@@ -307,13 +314,39 @@ def test_term_multi_arg():
          ('ExprList', 
           ('Constant', 'bool', True),
           ('Constant', 'bool', False))))
+
+##
+## Quantifier
+##
+@nottest
+def test_quantifier_all():
+    quantor =  parse_single_statement('forall (x in 1 | true);')
+    iterator = quantor.lhs
+    condition = quantor.cond
+
+    eq_(quantor.name, 'all')
+    eq_(iterator.assignable.name, 'x')
+    eq_(iterator.expression.value, 1)
+    eq_(condition.value, True)
+@nottest
+def test_quantifier_exists():
+    quantor =  parse_single_statement('exists (x in 1 | true);')
+    eq_(quantor.to_tuples(),
+        ('Quantor', 'any',
+         ('Iterator',
+          ('Identifier', 'x'),
+          ('Constant', 'int', 1)),
+         ('Constant', 'bool', True)))
+
+@nottest
+def test_quantifier_cray():
+    quantor = parse_single_statement('forall (n in [1..10] | n**2 <= 2**n);')
     
 ####
 ##
 ## Compound Statements
 ##
 ####
-    
     
 ##
 ## If statements
@@ -329,7 +362,6 @@ def test_if_no_else():
          ('Block',
           ('Return', ('Constant', 'bool', True)))))
 
-@nottest
 def test_if_no_else_longer_block():
     s = """
     if(isRaining && isCold) {
@@ -627,17 +659,12 @@ def test_for_loop_three_iterators():
             ('Identifier', 'address'),
             ('Identifier', 'i')),
            ('Constant', 'string', "$street$ $street_number$")))))
-           
-
-
-    
+               
 ##
 ## Assignments
 ##
 @nottest
-def test_assignment():
-    assert_assignment('foo := 42;', ':=',  'foo', 42)
-    assert_assignment('_ := true;', ':=',  'unused', True)
+def test_augmented_assignment():
     assert_assignment('foo += 42;', '+=',  'foo', 42)
     assert_assignment('foo -= 1;',  '-=',  'foo', 1)
     assert_assignment('foo *= 2;',  '*=',  'foo', 2)
@@ -689,32 +716,6 @@ def test_assignable_array_ref_chained():
           ('Constant', 'int', 1)),
          ('Constant', 'bool', True)))
 
-##
-## Quantifier
-##
-@nottest
-def test_quantifier_all():
-    quantor =  parse_single_statement('forall (x in 1 | true);')
-    iterator = quantor.lhs
-    condition = quantor.cond
-
-    eq_(quantor.name, 'all')
-    eq_(iterator.assignable.name, 'x')
-    eq_(iterator.expression.value, 1)
-    eq_(condition.value, True)
-@nottest
-def test_quantifier_exists():
-    quantor =  parse_single_statement('exists (x in 1 | true);')
-    eq_(quantor.to_tuples(),
-        ('Quantor', 'any',
-         ('Iterator',
-          ('Identifier', 'x'),
-          ('Constant', 'int', 1)),
-         ('Constant', 'bool', True)))
-
-@nottest
-def test_quantifier_cray():
-    quantor = parse_single_statement('forall (n in [1..10] | n**2 <= 2**n);')
 
 ##
 ## Procedures

@@ -13,8 +13,6 @@ from ply import yacc
 from setlx2py.setlx_lexer import Lexer
 from setlx2py.setlx_ast import *
 
-
-
 class Parser():
 
     tokens = Lexer.tokens
@@ -90,6 +88,7 @@ class Parser():
     def p_simple_statement(self, p):
         """ simple_statement : expression_statement
                              | assert_statement
+                             | assignment_statement
                              | backtrack_statement        
                              | break_statement
                              | continue_statement
@@ -291,7 +290,9 @@ class Parser():
         p[0] = p[1]
 
     def p_variable(self, p):
-        """ identifier : IDENTIFIER """
+        """ identifier : IDENTIFIER 
+                       | UNUSED
+        """
         p[0] = Identifier(p[1])
 
     ##
@@ -333,6 +334,33 @@ class Parser():
     def p_boolean_2(self, p):
         """ boolean : FALSE """
         p[0] = Constant('bool', False)
+
+    ##
+    ## Assignment Statement
+    ##
+
+    def p_assignment_statement(self, p):
+        """ assignment_statement : target_list ASSIGN expression_list """
+        p[0] = Assignment(p[2], p[1], p[3],  p[1].coord)
+        
+    def p_target_list_1(self, p):
+        """ target_list : target """
+        p[0] = p[1]
+
+    def p_target_list_2(self, p):
+        """ target_list : target_list COMMA target """
+        if p[3] is not None:
+            p[1].append(p[3])
+        p[0] = p[1]
+
+    def p_target_1(self, p):
+        """ target : identifier """
+        p[0] = p[1]
+        
+        
+    ##
+    ## Augmented Assignment Statement
+    ##
 
     ##
     ## Assert
@@ -466,65 +494,9 @@ class Parser():
         """
         p[0] = DoWhile(p[7], p[3], p[3].coord)
 
-        
-
 #    def p_for_loop(self, p):
 #        """ for_loop : FOR LPAREN iterator_chain  RPAREN LBRACE block RBRACE """
 #        p[0] = For(p[3], p[6], p[3].coord)
-        
-    # def p_init_block_or_epsilon(self, p):
-    #     """ init_block_or_epsilon : init_block
-    #                               | epsilon
-    #     """
-    #     p[0] = FileAST([]) if p[1] is None else FileAST(p[1])
-
-    # def p_init_block_1(self, p):
-    #     """ init_block : statement  """
-    #     p[0] = p[1]
-
-    # def p_init_block_2(self, p):
-    #     """ init_block : init_block statement """
-    #     if p[2] is not None:
-    #         p[1].extend(p[2])
-    #     p[0] = p[1]
-
-    # def p_statement(self, p):
-    #     """ statement : if_statement
-    #                   | switch_statement
-    #                   | while_loop
-    #                   | do_while_loop
-    #                   | for_loop
-    #                   | jump_statement SEMICOLON
-    #                   | assert_statement SEMICOLON
-    #                   | assignment_direct SEMICOLON
-    #                   | assignment_other  SEMICOLON
-    #                   | expr SEMICOLON 
-    #     """
-    #     p[0] = [p[1]]
-
-    # ##
-    # ## Variable/Condition
-    # ##
-
-
-    # def p_condition(self, p):
-    #     """ condition : expr """
-    #     p[0] = p[1]
-
-    # ##
-    # ## Block
-    # ##
-
-
-    
-        
-
-
-
-
-
-    
-
 
     # ##
     # ## Assignment
