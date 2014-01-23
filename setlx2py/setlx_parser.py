@@ -339,9 +339,10 @@ class Parser():
     ## Assignment Statement
     ##
 
+    # TODO : recursive assignment
     def p_assignment_statement(self, p):
-        """ assignment_statement : target_list ASSIGN expression_list """
-        p[0] = Assignment(p[2], p[1], p[3],  p[1].coord)
+        """ assignment_statement : target_list ASSIGN expression """
+        p[0] = Assignment(p[2], p[1], p[3],  p[3].coord)
         
     def p_target_list_1(self, p):
         """ target_list : target """
@@ -349,13 +350,18 @@ class Parser():
 
     def p_target_list_2(self, p):
         """ target_list : target_list COMMA target """
-        if p[3] is not None:
-            p[1].append(p[3])
+        if not isinstance(p[1], TargetList):
+             p[1] = TargetList([p[1]], p[1].coord)
+        p[1].targets.append(p[3])
         p[0] = p[1]
 
     def p_target_1(self, p):
         """ target : identifier """
         p[0] = p[1]
+
+    def p_target_2(self, p):
+        """ target : LBRACKET target_list RBRACKET """
+        p[0] = p[2]
         
         
     ##

@@ -180,32 +180,19 @@ class Assert(Node):
     attr_names = ()
 
 class Assignment(Node):
-    def __init__(self, op, left, right, coord=None):
+    def __init__(self, op, target, right, coord=None):
         self.op = op
-        self.left = left
+        self.target = target
         self.right = right
         self.coord = coord
 
     def children(self):
         nodelist = []
-        if self.left is not None: nodelist.append(("left", self.left))
+        if self.target is not None: nodelist.append(("target", self.target))
         if self.right is not None: nodelist.append(("right", self.right))
         return tuple(nodelist)
 
     attr_names = ('op',)
-
-class AssignmentList(Node):
-    def __init__(self, assignments, coord=None):
-        self.assignments = assignments
-        self.coord = coord
-
-    def children(self):
-        nodelist = []
-        for i, child in enumerate(self.assignments or []):
-            nodelist.append(("assignments[%d]" % i, child))
-        return tuple(nodelist)
-
-    attr_names = ()
 
 class BinaryOp(Node):
     def __init__(self, op, left, right, coord=None):
@@ -536,6 +523,19 @@ class Switch (Node):
         nodelist = []
         if self.case_list is not None: nodelist.append(("case_list", self.case_list))
         if self.default is not None: nodelist.append(("default", self.default))
+        return tuple(nodelist)
+
+    attr_names = ()
+
+class TargetList (Node):
+    def __init__(self, targets, coord=None):
+        self.targets = targets
+        self.coord = coord
+
+    def children(self):
+        nodelist = []
+        for i, child in enumerate(self.targets or []):
+            nodelist.append(("targets[%d]" % i, child))
         return tuple(nodelist)
 
     attr_names = ()

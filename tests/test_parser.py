@@ -239,9 +239,92 @@ def test_more_than_one_statement_simple():
 ## Assignment
 ##
 
-def test_assignment_plain():
-    assert_assignment('foo := 42;', ':=',  'foo', 42)
-    assert_assignment('_ := true;', ':=',  '_', True)
+def test_assignment_minimal():
+    node = parse_single_statement('foo := 42;')
+    eq_(node.to_tuples(),
+        ('Assignment', ':=',
+         ('Identifier', 'foo'),
+         ('Constant', 'int', 42)))    
+    
+def test_assignment_underscore():
+    node = parse_single_statement('_ := true;')
+    eq_(node.to_tuples(),
+        ('Assignment', ':=',
+         ('Identifier', '_'),
+         ('Constant', 'bool', True)))    
+
+def test_assignment_explicit_minimal():
+    node = parse_single_statement('[foo] := 42;')
+    eq_(node.to_tuples(),
+        ('Assignment', ':=',
+         ('Identifier', 'foo'),
+         ('Constant', 'int', 42)))
+
+def test_assignment_explicit_two():
+    node = parse_single_statement('[foo,bar] := "xy";')
+    eq_(node.to_tuples(),
+        ('Assignment', ':=',
+         ('TargetList',
+          ('Identifier', 'foo'),
+          ('Identifier', 'bar')),
+         ('Constant', 'string', 'xy')))
+    
+@nottest
+def test_assignment_member_access():
+    assignment = parse_single_statement('foo.bar := true;')
+    eq_(assignment.to_tuples(),
+        ('Assignment', ':=',
+        ('MemberAccess',
+          ('Identifier', 'foo'),
+          ('Identifier', 'bar')),
+         ('Constant', 'bool', True)))
+@nottest
+def test_assignment_member_access_chained():
+    assignment = parse_single_statement('foo.bar.baz := 42;')
+    eq_(assignment.to_tuples(),
+        ('Assignment', ':=',
+         ('MemberAccess',
+          ('MemberAccess',
+           ('Identifier', 'foo'),
+           ('Identifier', 'bar')),
+          ('Identifier', 'baz')),
+         ('Constant', 'int', 42)))
+@nottest
+def test_assignment_array_ref():
+    node = parse_single_statement('foo[0] := true;')
+    eq_(node.to_tuples(),
+        ('Assignment', ':=',
+         ('ArrayRef',
+          ('Identifier', 'foo'),
+          ('Constant', 'int', 0)),
+         ('Constant', 'bool', True)))
+@nottest
+def test_assignment_array_ref_chained():
+    node = parse_single_statement('foo[0][1] := true;')
+    eq_(node.to_tuples(),
+        ('Assignment', ':=',
+         ('ArrayRef',
+          ('ArrayRef',
+           ('Identifier', 'foo'),
+           ('Constant', 'int', 0)),
+          ('Constant', 'int', 1)),
+         ('Constant', 'bool', True)))
+@nottest    
+def test_assignment_mixed_attributeref_subscription():
+    node = parse_single_statement('foo[x+1].bar.baz[42][y**2] := z')
+
+##
+## Augmented Assignment
+##
+
+@nottest
+def test_augmented_assignment():
+    assert_assignment('foo += 42;', '+=',  'foo', 42)
+    assert_assignment('foo -= 1;',  '-=',  'foo', 1)
+    assert_assignment('foo *= 2;',  '*=',  'foo', 2)
+    assert_assignment('foo /= 2;',  '/=',  'foo', 2)
+    assert_assignment('foo \\= 3;', '\\=', 'foo', 3)
+    assert_assignment('foo %= 10;', '%=',  'foo', 10)
 
 ##    
 ## Assert
@@ -663,58 +746,6 @@ def test_for_loop_three_iterators():
 ##
 ## Assignments
 ##
-@nottest
-def test_augmented_assignment():
-    assert_assignment('foo += 42;', '+=',  'foo', 42)
-    assert_assignment('foo -= 1;',  '-=',  'foo', 1)
-    assert_assignment('foo *= 2;',  '*=',  'foo', 2)
-    assert_assignment('foo /= 2;',  '/=',  'foo', 2)
-    assert_assignment('foo \\= 3;', '\\=', 'foo', 3)
-    assert_assignment('foo %= 10;', '%=',  'foo', 10)
-@nottest
-def test_assignment_explicit():
-    assert_assignment('[foo] := 42;', ':=', 'foo', 42)
-    assert_assignment_explicit('[foo, bar] := 42;', ':=', ['foo', 'bar'], 42)    
-@nottest
-def test_assignable_member_access():
-    assignment = parse_single_statement('foo.bar := true;')
-    eq_(assignment.to_tuples(),
-        ('Assignment', ':=',
-        ('MemberAccess',
-          ('Identifier', 'foo'),
-          ('Identifier', 'bar')),
-         ('Constant', 'bool', True)))
-@nottest
-def test_assignable_member_access_chained():
-    assignment = parse_single_statement('foo.bar.baz := 42;')
-    eq_(assignment.to_tuples(),
-        ('Assignment', ':=',
-         ('MemberAccess',
-          ('MemberAccess',
-           ('Identifier', 'foo'),
-           ('Identifier', 'bar')),
-          ('Identifier', 'baz')),
-         ('Constant', 'int', 42)))
-@nottest
-def test_assignable_array_ref():
-    node = parse_single_statement('foo[0] := true;')
-    eq_(node.to_tuples(),
-        ('Assignment', ':=',
-         ('ArrayRef',
-          ('Identifier', 'foo'),
-          ('Constant', 'int', 0)),
-         ('Constant', 'bool', True)))
-@nottest
-def test_assignable_array_ref_chained():
-    node = parse_single_statement('foo[0][1] := true;')
-    eq_(node.to_tuples(),
-        ('Assignment', ':=',
-         ('ArrayRef',
-          ('ArrayRef',
-           ('Identifier', 'foo'),
-           ('Constant', 'int', 0)),
-          ('Constant', 'int', 1)),
-         ('Constant', 'bool', True)))
 
 
 ##
