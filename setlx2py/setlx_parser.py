@@ -274,6 +274,7 @@ class Parser():
     def p_primary_1(self, p):
         """ primary  : atom
                      | attributeref
+                     | subscription
         """
         p[0] = p[1]
 
@@ -301,6 +302,12 @@ class Parser():
     def p_attributeref(self, p):
         """ attributeref : primary DOT identifier """
         p[0] = AttributeRef(p[1], p[3], p[1].coord)
+
+    # Subscription
+
+    def p_subscription(self, p):
+        """ subscription : primary LBRACKET expression RBRACKET """
+        p[0] = Subscription(p[1], p[3], p[1].coord)
 
     ##
     ## Literals
@@ -365,6 +372,7 @@ class Parser():
     def p_target_1(self, p):
         """ target : identifier
                    | attributeref
+                   | subscription        
         """
         p[0] = p[1]
 

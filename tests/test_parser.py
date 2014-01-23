@@ -288,29 +288,43 @@ def test_assignment_member_access_chained():
            ('Identifier', 'bar')),
           ('Identifier', 'baz')),
          ('Constant', 'int', 42)))
-@nottest
-def test_assignment_array_ref():
+
+def test_assignment_subscription():
     node = parse_single_statement('foo[0] := true;')
     eq_(node.to_tuples(),
         ('Assignment', ':=',
-         ('ArrayRef',
+         ('Subscription',
           ('Identifier', 'foo'),
           ('Constant', 'int', 0)),
          ('Constant', 'bool', True)))
-@nottest
-def test_assignment_array_ref_chained():
+
+def test_assignment_subscription_chained():
     node = parse_single_statement('foo[0][1] := true;')
     eq_(node.to_tuples(),
         ('Assignment', ':=',
-         ('ArrayRef',
-          ('ArrayRef',
+         ('Subscription',
+          ('Subscription',
            ('Identifier', 'foo'),
            ('Constant', 'int', 0)),
           ('Constant', 'int', 1)),
          ('Constant', 'bool', True)))
-@nottest    
+
 def test_assignment_mixed_attributeref_subscription():
-    node = parse_single_statement('foo[x+1].bar.baz[42][y**2] := z')
+    node = parse_single_statement('foo[x+1].bar.baz[42][y**2] := z;')
+    eq_(node.to_tuples(),
+        ('Assignment', ':=',
+         ('Subscription',
+          ('Subscription',
+           ('AttributeRef',
+            ('AttributeRef',
+             ('Subscription',
+              ('Identifier', 'foo'),
+              ('BinaryOp', '+', ('Identifier', 'x'), ('Constant', 'int', 1))),
+             ('Identifier', 'bar')),
+            ('Identifier', 'baz')),
+           ('Constant', 'int', 42)),
+          ('BinaryOp', '**', ('Identifier', 'y'), ('Constant', 'int', 2))),
+         ('Identifier', 'z')))
 
 ##
 ## Augmented Assignment

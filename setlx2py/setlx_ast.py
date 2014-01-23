@@ -151,20 +151,6 @@ class NodeVisitor(object):
             self.visit(c)
 
 
-class ArrayRef(Node):
-    def __init__(self, obj, subscript, coord=None):
-        self.obj = obj
-        self.subscript = subscript
-        self.coord = coord
-
-    def children(self):
-        nodelist = []
-        if self.obj is not None: nodelist.append(("obj", self.obj))
-        if self.subscript is not None: nodelist.append(("subscript", self.subscript))
-        return tuple(nodelist)
-
-    attr_names = ()
-
 class Assert(Node):
     def __init__(self, cond, expr, coord=None):
         self.cond = cond
@@ -509,6 +495,20 @@ class Return (Node):
     def children(self):
         nodelist = []
         if self.expr is not None: nodelist.append(("expr", self.expr))
+        return tuple(nodelist)
+
+    attr_names = ()
+
+class Subscription(Node):
+    def __init__(self, obj, subscript, coord=None):
+        self.obj = obj
+        self.subscript = subscript
+        self.coord = coord
+
+    def children(self):
+        nodelist = []
+        if self.obj is not None: nodelist.append(("obj", self.obj))
+        if self.subscript is not None: nodelist.append(("subscript", self.subscript))
         return tuple(nodelist)
 
     attr_names = ()
