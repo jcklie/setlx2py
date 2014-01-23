@@ -315,7 +315,7 @@ class Parser():
 
     def p_slicing(self, p):
         """ slicing : primary LBRACKET lower_bound RANGE upper_bound RBRACKET """
-        p[0] = Slice(p[1], p[3])
+        p[0] = Slice(p[1], p[3], p[5])
 
     def p_lower_bound(self, p):
         """ lower_bound : expression

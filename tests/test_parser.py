@@ -328,13 +328,25 @@ def test_call_chained():
 
 def test_slicing_left():
     node = parse_single_statement('list[..b];')
+    eq_(node.to_tuples(),
+        ('Slice',
+         ('Identifier', 'list'),
+         ('Identifier', 'b')))
 
 def test_slicing_right():
-    node = parse_single_statement('list[b..];')
-
+    node = parse_single_statement('list[a..];')
+    eq_(node.to_tuples(),
+        ('Slice',
+         ('Identifier', 'list'),
+         ('Identifier', 'a')))
+    
 def test_slicing_both():
     node = parse_single_statement('list[a..b];')
- 
+    eq_(node.to_tuples(),
+        ('Slice',
+         ('Identifier', 'list'),
+         ('Identifier', 'a'),
+         ('Identifier', 'b'))) 
 ##
 ## Lambda
 ##

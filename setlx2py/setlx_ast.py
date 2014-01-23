@@ -527,13 +527,15 @@ class Return (Node):
     attr_names = ()
 
 class Slice (Node):
-    def __init__(self, lower, upper, coord=None):
+    def __init__(self, obj, lower, upper, coord=None):
+        self.obj = obj
         self.lower = lower
         self.upper = upper
         self.coord = coord
 
     def children(self):
         nodelist = []
+        if self.obj is not None: nodelist.append(("obj", self.obj))
         if self.lower is not None: nodelist.append(("lower", self.lower))
         if self.upper is not None: nodelist.append(("upper", self.upper))
         return tuple(nodelist)
