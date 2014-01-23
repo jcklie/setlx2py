@@ -150,6 +150,7 @@ def test_delimiter():
     assert_token_type(',', 'COMMA')
     assert_token_type(':', 'COLON')
     assert_token_type('.', 'DOT')
+    assert_token_type('..', 'RANGE')
     assert_token_types('()', ['LPAREN', 'RPAREN'])
     assert_token_types('[]', ['LBRACKET', 'RBRACKET'])
     assert_token_types('{}', ['LBRACE', 'RBRACE'])

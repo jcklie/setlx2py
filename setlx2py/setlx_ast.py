@@ -526,6 +526,20 @@ class Return (Node):
 
     attr_names = ()
 
+class Slice (Node):
+    def __init__(self, lower, upper, coord=None):
+        self.lower = lower
+        self.upper = upper
+        self.coord = coord
+
+    def children(self):
+        nodelist = []
+        if self.lower is not None: nodelist.append(("lower", self.lower))
+        if self.upper is not None: nodelist.append(("upper", self.upper))
+        return tuple(nodelist)
+
+    attr_names = ()
+
 class Subscription(Node):
     def __init__(self, obj, subscript, coord=None):
         self.obj = obj

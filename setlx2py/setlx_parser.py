@@ -274,6 +274,7 @@ class Parser():
         """ primary  : atom
                      | attributeref
                      | subscription
+                     | slicing
                      | procedure
                      | call
         """
@@ -309,6 +310,24 @@ class Parser():
     def p_subscription(self, p):
         """ subscription : primary LBRACKET expression RBRACKET """
         p[0] = Subscription(p[1], p[3], p[1].coord)
+
+    # Slicing
+
+    def p_slicing(self, p):
+        """ slicing : primary LBRACKET lower_bound RANGE upper_bound RBRACKET """
+        p[0] = Slice(p[1], p[3])
+
+    def p_lower_bound(self, p):
+        """ lower_bound : expression
+                        | epsilon
+        """
+        p[0] = p[1]
+
+    def p_upper_bound(self, p):
+        """ upper_bound : expression
+                        | epsilon
+        """
+        p[0] = p[1]
 
     ##
     ## Literals

@@ -321,8 +321,20 @@ def test_call_chained():
           ('ArgumentList',
            ('Constant', 'string', 'onExit'))),
          ('ArgumentList', )))
-        
 
+##
+## Slicing
+##
+
+def test_slicing_left():
+    node = parse_single_statement('list[..b];')
+
+def test_slicing_right():
+    node = parse_single_statement('list[b..];')
+
+def test_slicing_both():
+    node = parse_single_statement('list[a..b];')
+ 
 ##
 ## Lambda
 ##

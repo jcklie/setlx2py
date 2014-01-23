@@ -137,7 +137,7 @@ class Lexer():
         'HASH', 'AT',
 
         # Delimiter
-        'SEMICOLON', 'COMMA', 'COLON', 'DOT',
+        'SEMICOLON', 'COMMA', 'COLON', 'DOT', 'RANGE',
         'LPAREN', 'RPAREN',             # ()
         'LBRACKET', 'RBRACKET',         # []
         'LBRACE', 'RBRACE',             # {}
@@ -192,6 +192,7 @@ class Lexer():
     t_SEMICOLON     = r';'
     t_COMMA         = r','
     t_COLON         = r':'
+    t_RANGE         = r'\.\.'
     t_DOT           = r'\.'
     t_PIPE          = r'\|'
     t_LPAREN        = r'\('
