@@ -73,7 +73,7 @@ def assert_assignment(text, operator, left, right):
     try:
         node = parse_single_statement(text)
         eq_(node.op, operator)
-        eq_(node.left.name, left)
+        eq_(node.target.name, left)
         eq_( node.right.value, right)
     except AssertionError as e:
         node.show()
@@ -330,7 +330,6 @@ def test_assignment_mixed_attributeref_subscription():
 ## Augmented Assignment
 ##
 
-@nottest
 def test_augmented_assignment():
     assert_assignment('foo += 42;', '+=',  'foo', 42)
     assert_assignment('foo -= 1;',  '-=',  'foo', 1)

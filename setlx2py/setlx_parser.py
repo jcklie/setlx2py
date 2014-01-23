@@ -89,6 +89,7 @@ class Parser():
         """ simple_statement : expression_statement
                              | assert_statement
                              | assignment_statement
+                             | augmented_assign_statement
                              | backtrack_statement        
                              | break_statement
                              | continue_statement
@@ -384,6 +385,27 @@ class Parser():
     ##
     ## Augmented Assignment Statement
     ##
+
+    def p_augmented_assign_statement(self, p):
+        """ augmented_assign_statement : augtarget augop expression """
+        p[0] = Assignment(p[2], p[1], p[3],  p[3].coord)
+        
+    def p_augtarget(self, p):
+        """ augtarget : identifier
+                      | attributeref
+                      | subscription
+        """
+        p[0] = p[1]
+
+    def p_augop(self, p):
+        """ augop :  PLUS_EQUAL  
+                  |  MINUS_EQUAL   
+                  |  TIMES_EQUAL   
+                  |  DIVIDE_EQUAL  
+                  |  IDIVIDE_EQUAL 
+                  |  MOD_EQUAL
+        """
+        p[0] = p[1]
 
     ##
     ## Assert
