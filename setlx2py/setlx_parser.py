@@ -95,6 +95,7 @@ class Parser():
                              | continue_statement
                              | exit_statement
                              | return_statement
+                             | quantor
                              | term
         """
         p[0] = p[1]
@@ -598,36 +599,36 @@ class Parser():
         """ procedure_param : identifier """
         p[0] = Param(p[1].name, p[1].coord)
 
-    # ##
-    # ## Quantor
-    # ##
+    ##
+    ## Quantor
+    ##
     
-    # def p_quantor_1(self, p):
-    #     """ quantor : FORALL LPAREN iterator_chain PIPE condition RPAREN """
-    #     p[0] = Quantor('all', p[3], p[5], p[3].coord)
+    def p_quantor_1(self, p):
+        """ quantor : FORALL LPAREN iterator_chain PIPE expression RPAREN """
+        p[0] = Quantor('all', p[3], p[5], p[3].coord)
 
-    # def p_quantor_2(self, p):
-    #     """ quantor : EXISTS LPAREN iterator_chain PIPE condition RPAREN """
-    #     p[0] = Quantor('any', p[3], p[5], p[3].coord)
+    def p_quantor_2(self, p):
+        """ quantor : EXISTS LPAREN iterator_chain PIPE expression RPAREN """
+        p[0] = Quantor('any', p[3], p[5], p[3].coord)
 
-    # ##
-    # ## Iterator
-    # ##
+    ##
+    ## Iterator
+    ##
 
-    # def p_iterator(self, p):
-    #     """ iterator : assignable IN expr """
-    #     p[0] = Iterator(p[1], p[3], p[1].coord)
+    def p_iterator(self, p):
+        """ iterator : target IN expression """
+        p[0] = Iterator(p[1], p[3], p[1].coord)
 
-    # def p_iterator_chain_1(self, p):
-    #     """ iterator_chain : iterator """
-    #     p[0] = p[1]
+    def p_iterator_chain_1(self, p):
+        """ iterator_chain : iterator """
+        p[0] = p[1]
 
-    # def p_iterator_chain_2(self, p):
-    #     """ iterator_chain : iterator_chain COMMA iterator """
-    #     if not isinstance(p[1], IteratorChain):
-    #         p[1] = IteratorChain([p[1]], p[1].coord)
-    #     p[1].iterators.append(p[3])
-    #     p[0] = p[1]
+    def p_iterator_chain_2(self, p):
+        """ iterator_chain : iterator_chain COMMA iterator """
+        if not isinstance(p[1], IteratorChain):
+            p[1] = IteratorChain([p[1]], p[1].coord)
+        p[1].iterators.append(p[3])
+        p[0] = p[1]
         
     # ##
     # ## Values

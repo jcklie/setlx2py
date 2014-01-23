@@ -449,7 +449,7 @@ def test_term_multi_arg():
 ##
 ## Quantifier
 ##
-@nottest
+
 def test_quantifier_all():
     quantor =  parse_single_statement('forall (x in 1 | true);')
     iterator = quantor.lhs
@@ -459,7 +459,7 @@ def test_quantifier_all():
     eq_(iterator.assignable.name, 'x')
     eq_(iterator.expression.value, 1)
     eq_(condition.value, True)
-@nottest
+
 def test_quantifier_exists():
     quantor =  parse_single_statement('exists (x in 1 | true);')
     eq_(quantor.to_tuples(),
@@ -468,7 +468,6 @@ def test_quantifier_exists():
           ('Identifier', 'x'),
           ('Constant', 'int', 1)),
          ('Constant', 'bool', True)))
-
 @nottest
 def test_quantifier_cray():
     quantor = parse_single_statement('forall (n in [1..10] | n**2 <= 2**n);')
