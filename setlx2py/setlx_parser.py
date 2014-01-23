@@ -146,6 +146,7 @@ class Parser():
     # TODO : lambda
     def p_expression_1(self, p):
         """ expression : implication
+                       | lambda_definition
         """
         p[0] = p[1]
 
@@ -350,6 +351,25 @@ class Parser():
     def p_boolean_2(self, p):
         """ boolean : FALSE """
         p[0] = Constant('bool', False)
+
+    ##
+    ## Lambda Definitions
+    ##
+
+    def p_lambda_definition(self, p):
+        """ lambda_definition : lambda_parameters LAMBDADEF expression """
+        p[0] = Lambda(p[1], p[3], p[1].coord)
+
+    def p_lambda_parameters(self, p):
+        """ lambda_parameters : identifier
+                              | LT parameter_list GT
+        """
+        if len(p) == 2:
+            param = Param(p[1].name)
+            p[0] = ParamList([param], p[1].coord)
+        else:
+            p[0] = p[2]
+        
 
     ##
     ## Assignment Statement
@@ -579,86 +599,6 @@ class Parser():
         p[0] = Param(p[1].name, p[1].coord)
 
     # ##
-    # ## Assignment
-    # ##
-
-    # ## Assignment Direct
-    # def p_assignment_direct_1(self, p):
-    #     """ assignment_direct : assignable ASSIGN expr """
-    #     p[0] = Assignment(p[2], p[1], p[3],  p[1].coord)
-
-    # ## Assignment Other
-    # def p_assignment_other(self, p):
-    #     """ assignment_other : assignable PLUS_EQUAL    expr
-    #                          | assignable MINUS_EQUAL   expr
-    #                          | assignable TIMES_EQUAL   expr
-    #                          | assignable DIVIDE_EQUAL  expr
-    #                          | assignable IDIVIDE_EQUAL expr
-    #                          | assignable MOD_EQUAL     expr
-    #     """
-    #     p[0] = Assignment(p[2], p[1], p[3], p[1].coord)
-        
-    # ## Assignable
-
-    # def p_assignable_1(self, p):
-    #     """ assignable : variable
-    #                    | unused
-    #     """
-    #     p[0] = p[1]
-
-    # def p_assignable_2(self, p):
-    #     """ assignable : assignable DOT variable """
-    #     p[0] = MemberAccess(p[1], p[3], p[1].coord)
-
-    # def p_assignable_3(self, p):
-    #     """ assignable : assignable LBRACKET expr RBRACKET """
-    #     p[0] = ArrayRef(p[1], p[3], p[1].coord)
-
-    # def p_assignable_4(self, p):
-    #     """ assignable : LBRACKET explicit_assign_list RBRACKET
-    #     """
-    #     p[0] = p[2]
-
-    # def p_explicit_assign_list_1(self, p):
-    #     """ explicit_assign_list : assignable """
-    #     p[0] = p[1]
-
-    # def p_explicit_assign_list_2(self, p):
-    #     """ explicit_assign_list : explicit_assign_list COMMA assignable """
-    #     if not isinstance(p[1], AssignmentList):
-    #         p[1] = AssignmentList([p[1]], p[1].coord)
-    #     p[1].assignments.append(p[3])
-    #     p[0] = p[1]
-
-
-
-    # def p_factor_2(self, p):
-    #     """ factor : BANG factor """
-    #     p[0] = UnaryOp('not', p[2], p[2].coord)
-
-    # def p_factor_3(self, p):
-    #     """ factor : value BANG """
-    #     p[0] = UnaryOp('fac', p[1], p[1].coord)
-
-    # def p_factor_4(self, p):
-    #     """ factor : term """
-    #     p[0] = p[1]
-
-    # def p_facto_5(self, p):
-    #     """ factor : quantor """
-    #     p[0] = p[1]
-
-    # def p_factor_6(self, p):
-    #     """ factor : LPAREN expr RPAREN """
-    #     p[0] = p[2]
-
-    # def p_factor_7(self, p):
-    #     """ factor : variable
-    #                | procedure_definition
-    #     """
-    #     p[0] = p[1]
-
-    # ##
     # ## Quantor
     # ##
     
@@ -669,62 +609,6 @@ class Parser():
     # def p_quantor_2(self, p):
     #     """ quantor : EXISTS LPAREN iterator_chain PIPE condition RPAREN """
     #     p[0] = Quantor('any', p[3], p[5], p[3].coord)
-
-
-
-    # ##
-    # ## Procedures
-    # ##
-    # def p_procedure_definition(self, p):
-    #     """ procedure_definition : procedure
-    #     """
-    #     p[0] = p[1]
-
-    # def p_procedure_1(self, p):
-    #     """ procedure : PROCEDURE LPAREN parameter_list RPAREN \
-    #                     LBRACE block RBRACE
-    #     """
-    #     p[0] = Procedure(p[3], p[6], p[3].coord)
-
-    # def p_procedure_2(self, p):
-    #     """ procedure : CPROCEDURE LPAREN parameter_list RPAREN \
-    #                     LBRACE block RBRACE
-    #     """
-    #     p[0] = CachedProcedure(p[3], p[6], p[3].coord)
-
-    # def p_parameter_list(self, p):
-    #     """ parameter_list : procedure_param
-    #                        | parameter_list COMMA procedure_param
-    #                        | epsilon
-    #     """
-    #     if len(p) == 2:
-    #         if p[1] is None: p[0] = ParamList([])
-    #         else: p[0] = ParamList([p[1]], p[1].coord)
-    #     else:
-    #         p[1].params.append(p[3])
-    #         p[0] = p[1]
-
-    # def p_procedure_param(self, p):
-    #     """ procedure_param : variable """
-    #     p[0] = Param(p[1].name, p[1].coord)
-
-    # ##
-    # ## Lambda Definitions
-    # ##
-
-    # def p_lambda_definition(self, p):
-    #     """ lambda_definition : lambda_parameters LAMBDADEF expr """
-    #     p[0] = Lambda(p[1], p[3], p[1].coord)
-
-    # def p_lambda_parameters(self, p):
-    #     """ lambda_parameters : variable
-    #                           | LT parameter_list GT
-    #     """
-    #     if len(p) == 2:
-    #         param = Param(p[1].name)
-    #         p[0] = ParamList([param], p[1].coord)
-    #     else:
-    #         p[0] = p[2]
 
     # ##
     # ## Iterator

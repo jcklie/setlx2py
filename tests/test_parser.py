@@ -236,6 +236,42 @@ def test_more_than_one_statement_simple():
           ('Constant', 'int', 4))))
 
 ##
+## Lambda
+##
+
+def test_lambda_minimal_zero_params():
+    node = parse_single_statement('< > |-> true;')
+    eq_(node.to_tuples(),
+        ('Lambda',
+         ('ParamList', ),
+         ('Constant', 'bool', True)))
+
+def test_lamba_minimal_one_param_no_brackets():
+    node = parse_single_statement("foo |-> 'bar';")
+    eq_(node.to_tuples(),
+        ('Lambda',
+         ('ParamList', ('Param', 'foo')),
+         ('Constant', 'literal', 'bar')))
+
+def test_lambda_minimal_one_param_brackets():
+    node = parse_single_statement('x |-> x ** x;')
+    eq_(node.to_tuples(),
+        ('Lambda',
+         ('ParamList', ('Param', 'x')),
+         ('BinaryOp', '**',
+          ('Identifier', 'x'),
+          ('Identifier', 'x'))))
+
+def test_lambda_two_params():
+    node = parse_single_statement('<x,y> |-> x+y;')
+    eq_(node.to_tuples(),
+        ('Lambda',
+         ('ParamList', ('Param', 'x'), ('Param', 'y')),
+         ('BinaryOp', '+',
+          ('Identifier', 'x'),
+          ('Identifier', 'y'))))
+    
+##
 ## Assignment
 ##
 
@@ -886,40 +922,3 @@ def test_cached_procedure_fac():
              ('Assignment', '-=', ('Identifier', 'n'), ('Constant', 'int', 1)))),
             ('Return', ('Identifier', 'i'))))))
 
-##
-## Lambda
-##
-@nottest
-def test_lambda_minimal_zero_params():
-    node = parse_single_statement('< > |-> true;')
-    eq_(node.to_tuples(),
-        ('Lambda',
-         ('ParamList', ),
-         ('Constant', 'bool', True)))
-
-@nottest
-def test_lamba_minimal_one_param_no_brackets():
-    node = parse_single_statement("foo |-> 'bar';")
-    eq_(node.to_tuples(),
-        ('Lambda',
-         ('ParamList', ('Param', 'foo')),
-         ('Constant', 'literal', 'bar')))
-@nottest    
-def test_lambda_minimal_one_param_brackets():
-    node = parse_single_statement('x |-> x ** x;')
-    eq_(node.to_tuples(),
-        ('Lambda',
-         ('ParamList', ('Param', 'x')),
-         ('BinaryOp', '**',
-          ('Identifier', 'x'),
-          ('Identifier', 'x'))))
-@nottest
-def test_lambda_two_params():
-    node = parse_single_statement('<x,y> |-> x+y;')
-    eq_(node.to_tuples(),
-        ('Lambda',
-         ('ParamList', ('Param', 'x'), ('Param', 'y')),
-         ('BinaryOp', '+',
-          ('Identifier', 'x'),
-          ('Identifier', 'y'))))
-    
