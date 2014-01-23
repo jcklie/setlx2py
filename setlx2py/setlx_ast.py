@@ -165,6 +165,19 @@ class Assert(Node):
 
     attr_names = ()
 
+class ArgumentList (Node):
+    def __init__(self, arguments, coord=None):
+        self.arguments = arguments
+        self.coord = coord
+
+    def children(self):
+        nodelist = []
+        for i, child in enumerate(self.arguments or []):
+            nodelist.append(("arguments[%d]" % i, child))
+        return tuple(nodelist)
+
+    attr_names = ()
+
 class Assignment(Node):
     def __init__(self, op, target, right, coord=None):
         self.op = op
@@ -250,6 +263,20 @@ class CachedProcedure(Node):
         nodelist = []
         if self.params is not None: nodelist.append(("params", self.params))
         if self.body is not None: nodelist.append(("body", self.body))
+        return tuple(nodelist)
+
+    attr_names = ()
+
+class Call (Node):
+    def __init__(self, name, args, coord=None):
+        self.name = name
+        self.args = args
+        self.coord = coord
+
+    def children(self):
+        nodelist = []
+        if self.name is not None: nodelist.append(("name", self.name))
+        if self.args is not None: nodelist.append(("args", self.args))
         return tuple(nodelist)
 
     attr_names = ()

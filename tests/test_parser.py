@@ -279,6 +279,50 @@ def test_subscription_chained():
 ## Call
 ##
 
+def test_call_minimal():
+    node = parse_single_statement('foo();')
+    eq_(node.to_tuples(),
+        ('Call',
+         ('Identifier', 'foo'),
+         ('ArgumentList', )))
+
+def test_call_one_argument():
+    node = parse_single_statement('foo(bar);')
+    eq_(node.to_tuples(),
+        ('Call',
+         ('Identifier', 'foo'),
+         ('ArgumentList',
+          ('Identifier', 'bar'))))
+
+def test_call_two_arguments():
+    node = parse_single_statement('foo(bar,baz);')
+    eq_(node.to_tuples(),
+        ('Call',
+         ('Identifier', 'foo'),
+         ('ArgumentList',
+          ('Identifier', 'bar'),
+          ('Identifier', 'baz'))))
+
+def test_call_two_expressions():
+    node = parse_single_statement('substring(size-1,size+3);')
+    eq_(node.to_tuples(),
+        ('Call',
+         ('Identifier', 'substring'),
+         ('ArgumentList',
+          ('BinaryOp', '-', ('Identifier', 'size'), ('Constant', 'int', 1)),
+          ('BinaryOp', '+', ('Identifier', 'size'), ('Constant', 'int', 3)))))
+
+def test_call_chained():
+    node = parse_single_statement('getCallback("onExit")();')
+    eq_(node.to_tuples(),
+        ('Call',
+         ('Call',
+          ('Identifier', 'getCallback'),
+          ('ArgumentList',
+           ('Constant', 'string', 'onExit'))),
+         ('ArgumentList', )))
+        
+
 ##
 ## Lambda
 ##

@@ -70,13 +70,10 @@ class Parser():
             p[1].extend(p[2])
         p[0] = p[1]
 
-    def p_statement_1(self, p):
+    def p_statement(self, p):
         """ statement : simple_statement SEMICOLON
+                      | compound_statement
         """
-        p[0] = [p[1]]
-
-    def p_statement_2(self, p):
-        """ statement : compound_statement """
         p[0] = [p[1]]
 
     ####
@@ -144,7 +141,6 @@ class Parser():
         p[0] = p[1]
         
 
-    # TODO : lambda
     def p_expression_1(self, p):
         """ expression : implication
                        | lambda_definition
@@ -279,6 +275,7 @@ class Parser():
                      | attributeref
                      | subscription
                      | procedure
+                     | call
         """
         p[0] = p[1]
 
@@ -445,12 +442,97 @@ class Parser():
         """ term : TERM LPAREN term_arguments RPAREN """
         p[0] = Term(p[1], p[3], p[3].coord)
 
-        
     def p_term_arguments(self, p):
         """ term_arguments : expression_list
                            | epsilon
         """
         p[0] = p[1] if p[1] is not None else ExprList([])
+
+    ##
+    ## Procedures
+    ##
+        
+    def p_procedure_1(self, p):
+        """ procedure : PROCEDURE LPAREN parameter_list RPAREN \
+                        LBRACE block RBRACE
+        """
+        p[0] = Procedure(p[3], p[6], p[3].coord)
+
+    def p_procedure_2(self, p):
+        """ procedure : CPROCEDURE LPAREN parameter_list RPAREN \
+                        LBRACE block RBRACE
+        """
+        p[0] = CachedProcedure(p[3], p[6], p[3].coord)
+
+    def p_parameter_list(self, p):
+        """ parameter_list : procedure_param
+                           | parameter_list COMMA procedure_param
+                           | epsilon
+        """
+        if len(p) == 2:
+            if p[1] is None: p[0] = ParamList([])
+            else: p[0] = ParamList([p[1]], p[1].coord)
+        else:
+            p[1].params.append(p[3])
+            p[0] = p[1]
+
+    def p_procedure_param(self, p):
+        """ procedure_param : identifier """
+        p[0] = Param(p[1].name, p[1].coord)
+
+    ##
+    ## Call
+    ##
+
+    def p_call(self, p):
+        """ call : primary LPAREN argument_list RPAREN
+                 | primary LPAREN RPAREN
+        """
+        argumentlist = p[3] if len(p) == 5 else ArgumentList([])
+        p[0] = Call(p[1], argumentlist, p[1].coord)
+
+    def p_argument_list(self, p):
+        """ argument_list : expression
+                          | argument_list COMMA expression
+        """
+
+        if len(p) == 2: # single expr
+            p[0] = ArgumentList([p[1]], p[1].coord)
+        else:
+            p[1].arguments.append(p[3])
+            p[0] = p[1]
+
+    ##
+    ## Quantor
+    ##
+    
+    def p_quantor_1(self, p):
+        """ quantor : FORALL LPAREN iterator_chain PIPE expression RPAREN """
+        p[0] = Quantor('all', p[3], p[5], p[3].coord)
+
+    def p_quantor_2(self, p):
+        """ quantor : EXISTS LPAREN iterator_chain PIPE expression RPAREN """
+        p[0] = Quantor('any', p[3], p[5], p[3].coord)
+
+    ##
+    ## Iterator
+    ##
+
+    def p_iterator(self, p):
+        """ iterator : target IN expression """
+        p[0] = Iterator(p[1], p[3], p[1].coord)
+
+    def p_iterator_chain_1(self, p):
+        """ iterator_chain : iterator """
+        p[0] = p[1]
+
+    def p_iterator_chain_2(self, p):
+        """ iterator_chain : iterator_chain COMMA iterator """
+        if not isinstance(p[1], IteratorChain):
+            p[1] = IteratorChain([p[1]], p[1].coord)
+        p[1].iterators.append(p[3])
+        p[0] = p[1]
+        
         
         
     ##
@@ -566,69 +648,6 @@ class Parser():
 #        """ for_loop : FOR LPAREN iterator_chain  RPAREN LBRACE block RBRACE """
 #        p[0] = For(p[3], p[6], p[3].coord)
 
-
-    ##
-    ## Procedures
-    ##
-        
-    def p_procedure_1(self, p):
-        """ procedure : PROCEDURE LPAREN parameter_list RPAREN \
-                        LBRACE block RBRACE
-        """
-        p[0] = Procedure(p[3], p[6], p[3].coord)
-
-    def p_procedure_2(self, p):
-        """ procedure : CPROCEDURE LPAREN parameter_list RPAREN \
-                        LBRACE block RBRACE
-        """
-        p[0] = CachedProcedure(p[3], p[6], p[3].coord)
-
-    def p_parameter_list(self, p):
-        """ parameter_list : procedure_param
-                           | parameter_list COMMA procedure_param
-                           | epsilon
-        """
-        if len(p) == 2:
-            if p[1] is None: p[0] = ParamList([])
-            else: p[0] = ParamList([p[1]], p[1].coord)
-        else:
-            p[1].params.append(p[3])
-            p[0] = p[1]
-
-    def p_procedure_param(self, p):
-        """ procedure_param : identifier """
-        p[0] = Param(p[1].name, p[1].coord)
-
-    ##
-    ## Quantor
-    ##
-    
-    def p_quantor_1(self, p):
-        """ quantor : FORALL LPAREN iterator_chain PIPE expression RPAREN """
-        p[0] = Quantor('all', p[3], p[5], p[3].coord)
-
-    def p_quantor_2(self, p):
-        """ quantor : EXISTS LPAREN iterator_chain PIPE expression RPAREN """
-        p[0] = Quantor('any', p[3], p[5], p[3].coord)
-
-    ##
-    ## Iterator
-    ##
-
-    def p_iterator(self, p):
-        """ iterator : target IN expression """
-        p[0] = Iterator(p[1], p[3], p[1].coord)
-
-    def p_iterator_chain_1(self, p):
-        """ iterator_chain : iterator """
-        p[0] = p[1]
-
-    def p_iterator_chain_2(self, p):
-        """ iterator_chain : iterator_chain COMMA iterator """
-        if not isinstance(p[1], IteratorChain):
-            p[1] = IteratorChain([p[1]], p[1].coord)
-        p[1].iterators.append(p[3])
-        p[0] = p[1]
         
     # ##
     # ## Values
