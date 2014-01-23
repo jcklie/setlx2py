@@ -669,7 +669,6 @@ def test_while_minimal():
          ('UnaryOp', 'not', ('Identifier', 'empty')),
          ('Block',)))
 
-@nottest    
 def test_while_bigger_body():
     node = parse_single_statement('while(i < n) { x *= 2; i -= 1;}')
     eq_(node.to_tuples(),
@@ -688,7 +687,7 @@ def test_do_while_loop_minimal():
         ('DoWhile',
          ('UnaryOp', 'not', ('Identifier', 'empty')),
          ('Block',)))
-@nottest
+
 def test_do_while_loop_bigger_body():
     node = parse_single_statement('do { x *= 2; i -= 1;} while(i < n);')
     eq_(node.to_tuples(),
@@ -754,11 +753,6 @@ def test_for_loop_three_iterators():
             ('Identifier', 'address'),
             ('Identifier', 'i')),
            ('Constant', 'string', "$street$ $street_number$")))))
-               
-##
-## Assignments
-##
-
 
 ##
 ## Procedures
