@@ -236,6 +236,50 @@ def test_more_than_one_statement_simple():
           ('Constant', 'int', 4))))
 
 ##
+## Attributeref
+##
+
+def test_attributeref_minimal():
+    node = parse_single_statement('x.y;')
+    eq_(node.to_tuples(),
+        ('AttributeRef',
+         ('Identifier', 'x'),
+         ('Identifier', 'y')))
+
+def test_attributeref_chained():
+    node = parse_single_statement('x.y.z;')
+    eq_(node.to_tuples(),
+        ('AttributeRef',
+         ('AttributeRef',
+          ('Identifier', 'x'),
+          ('Identifier', 'y')),
+         ('Identifier', 'z')))
+
+##
+## Subscription
+##
+
+def test_subscription_minimal():
+    node = parse_single_statement('x[y];')
+    eq_(node.to_tuples(),
+        ('Subscription',
+         ('Identifier', 'x'),
+         ('Identifier', 'y')))
+
+def test_subscription_chained():
+    node = parse_single_statement('x[y][0];')
+    eq_(node.to_tuples(),
+        ('Subscription',
+         ('Subscription',
+          ('Identifier', 'x'),
+          ('Identifier', 'y')),
+         ('Constant', 'int', 0)))    
+        
+##
+## Call
+##
+
+##
 ## Lambda
 ##
 
