@@ -269,22 +269,21 @@ def test_assignment_explicit_two():
           ('Identifier', 'bar')),
          ('Constant', 'string', 'xy')))
     
-@nottest
-def test_assignment_member_access():
+def test_assignment_attributeref():
     assignment = parse_single_statement('foo.bar := true;')
     eq_(assignment.to_tuples(),
         ('Assignment', ':=',
-        ('MemberAccess',
+        ('AttributeRef',
           ('Identifier', 'foo'),
           ('Identifier', 'bar')),
          ('Constant', 'bool', True)))
-@nottest
+
 def test_assignment_member_access_chained():
     assignment = parse_single_statement('foo.bar.baz := 42;')
     eq_(assignment.to_tuples(),
         ('Assignment', ':=',
-         ('MemberAccess',
-          ('MemberAccess',
+         ('AttributeRef',
+          ('AttributeRef',
            ('Identifier', 'foo'),
            ('Identifier', 'bar')),
           ('Identifier', 'baz')),

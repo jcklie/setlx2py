@@ -273,6 +273,7 @@ class Parser():
         
     def p_primary_1(self, p):
         """ primary  : atom
+                     | attributeref
         """
         p[0] = p[1]
 
@@ -294,6 +295,12 @@ class Parser():
                        | UNUSED
         """
         p[0] = Identifier(p[1])
+
+    # Attribute Ref
+
+    def p_attributeref(self, p):
+        """ attributeref : primary DOT identifier """
+        p[0] = AttributeRef(p[1], p[3], p[1].coord)
 
     ##
     ## Literals
@@ -356,7 +363,9 @@ class Parser():
         p[0] = p[1]
 
     def p_target_1(self, p):
-        """ target : identifier """
+        """ target : identifier
+                   | attributeref
+        """
         p[0] = p[1]
 
     def p_target_2(self, p):

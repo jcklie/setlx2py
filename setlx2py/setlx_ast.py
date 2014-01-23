@@ -194,6 +194,20 @@ class Assignment(Node):
 
     attr_names = ('op',)
 
+class AttributeRef (Node):
+    def __init__(self, obj, field, coord=None):
+        self.obj = obj
+        self.field = field
+        self.coord = coord
+
+    def children(self):
+        nodelist = []
+        if self.obj is not None: nodelist.append(("obj", self.obj))
+        if self.field is not None: nodelist.append(("field", self.field))
+        return tuple(nodelist)
+
+    attr_names = ()
+
 class BinaryOp(Node):
     def __init__(self, op, left, right, coord=None):
         self.op = op
@@ -430,20 +444,6 @@ class Lambda(Node):
         nodelist = []
         if self.params is not None: nodelist.append(("params", self.params))
         if self.body is not None: nodelist.append(("body", self.body))
-        return tuple(nodelist)
-
-    attr_names = ()
-
-class MemberAccess(Node):
-    def __init__(self, obj, field, coord=None):
-        self.obj = obj
-        self.field = field
-        self.coord = coord
-
-    def children(self):
-        nodelist = []
-        if self.obj is not None: nodelist.append(("obj", self.obj))
-        if self.field is not None: nodelist.append(("field", self.field))
         return tuple(nodelist)
 
     attr_names = ()
