@@ -276,6 +276,7 @@ class Parser():
         """ primary  : atom
                      | attributeref
                      | subscription
+                     | procedure
         """
         p[0] = p[1]
 
@@ -449,12 +450,13 @@ class Parser():
     ## Compound statement
     ##
     ####
+        
     def p_compound_statement(self, p):
         """ compound_statement : if_statement
                                | switch_statement
                                | while_loop
                                | do_while_loop
-         """
+        """
         p[0] = p[1]
         
     def p_block(self, p):
@@ -542,6 +544,39 @@ class Parser():
 #    def p_for_loop(self, p):
 #        """ for_loop : FOR LPAREN iterator_chain  RPAREN LBRACE block RBRACE """
 #        p[0] = For(p[3], p[6], p[3].coord)
+
+
+    ##
+    ## Procedures
+    ##
+        
+    def p_procedure_1(self, p):
+        """ procedure : PROCEDURE LPAREN parameter_list RPAREN \
+                        LBRACE block RBRACE
+        """
+        p[0] = Procedure(p[3], p[6], p[3].coord)
+
+    def p_procedure_2(self, p):
+        """ procedure : CPROCEDURE LPAREN parameter_list RPAREN \
+                        LBRACE block RBRACE
+        """
+        p[0] = CachedProcedure(p[3], p[6], p[3].coord)
+
+    def p_parameter_list(self, p):
+        """ parameter_list : procedure_param
+                           | parameter_list COMMA procedure_param
+                           | epsilon
+        """
+        if len(p) == 2:
+            if p[1] is None: p[0] = ParamList([])
+            else: p[0] = ParamList([p[1]], p[1].coord)
+        else:
+            p[1].params.append(p[3])
+            p[0] = p[1]
+
+    def p_procedure_param(self, p):
+        """ procedure_param : identifier """
+        p[0] = Param(p[1].name, p[1].coord)
 
     # ##
     # ## Assignment

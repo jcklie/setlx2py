@@ -757,11 +757,11 @@ def test_for_loop_three_iterators():
 ##
 ## Procedures
 ##
-@nottest
+
 def test_procedure_minimal():
     node = parse_single_statement('procedure() {};')
     eq_(node.to_tuples(), ('Procedure', ('ParamList',), ('Block',)))
-@nottest
+
 def test_procedure_square():
     node = parse_single_statement('procedure(x) { return x ** x; };')
     eq_(node.to_tuples(),
@@ -771,7 +771,7 @@ def test_procedure_square():
            ('BinaryOp', '**',
             ('Identifier', 'x'),
             ('Identifier', 'x'))))))
-@nottest
+
 def test_procedure_max():
     s = """
     max := procedure(a, b) {
@@ -793,7 +793,7 @@ def test_procedure_max():
             ('BinaryOp', '>', ('Identifier', 'a'), ('Identifier', 'b')),
             ('Block', ('Return', ('Identifier', 'a'))),
             ('Block', ('Return', ('Identifier', 'b'))))))))
-@nottest
+
 def test_procedure_fac():
     s = """
     fac := procedure(n) {
@@ -823,11 +823,11 @@ def test_procedure_fac():
 ##
 ## Cached procedures
 ##
-@nottest
+
 def test_cached_procedure_minimal():
     node = parse_single_statement('cachedProcedure() {};')
     eq_(node.to_tuples(), ('CachedProcedure', ('ParamList',), ('Block',)))
-@nottest
+
 def test_cached_procedure_square():
     node = parse_single_statement('cachedProcedure(x) { return x ** x; };')
     eq_(node.to_tuples(),
@@ -837,7 +837,7 @@ def test_cached_procedure_square():
            ('BinaryOp', '**',
             ('Identifier', 'x'),
             ('Identifier', 'x'))))))
-@nottest
+
 def test_cached_procedure_max():
     s = """
     max := cachedProcedure(a, b) {
@@ -859,7 +859,7 @@ def test_cached_procedure_max():
             ('BinaryOp', '>', ('Identifier', 'a'), ('Identifier', 'b')),
             ('Block', ('Return', ('Identifier', 'a'))),
             ('Block', ('Return', ('Identifier', 'b'))))))))
-@nottest
+
 def test_cached_procedure_fac():
     s = """
     fac := cachedProcedure(n) {
