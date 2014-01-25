@@ -79,9 +79,7 @@ class Lexer():
     integer_constant = '0|([1-9][0-9]*)'
 
     # floating constants
-    exponent_part = r'([eE][-+]?[0-9]+)'
-    frac_constant = r'([0-9]*\.[0-9]+)|([0-9]+\.)'
-    double_constant = '(((('+frac_constant+')'+exponent_part+'?)|([0-9]+'+exponent_part+'))[FfLl]?)'
+    double_constant = '(' + integer_constant + ')\.(' + integer_constant + ')'
 
     ##
     ## List of tokens recognized by the lexer
@@ -95,6 +93,7 @@ class Lexer():
         'forall'          : 'FORALL',
         'exists'          : 'EXISTS',
         'backtrack'       : 'BACKTRACK',
+        'match'           : 'MATCH',
         'break'           : 'BREAK',
         'continue'        : 'CONTINUE',
         'exit'            : 'EXIT',

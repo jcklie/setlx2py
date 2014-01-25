@@ -117,19 +117,23 @@ def test_atomic_value_false():
     node = parse_single_statement('false;')
     eq_(node.to_tuples(), ('Constant', 'bool', False))
 
+##
+## Ranges
+##
+
 # List
 
 def test_atomic_value_list_ab():
     node = parse_single_statement('[1 .. 10];')
     eq_(node.to_tuples(),
-        ('List',
+        ('Range', 'list',
          ('Constant', 'int', 1),
          ('Constant', 'int', 10)))
 
 def test_atomic_value_list_abc():
     node = parse_single_statement('[a,b..c];')
     eq_(node.to_tuples(),
-        ('List',
+        ('Range', 'list',
          ('Identifier', 'a'),
          ('Identifier', 'c'),
          ('Identifier', 'b')))    
@@ -139,14 +143,14 @@ def test_atomic_value_list_abc():
 def test_atomic_value_set_ab():
     node = parse_single_statement('{a..b};')
     eq_(node.to_tuples(),
-        ('Set',
+        ('Range', 'set',
          ('Identifier', 'a'),
          ('Identifier', 'b')))
 
 def test_atomic_value_set_abc():
     node = parse_single_statement('{a,b..c};')
     eq_(node.to_tuples(),
-        ('Set',
+        ('Range', 'set',
          ('Identifier', 'a'),
          ('Identifier', 'c'),
          ('Identifier', 'b')))
@@ -782,7 +786,6 @@ def test_switch_case_minimal():
     eq_(node.to_tuples(),
         ('Switch',
          ('CaseList', )))
-    pass
 
 def test_switch_case_simple_no_default():
     s = """
@@ -839,6 +842,25 @@ def test_switch_case_with_default():
           ('Block', ('Return', ('Constant', 'literal', 'Fail'))))),
           ('Default', ('Block', ('Return', ('Constant', 'literal', 'Invalid input'))))))
 
+##
+## Match
+##
+
+@nottest
+def test_match_minimal():
+    s = """
+    match(s) {
+        case [] : return s;
+    }
+
+    """
+    node = parse_single_statement('switch {}')
+    eq_(node.to_tuples(),
+        ('Match',
+         ('CaseList',
+          ('Case',
+           ('List')))))
+    
 ##
 ## While-Loop
 ##

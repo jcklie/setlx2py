@@ -530,6 +530,23 @@ class Quantor(Node):
 
     attr_names = ('name',)
 
+class Range (Node):
+    def __init__(self, type, lower, upper, step, coord=None):
+        self.type = type
+        self.lower = lower
+        self.upper = upper
+        self.step = step
+        self.coord = coord
+
+    def children(self):
+        nodelist = []
+        if self.lower is not None: nodelist.append(("lower", self.lower))
+        if self.upper is not None: nodelist.append(("upper", self.upper))
+        if self.step is not None: nodelist.append(("step", self.step))
+        return tuple(nodelist)
+
+    attr_names = ('type',)
+
 class Return (Node):
     def __init__(self, expr, coord=None):
         self.expr = expr
