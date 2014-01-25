@@ -461,6 +461,22 @@ class Lambda(Node):
 
     attr_names = ()
 
+class List(Node):
+    def __init__(self, lower, upper, step, coord=None):
+        self.lower = lower
+        self.upper = upper
+        self.step = step
+        self.coord = coord
+
+    def children(self):
+        nodelist = []
+        if self.lower is not None: nodelist.append(("lower", self.lower))
+        if self.upper is not None: nodelist.append(("upper", self.upper))
+        if self.step is not None: nodelist.append(("step", self.step))
+        return tuple(nodelist)
+
+    attr_names = ()
+
 class Param (Node):
     def __init__(self, name, coord=None):
         self.name = name
@@ -522,6 +538,22 @@ class Return (Node):
     def children(self):
         nodelist = []
         if self.expr is not None: nodelist.append(("expr", self.expr))
+        return tuple(nodelist)
+
+    attr_names = ()
+
+class Set(Node):
+    def __init__(self, lower, upper, step, coord=None):
+        self.lower = lower
+        self.upper = upper
+        self.step = step
+        self.coord = coord
+
+    def children(self):
+        nodelist = []
+        if self.lower is not None: nodelist.append(("lower", self.lower))
+        if self.upper is not None: nodelist.append(("upper", self.upper))
+        if self.step is not None: nodelist.append(("step", self.step))
         return tuple(nodelist)
 
     attr_names = ()

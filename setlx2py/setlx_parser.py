@@ -41,6 +41,7 @@ class Parser():
     ## Precedence and associativity of operators
     ##
     precedence = (
+        
     )
 
     ##
@@ -368,7 +369,39 @@ class Parser():
     def p_boolean_2(self, p):
         """ boolean : FALSE """
         p[0] = Constant('bool', False)
+        
+    ##
+    ##  Enclosures
+    ##
 
+    def p_enclosure(self, p):
+        """ enclosure : parenth_form
+                      | set_display
+                      | list_display
+        """
+        p[0] = p[1]
+
+    def p_parenth_form(self, p):
+        """ parenth_form : LPAREN expression RPAREN """
+        p[0] = p[2]
+
+    def p_set_display_1(self, p):
+        """ set_display : LBRACE expression RANGE expression RBRACE """
+        p[0] = Set(p[2], p[4], None)
+
+    def p_set_display_2(self, p):
+        " set_display : LBRACE expression COMMA expression RANGE expression RBRACE "
+        p[0] = Set(p[2], p[6], p[4])
+
+    def p_list_display_1(self, p):
+       """ list_display : LBRACKET expression RANGE expression RBRACKET """
+       p[0] = List(p[2], p[4], None)
+
+    def p_list_display_2(self, p):
+        """ list_display : LBRACKET expression \
+                           COMMA expression RANGE expression RBRACKET """
+        p[0] = List(p[2], p[6], p[4])
+        
     ##
     ## Lambda Definitions
     ##
@@ -415,11 +448,6 @@ class Parser():
         """
         p[0] = p[1]
 
-    def p_target_2(self, p):
-        """ target : LBRACKET target_list RBRACKET """
-        p[0] = p[2]
-        
-        
     ##
     ## Augmented Assignment Statement
     ##
@@ -552,20 +580,6 @@ class Parser():
         p[1].iterators.append(p[3])
         p[0] = p[1]
         
-        
-        
-    ##
-    ##  Enclosures
-    ##
-
-    def p_enclosure(self, p):
-        """ enclosure : parenth_form """
-        p[0] = p[1]
-
-    def p_parenth_form(self, p):
-        """ parenth_form : LPAREN expression RPAREN """
-        p[0] = p[2]
-
 
     ####
     ##
@@ -578,6 +592,7 @@ class Parser():
                                | switch_statement
                                | while_loop
                                | do_while_loop
+                               | for_loop
         """
         p[0] = p[1]
         
@@ -663,9 +678,9 @@ class Parser():
         """
         p[0] = DoWhile(p[7], p[3], p[3].coord)
 
-#    def p_for_loop(self, p):
-#        """ for_loop : FOR LPAREN iterator_chain  RPAREN LBRACE block RBRACE """
-#        p[0] = For(p[3], p[6], p[3].coord)
+    def p_for_loop(self, p):
+        """ for_loop : FOR LPAREN iterator_chain  RPAREN LBRACE block RBRACE """
+        p[0] = For(p[3], p[6], p[3].coord)
 
         
     # ##

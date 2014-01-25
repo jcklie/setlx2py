@@ -116,6 +116,40 @@ def test_atomic_value_true():
 def test_atomic_value_false():
     node = parse_single_statement('false;')
     eq_(node.to_tuples(), ('Constant', 'bool', False))
+
+# List
+
+def test_atomic_value_list_ab():
+    node = parse_single_statement('[1 .. 10];')
+    eq_(node.to_tuples(),
+        ('List',
+         ('Constant', 'int', 1),
+         ('Constant', 'int', 10)))
+
+def test_atomic_value_list_abc():
+    node = parse_single_statement('[a,b..c];')
+    eq_(node.to_tuples(),
+        ('List',
+         ('Identifier', 'a'),
+         ('Identifier', 'c'),
+         ('Identifier', 'b')))    
+    
+# Set
+
+def test_atomic_value_set_ab():
+    node = parse_single_statement('{a..b};')
+    eq_(node.to_tuples(),
+        ('Set',
+         ('Identifier', 'a'),
+         ('Identifier', 'b')))
+
+def test_atomic_value_set_abc():
+    node = parse_single_statement('{a,b..c};')
+    eq_(node.to_tuples(),
+        ('Set',
+         ('Identifier', 'a'),
+         ('Identifier', 'c'),
+         ('Identifier', 'b')))
     
 ##
 ## Variables
@@ -402,14 +436,14 @@ def test_assignment_underscore():
          ('Constant', 'bool', True)))    
 
 def test_assignment_explicit_minimal():
-    node = parse_single_statement('[foo] := 42;')
+    node = parse_single_statement('foo := 42;')
     eq_(node.to_tuples(),
         ('Assignment', ':=',
          ('Identifier', 'foo'),
          ('Constant', 'int', 42)))
 
 def test_assignment_explicit_two():
-    node = parse_single_statement('[foo,bar] := "xy";')
+    node = parse_single_statement('foo,bar := "xy";')
     eq_(node.to_tuples(),
         ('Assignment', ':=',
          ('TargetList',
@@ -580,9 +614,9 @@ def test_quantifier_exists():
           ('Identifier', 'x'),
           ('Constant', 'int', 1)),
          ('Constant', 'bool', True)))
-@nottest
+
 def test_quantifier_cray():
-    quantor = parse_single_statement('forall (n in [1..10] | n**2 <= 2**n);')
+    quantor = parse_single_statement('forall (n in [1 .. 10] | n**2 <= 2**n);')
     
 ####
 ##
@@ -847,7 +881,7 @@ def test_do_while_loop_bigger_body():
 ##
 ## For-Loop
 ##
-@nottest
+
 def test_for_loop_minimal():
     node = parse_single_statement("for(x in primes) {}")
     eq_(node.to_tuples(),
@@ -856,7 +890,7 @@ def test_for_loop_minimal():
           ('Identifier', 'x'),
           ('Identifier', 'primes')),
          ('Block', )))
-@nottest
+
 def test_for_loop_bigger_body():
     s = """
     // Finds the first vowel in a list of characters
@@ -880,7 +914,7 @@ def test_for_loop_bigger_body():
             ('Identifier', 'c'),
             ('Identifier', 'vowels')),
            ('Block', ('Return', ('Identifier', 'c')))))))
-@nottest
+
 def test_for_loop_three_iterators():
     s = """
     for(i in uids, s in street, n in street_number) {
@@ -896,7 +930,7 @@ def test_for_loop_three_iterators():
           ('Iterator', ('Identifier', 'n'), ('Identifier', 'street_number'))),
          ('Block',
           ('Assignment', ':=',
-           ('ArrayRef',
+           ('Subscription',
             ('Identifier', 'address'),
             ('Identifier', 'i')),
            ('Constant', 'string', "$street$ $street_number$")))))
