@@ -415,7 +415,7 @@ class Parser():
 
     def p_lambda_parameters(self, p):
         """ lambda_parameters : identifier
-                              | LT parameter_list GT
+                              | LBRACKET parameter_list RBRACKET
         """
         if len(p) == 2:
             param = Param(p[1].name)
@@ -450,6 +450,10 @@ class Parser():
                    | subscription        
         """
         p[0] = p[1]
+
+    def p_target_2(self, p):
+        """ target : LBRACKET target_list RBRACKET """
+        p[0] = p[2]
 
     ##
     ## Augmented Assignment Statement
