@@ -118,6 +118,13 @@ def test_atomic_value_false():
     eq_(node.to_tuples(), ('Constant', 'bool', False))
 
 ##
+## Collections
+##
+
+def test_list_minimal():
+    node = parse_single_statement('[];')
+
+##
 ## Ranges
 ##
 

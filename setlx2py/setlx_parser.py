@@ -41,7 +41,6 @@ class Parser():
     ## Precedence and associativity of operators
     ##
     precedence = (
-        
     )
 
     ##
@@ -401,6 +400,10 @@ class Parser():
         """ list_display : LBRACKET expression \
                            COMMA expression RANGE expression RBRACKET """
         p[0] = Range('list', p[2], p[6], p[4])
+
+    def p_list_display_3(self, p):
+        """ list_display : LBRACKET argument_list RBRACKET """
+        pass
         
     ##
     ## Lambda Definitions

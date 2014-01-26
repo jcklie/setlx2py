@@ -1,0 +1,32 @@
+rule stack: [initExpr, expr]
+line 1:1 at [@0,0:0='%',<19>,1:0]: no viable alternative at input '%'
+1 syntax error(s) encountered.
+
+Oh... you did that wrong... try again!
+
+value	:= om
+
+rule stack: [initExpr, expr]
+line 1:1 at [@0,0:0='%',<19>,1:0]: no viable alternative at input '%'
+1 syntax error(s) encountered.
+
+Oh... you did that wrong... try again!
+
+expr	:= value + value
+Syntax-Tree:
+expr	:= ^sum(^variable("value"), ^variable("value"))
+
+
+No, No, No... that did not work out!
+Try again from the beginning, but don't make this error again:
+'om + om' is undefined.
+
+value	:= 5
+
+expr	:= value ** value
+Syntax-Tree:
+expr	:= ^power(^variable("value"), ^variable("value"))
+
+result	:= 3125
+
+Great result!

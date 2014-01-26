@@ -1,0 +1,34 @@
+// This program demonstrates the regex-branch for match statements
+
+matchRegex := procedure(str) {
+    match (str) {
+        regex '.{4,5}' : // simple match
+            print("match (a)");
+        regex '(fo(o))(.+)' as [_, x,y,x] : // (optional) capture matched groups
+            print("match (b) $x$ $y$");
+        regex '.{9}' as x :    // first group is always the entire matched string
+            print("match (c) $x[1]$");
+        regex 'foo(.+)' as x | x[2][2] == "a" : // (optional) use conditions
+            print("match (d) $x[1]$");
+        default :
+            print("no match");
+    }
+};
+
+matchRegex("test1");     // (a)
+matchRegex("foofoo");    // (b)
+matchRegex("regexTest"); // (c)
+matchRegex("foobar");    // (d)
+matchRegex("bob");       // no match
+
+// There are also some functions which work with regular expressions:
+
+print(replace("fooo", 'o$', "bar"));            // foobar
+print(replace("foo", 'o', "bar"));              // fbarbar
+print(replaceFirst("fooo", 'o$', "bar"));       // foobar
+print(replaceFirst("foo", 'o', "bar"));         // fbaro
+print(matches("foo",'f.+'));                    // true
+print(matches("foo",'\s+'));                    // false
+print(matches("fobarabof",'f.+(bar).+',true));  // ["fobarabof", "bar"]
+print(matches("fobarabof",'\s+(bar)\s+',true)); // []  /* i.e. no match */
+

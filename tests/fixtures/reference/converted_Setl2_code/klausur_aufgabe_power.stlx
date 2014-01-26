@@ -1,0 +1,23 @@
+
+power := procedure(m) {
+	if (m == {}) {
+		return {m};
+	}
+	x := arb(m);
+	return {{y} + r: y in {x}, r in power(m - {x})} + {r: r in power(m - {x})};
+};
+
+improvedPower := procedure(m) {
+	if (m == {}) {
+		return {m};
+	}
+	y := from(m);
+	x := {y};
+	return {x + r: r in improvedPower(m)} + improvedPower(m);
+};
+
+m := {1, 2, 3};
+print(power(m));
+print(improvedPower(m));
+print(pow(m));
+

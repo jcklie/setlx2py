@@ -1,0 +1,6 @@
+// this "program" make sure the parser finds these "hidden" syntax errors
+
+exit;
+%%%;
+1 + 2 *** 3;
+~~;
