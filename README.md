@@ -34,4 +34,3 @@ The unit test suite can be run with
     make test
 
 [![Build Status](https://travis-ci.org/Rentier/setlx2py.png?branch=master)](https://travis-ci.org/Rentier/setlx2py)
-bx
