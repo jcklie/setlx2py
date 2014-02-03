@@ -21,7 +21,7 @@ Load the parser and start an interactive shell with
 
     make parser
 
-You can now use the *parser* variable to parse text:
+You can now use the **parser** variable to parse text:
 
     >>> parser.parse("a;")
     ('FileAST', ('Identifier', 'a'))
