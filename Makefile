@@ -1,5 +1,8 @@
 parser:
-	python -c "from setlx2py.setlx_parser import Parser; parser = Parser()" -i
+	python -i -c "from setlx2py.setlx_parser import Parser; parser = Parser()"
+	
+foo:
+	python -i -c "x = 1"
 
 ast:
 	python -c "from astgen.ast_gen import ASTCodeGenerator; \
