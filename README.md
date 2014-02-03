@@ -10,30 +10,28 @@ Dependencies
 
 * Python 2.7.3
 * PLY (Python Lex-Yacc)
+* ast-gen (only for development)
 
-Virtualenv
-==========
-virtualenv is a tool to create isolated Python environments. To create a fresh python installation, just enter the following commmand:
+Play with it
+============
 
-	cd "PATH_TO_README"
-	virtualenv -p python3.3 python3.3
-	source venv/bin/activate
-	pip install -r REQUIREMENTS.txt	
+## Parser
 
-Then, the prompt should have changed and start with 
+Load the parser and start an interactive shell with
 
-	(venv)
+    make parser
 
-Whenever a command related to this project is issued, the step with 
+## AST
 
-	source venv/bin/activate
+Rebuild the AST classes (needs ast-gen installed):
 
-has to be repeated, since only the then Python executable of this very project is used.
-Shovel
-=====
+    make ast
 
-To create the Python AST representation for the parse tree, use
+## Run tests
 
-	shovel build.ast
+The unit test suite can be run with
+
+    make test
 
 [![Build Status](https://travis-ci.org/Rentier/setlx2py.png?branch=master)](https://travis-ci.org/Rentier/setlx2py)
+bx
