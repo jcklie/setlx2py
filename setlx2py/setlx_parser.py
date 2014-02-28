@@ -376,7 +376,6 @@ class Parser():
     def p_enclosure(self, p):
         """ enclosure : parenth_form
                       | set_display
-                      | list_display
         """
         p[0] = p[1]
 
@@ -391,7 +390,7 @@ class Parser():
     def p_set_display_2(self, p):
         " set_display : LBRACE expression COMMA expression RANGE expression RBRACE "
         p[0] = Range('set', p[2], p[6], p[4])
-
+        '''
     def p_list_display_1(self, p):
        """ list_display : LBRACKET expression RANGE expression RBRACKET """
        p[0] = Range('list', p[2], p[4], None)
@@ -404,7 +403,7 @@ class Parser():
     def p_list_display_3(self, p):
         """ list_display : LBRACKET argument_list RBRACKET """
         pass
-        
+        '''
     ##
     ## Lambda Definitions
     ##
@@ -415,7 +414,7 @@ class Parser():
 
     def p_lambda_parameters(self, p):
         """ lambda_parameters : identifier
-                              | LBRACKET parameter_list RBRACKET
+                              | LT parameter_list GT
         """
         if len(p) == 2:
             param = Param(p[1].name)

@@ -121,6 +121,7 @@ def test_atomic_value_false():
 ## Collections
 ##
 
+@nottest    
 def test_list_minimal():
     node = parse_single_statement('[];')
 
@@ -130,6 +131,7 @@ def test_list_minimal():
 
 # List
 
+@nottest    
 def test_atomic_value_list_ab():
     node = parse_single_statement('[1 .. 10];')
     eq_(node.to_tuples(),
@@ -137,6 +139,7 @@ def test_atomic_value_list_ab():
          ('Constant', 'int', 1),
          ('Constant', 'int', 10)))
 
+@nottest    
 def test_atomic_value_list_abc():
     node = parse_single_statement('[a,b..c];')
     eq_(node.to_tuples(),
@@ -626,6 +629,7 @@ def test_quantifier_exists():
           ('Constant', 'int', 1)),
          ('Constant', 'bool', True)))
 
+@nottest    
 def test_quantifier_cray():
     quantor = parse_single_statement('forall (n in [1 .. 10] | n**2 <= 2**n);')
     
