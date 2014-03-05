@@ -392,6 +392,10 @@ class Parser():
         " set_display : LBRACE expression COMMA expression RANGE expression RBRACE "
         p[0] = Range('set', p[2], p[6], p[4])
 
+    def p_set_display_3(self, p):
+        """ set_display : LPAREN argument_list RPAREN """
+        p[0] = Set(p[2], p[2].coord)
+    
     def p_list_display_1(self, p):
        """ list_display : LBRACKET expression RANGE expression RBRACKET """
        p[0] = Range('list', p[2], p[4], None)
@@ -403,7 +407,7 @@ class Parser():
 
     def p_list_display_3(self, p):
         """ list_display : LBRACKET argument_list RBRACKET """
-        pass
+        p[0] = List(p[2], p[2].coord)
         
     ##
     ## Lambda Definitions
@@ -415,7 +419,7 @@ class Parser():
 
     def p_lambda_parameters(self, p):
         """ lambda_parameters : identifier
-                              | LBRACKET parameter_list RBRACKET
+                              | LT  parameter_list GT
         """
         if len(p) == 2:
             param = Param(p[1].name)
@@ -430,31 +434,13 @@ class Parser():
 
     # TODO : recursive assignment
     def p_assignment_statement(self, p):
-        """ assignment_statement : target_list ASSIGN expression """
+        """ assignment_statement : target ASSIGN expression """
         p[0] = Assignment(p[2], p[1], p[3],  p[3].coord)
+
+    def p_target(self, p):
+        """ target : expression """
+        p[0] = p[1]
         
-    def p_target_list_1(self, p):
-        """ target_list : target """
-        p[0] = p[1]
-
-    def p_target_list_2(self, p):
-        """ target_list : target_list COMMA target """
-        if not isinstance(p[1], TargetList):
-             p[1] = TargetList([p[1]], p[1].coord)
-        p[1].targets.append(p[3])
-        p[0] = p[1]
-
-    def p_target_1(self, p):
-        """ target : identifier
-                   | attributeref
-                   | subscription        
-        """
-        p[0] = p[1]
-
-    def p_target_2(self, p):
-        """ target : LBRACKET target_list RBRACKET """
-        p[0] = p[2]
-
     ##
     ## Augmented Assignment Statement
     ##
@@ -696,25 +682,3 @@ class Parser():
     def p_for_loop(self, p):
         """ for_loop : FOR LPAREN iterator_chain  RPAREN LBRACE block RBRACE """
         p[0] = For(p[3], p[6], p[3].coord)
-
-        
-    # ##
-    # ## Values
-    # ##
-
-    # def p_unused(self, p):
-    #     """ unused : UNUSED """
-    #     p[0] = Variable('unused', 'unused')
-        
-    # def p_value_1(self, p):
-    #     """ value : atomic_value """
-    #     p[0] = p[1]
-
-
-    # def p_value_4(self, p):
-    #     """ value : unused """
-    #     p[0] = p[1]
-
-    # ## Atomic Value
-        
-
