@@ -663,18 +663,18 @@ def test_term_multi_arg():
 ##
 
 def test_quantifier_all():
-    quantor =  parse_single_statement('forall (x in 1 | true);')
-    iterator = quantor.lhs
-    condition = quantor.cond
-
-    eq_(quantor.name, 'all')
-    eq_(iterator.assignable.name, 'x')
-    eq_(iterator.expression.value, 1)
-    eq_(condition.value, True)
+    node =  parse_single_statement('forall (x in 1 | true);')
+    eq_(node.to_tuples(),
+        ('Quantor', 'all',
+         ('Iterator',
+          ('Identifier', 'x'),
+          ('Constant', 'int', 1)),
+         ('Constant', 'bool', True)))
+    
 
 def test_quantifier_exists():
-    quantor =  parse_single_statement('exists (x in 1 | true);')
-    eq_(quantor.to_tuples(),
+    node =  parse_single_statement('exists (x in 1 | true);')
+    eq_(node.to_tuples(),
         ('Quantor', 'any',
          ('Iterator',
           ('Identifier', 'x'),
@@ -682,7 +682,21 @@ def test_quantifier_exists():
          ('Constant', 'bool', True)))
 
 def test_quantifier_cray():
-    quantor = parse_single_statement('forall (n in [1 .. 10] | n**2 <= 2**n);')
+    node = parse_single_statement('forall (n in [1 .. 10] | n**2 <= 2**n);')
+    eq_(node.to_tuples(),
+        ('Quantor', 'all',
+         ('Iterator',
+          ('Identifier', 'n'),
+          ('Range', 'list',
+           ('Constant', 'int', 1),
+           ('Constant', 'int', 10))),
+         ('BinaryOp', '<=',
+          ('BinaryOp', '**',
+           ('Identifier', 'n'),
+           ('Constant', 'int', 2)),
+          ('BinaryOp', '**',
+           ('Constant', 'int', 2),
+           ('Identifier', 'n')))))
     
 ####
 ##
