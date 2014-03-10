@@ -709,12 +709,12 @@ class Parser():
 
     def p_match_statement(self, p):
         """ match_statement : MATCH LPAREN expression RPAREN \
-                              LBRACE match_list RBRACE 
+                              LBRACE match_list default_case RBRACE 
         """
         if not isinstance(p[6], CaseList):
             p[6] = CaseList([p[6]], p[3].coord)
 
-        p[0] = Match(p[3], p[6], None)
+        p[0] = Match(p[3], p[6], p[7])
 
     def p_match_list_1(self, p):
         """ match_list : match_case  """
@@ -730,7 +730,7 @@ class Parser():
     def p_match_case(self, p):
         """ match_case : CASE expression_list COLON block """
         p[0] = Case(p[2], p[4])
-        
+
     ##
     ## Loops
     ##
