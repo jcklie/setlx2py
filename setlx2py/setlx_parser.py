@@ -12,6 +12,7 @@ from ply import yacc
 
 from setlx2py.setlx_lexer import Lexer
 from setlx2py.setlx_ast import *
+from setlx2py.setlx_semcheck import *
 
 class Parser():
 
@@ -139,7 +140,6 @@ class Parser():
             p[1] = ExprList([p[1]], p[1].coord)
         p[1].exprs.append(p[3])
         p[0] = p[1]
-        
 
     def p_expression_1(self, p):
         """ expression : implication
@@ -559,8 +559,9 @@ class Parser():
     ##
 
     def p_iterator(self, p):
-        """ iterator : target IN expression """
-        p[0] = Iterator(p[1], p[3], p[1].coord)
+        """ iterator : comparison """
+        check_iterator(p)
+        p[0] = Iterator(p.left, p.right, p.coord)
 
     def p_iterator_chain_1(self, p):
         """ iterator_chain : iterator """
@@ -572,7 +573,6 @@ class Parser():
             p[1] = IteratorChain([p[1]], p[1].coord)
         p[1].iterators.append(p[3])
         p[0] = p[1]
-        
 
     ####
     ##
