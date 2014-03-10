@@ -406,7 +406,11 @@ class Parser():
         p[0] = Range('list', p[2], p[6], p[4])
 
     def p_list_display_3(self, p):
-        """ list_display : LBRACKET argument_list RBRACKET """
+        """ list_display : LBRACKET expression RBRACKET """
+        p[0] = List(p[2], p[2].coord)
+
+    def p_list_display_4(self, p):
+        """ list_display : LBRACKET expression COMMA argument_list RBRACKET """
         p[0] = List(p[2], p[2].coord)
         
     ##
@@ -439,6 +443,8 @@ class Parser():
 
     def p_target(self, p):
         """ target : expression """
+        ast = p[1]
+        check_target(ast)
         p[0] = p[1]
         
     ##
@@ -560,8 +566,9 @@ class Parser():
 
     def p_iterator(self, p):
         """ iterator : comparison """
-        check_iterator(p)
-        p[0] = Iterator(p.left, p.right, p.coord)
+        ast = p[1]
+        check_iterator(ast)
+        p[0] = Iterator(ast.left, ast.right, ast.coord)
 
     def p_iterator_chain_1(self, p):
         """ iterator_chain : iterator """
