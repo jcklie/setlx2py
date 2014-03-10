@@ -447,7 +447,9 @@ class Parser():
     def p_lambda_parameters_2(self, p):
         """ lambda_parameters : list_display """
         lst = p[1].items
-        p[0] = ParamList(lst, p[1].coord)
+        params = ParamList(lst, p[1].coord)
+        check_lambda(params)
+        p[0] = params
 
     ##
     ## Assignment Statement
@@ -518,22 +520,28 @@ class Parser():
         """ procedure : PROCEDURE LPAREN parameter_list RPAREN \
                         LBRACE block RBRACE
         """
-        p[0] = Procedure(p[3], p[6], p[3].coord)
+        p[0] = Procedure(p[3], p[6], p[6].coord)
 
     def p_procedure_2(self, p):
         """ procedure : CPROCEDURE LPAREN parameter_list RPAREN \
                         LBRACE block RBRACE
         """
-        p[0] = CachedProcedure(p[3], p[6], p[3].coord)
+        p[0] = CachedProcedure(p[3], p[6], p[6].coord)
 
-    def p_parameter_list(self, p):
-        """ parameter_list : procedure_param
-                           | parameter_list COMMA procedure_param
-                           | epsilon
+    def p_parameter_list_1(self, p):
+        """ parameter_list : params """
+        p[0] = p[1]
+
+    def p_parameter_list_2(self, p):
+        """ parameter_list : epsilon """
+        p[0] = ParamList([])
+
+    def p_params(self, p):
+        """ params : procedure_param
+                   | params COMMA procedure_param
         """
-        if len(p) == 2:
-            if p[1] is None: p[0] = ParamList([])
-            else: p[0] = ParamList([p[1]], p[1].coord)
+        if len(p) == 2: # single parameter
+            p[0] = ParamList([p[1]], p[1].coord)
         else:
             p[1].params.append(p[3])
             p[0] = p[1]
