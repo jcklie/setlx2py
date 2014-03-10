@@ -129,6 +129,16 @@ class Parser():
     ##
     ## Expressions
     ##
+    def p_expression_list_1(self, p):
+        """ expression_list : expression  """
+        p[0] = p[1]
+    
+    def p_expression_list_2(self, p):
+        """ expression_list : expression_list COMMA expression """
+        if not isinstance(p[1], ExprList):
+            p[1] = ExprList([p[1]], p[1].coord)
+        p[1].exprs.append(p[3])
+        p[0] = p[1]    
 
     def p_expression_1(self, p):
         """ expression : implication
@@ -430,6 +440,10 @@ class Parser():
     def p_list_display_3(self, p):
         """ list_display : LBRACKET RBRACKET """
         p[0] = List([])
+
+    def p_list_display_4(self, p):
+        """ list_display : LBRACKET expression PIPE expression RBRACKET """
+        p[0] = Pattern(p[2], p[4], p[2].coord)
         
     ##
     ## Lambda Definitions
@@ -694,7 +708,28 @@ class Parser():
     ##
 
     def p_match_statement(self, p):
-        """ match_statement : MATCH """
+        """ match_statement : MATCH LPAREN expression RPAREN \
+                              LBRACE match_list RBRACE 
+        """
+        if not isinstance(p[6], CaseList):
+            p[6] = CaseList([p[6]], p[3].coord)
+
+        p[0] = Match(p[3], p[6], None)
+
+    def p_match_list_1(self, p):
+        """ match_list : match_case  """
+        p[0] = p[1]
+    
+    def p_match_list_2(self, p):
+        """ match_list : match_list match_case """
+        if not isinstance(p[1], CaseList):
+            p[1] = CaseList([p[1]], p[1].coord)
+        p[1].cases.append(p[2])
+        p[0] = p[1]    
+
+    def p_match_case(self, p):
+        """ match_case : CASE expression_list COLON block """
+        p[0] = Case(p[2], p[4])
         
     ##
     ## Loops

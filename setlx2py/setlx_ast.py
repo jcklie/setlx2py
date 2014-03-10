@@ -474,6 +474,22 @@ class List(Node):
 
     attr_names = ()
 
+class Match(Node):
+    def __init__(self, matchee, case_list, default, coord=None):
+        self.matchee = matchee
+        self.case_list = case_list
+        self.default = default
+        self.coord = coord
+
+    def children(self):
+        nodelist = []
+        if self.matchee is not None: nodelist.append(("matchee", self.matchee))
+        if self.case_list is not None: nodelist.append(("case_list", self.case_list))
+        if self.default is not None: nodelist.append(("default", self.default))
+        return tuple(nodelist)
+
+    attr_names = ()
+
 class Param (Node):
     def __init__(self, name, coord=None):
         self.name = name
@@ -494,6 +510,20 @@ class ParamList (Node):
         nodelist = []
         for i, child in enumerate(self.params or []):
             nodelist.append(("params[%d]" % i, child))
+        return tuple(nodelist)
+
+    attr_names = ()
+
+class Pattern(Node):
+    def __init__(self, left, right, coord=None):
+        self.left = left
+        self.right = right
+        self.coord = coord
+
+    def children(self):
+        nodelist = []
+        if self.left is not None: nodelist.append(("left", self.left))
+        if self.right is not None: nodelist.append(("right", self.right))
         return tuple(nodelist)
 
     attr_names = ()

@@ -922,7 +922,7 @@ def test_switch_case_with_default():
 ## Match
 ##
 
-@nottest
+
 def test_match_minimal():
     s = """
     match(s) {
@@ -930,13 +930,83 @@ def test_match_minimal():
     }
 
     """
-    node = parse_single_statement('switch {}')
+    node = parse_single_statement(s)
     eq_(node.to_tuples(),
         ('Match',
+         ('Identifier', 's'),
          ('CaseList',
           ('Case',
-           ('List')))))
-    
+           ('List', ),
+           ('Block',
+            ('Return', ('Identifier', 's')))))))
+
+def test_match_minimal_pattern():
+    s = """
+    match(s) {
+        case [h|t] : return h;
+    }
+
+    """
+    node = parse_single_statement(s)
+    eq_(node.to_tuples(),
+        ('Match',
+         ('Identifier', 's'),
+         ('CaseList',
+          ('Case',
+           ('Pattern',
+            ('Identifier', 'h'),
+            ('Identifier', 't')),
+           ('Block',
+            ('Return', ('Identifier', 'h')))))))
+
+@nottest    
+def test_match_two_cases_default():
+    s = """
+    match (s) {
+      case [h] : return h;
+      case [h|t]: return t
+      default : return "Error!";
+    }
+    """
+    node = parse_single_statement(s)
+    eq_(node.to_tuples(),
+        ('Match',
+         ('Identifier', 's'),
+         ('CaseList',
+          ('Case',
+           ('List', ('Identifier', 'h')),
+           ('Block', ('Return', ('Identifier', 'h'))))
+          ('Case',
+           ('Pattern',
+            ('Identifier', 'h'),
+            ('Identifier', 't')),
+           ('Block',
+            ('Return', ('Identifier', 't'))))
+          ('Default',
+           ('Block',
+            ('Return', ('Constant', 'string', 'Error')))))))
+
+def test_match_two_cases():
+    s = """
+    match (s) {
+      case [] : return "Empty";
+      case [h|t]: return "Not empty";
+    }
+    """
+    node = parse_single_statement(s)
+    eq_(node.to_tuples(),
+        ('Match',
+         ('Identifier', 's'),
+         ('CaseList',
+          ('Case',
+           ('List',),
+           ('Block', ('Return', ('Constant', 'string', 'Empty')))),
+          ('Case',
+           ('Pattern',
+            ('Identifier', 'h'),
+            ('Identifier', 't')),
+           ('Block',
+            ('Return', ('Constant', 'string', 'Not empty')))))))
 ##
 ## While-Loop
 ##
