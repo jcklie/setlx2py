@@ -130,6 +130,21 @@ def test_list_single_element():
         ('List',
          ('Identifier', 'foo')))
 
+def test_list_two_elements():
+    node = parse_single_statement('[foo,bar];')
+    eq_(node.to_tuples(),
+        ('List',
+         ('Identifier', 'foo'),
+         ('Identifier', 'bar')))
+
+def test_list_three_elements():
+    node = parse_single_statement('[foo,bar,baz];')
+    eq_(node.to_tuples(),
+        ('List',
+         ('Identifier', 'foo'),
+         ('Identifier', 'bar'),
+         ('Identifier', 'baz')))
+
 ##
 ## Ranges
 ##
