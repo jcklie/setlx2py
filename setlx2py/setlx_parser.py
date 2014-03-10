@@ -376,8 +376,13 @@ class Parser():
     def p_enclosure(self, p):
         """ enclosure : set_display
                       | list_display
+                      | parenth_form
         """
         p[0] = p[1]
+
+    def p_parenth_form(self, p):
+        """ parenth_form : LPAREN expression RPAREN """
+        p[0] = p[2]
 
     # Set display
 
@@ -391,12 +396,19 @@ class Parser():
         p[0] = Range('set', p[2], p[6], p[4])
 
     def p_set_display_3(self, p):
-        """ set_display : LPAREN argument_list RPAREN """
-        lst = p[2].arguments
-        if len(lst) == 1: # (expression) is parenth_form, not set
-            p[0] = lst[0]
-        else:
-            p[0] = Set(lst, lst.coord)
+        """ set_display : LBRACE expression RBRACE """
+        p[0] = Set([p[2]], p[2].coord)
+
+    def p_set_display_4(self, p):
+        """ set_display : LBRACE expression COMMA argument_list RBRACE """
+        lst = p[4].arguments
+        expr = p[2]
+        lst.insert(0, expr)
+        p[0] = Set(lst, expr.coord)
+
+    def p_set_display_5(self, p):
+        """ set_display : LBRACE RBRACE """
+        p[0] = Set([])        
 
     # List Display
     

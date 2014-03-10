@@ -121,6 +121,8 @@ def test_atomic_value_false():
 ## Collections
 ##
 
+# List
+
 def test_list_minimal():
     node = parse_single_statement('[];')
 
@@ -145,6 +147,32 @@ def test_list_three_elements():
          ('Identifier', 'bar'),
          ('Identifier', 'baz')))
 
+# Set
+
+def test_set_minimal():
+    node = parse_single_statement('{};')
+
+def test_set_single_element():
+    node = parse_single_statement('{foo};')
+    eq_(node.to_tuples(),
+        ('Set',
+         ('Identifier', 'foo')))
+
+def test_set_two_elements():
+    node = parse_single_statement('{foo,bar};')
+    eq_(node.to_tuples(),
+        ('Set',
+         ('Identifier', 'foo'),
+         ('Identifier', 'bar')))
+
+def test_set_three_elements():
+    node = parse_single_statement('{foo,bar,baz};')
+    eq_(node.to_tuples(),
+        ('Set',
+         ('Identifier', 'foo'),
+         ('Identifier', 'bar'),
+         ('Identifier', 'baz')))
+    
 ##
 ## Ranges
 ##
