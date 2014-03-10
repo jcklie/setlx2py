@@ -130,17 +130,6 @@ class Parser():
     ## Expressions
     ##
 
-    def p_expression_list_1(self, p):
-        """ expression_list : expression  """
-        p[0] = p[1]
-
-    def p_expression_list_2(self, p):
-        """ expression_list : expression_list COMMA expression """
-        if not isinstance(p[1], ExprList):
-            p[1] = ExprList([p[1]], p[1].coord)
-        p[1].exprs.append(p[3])
-        p[0] = p[1]
-
     def p_expression_1(self, p):
         """ expression : implication
                        | lambda_definition
@@ -374,7 +363,9 @@ class Parser():
     ##
 
     def p_enclosure(self, p):
-        """ enclosure : set_display
+        """ enclosure : set_range
+                      | set_display
+                      | list_range
                       | list_display
                       | parenth_form
         """
@@ -384,55 +375,59 @@ class Parser():
         """ parenth_form : LPAREN expression RPAREN """
         p[0] = p[2]
 
-    # Set display
+    # Set range
 
-    def p_set_display_1(self, p):
-        """ set_display : LBRACE expression RANGE expression RBRACE """
+    def p_set_range_1(self, p):
+        """ set_range : LBRACE expression RANGE expression RBRACE """
         p[0] = Range('set', p[2], p[4], None)
 
-    def p_set_display_2(self, p):
-        """ set_display : LBRACE expression \
+    def p_set_range_2(self, p):
+        """ set_range : LBRACE expression \
                           COMMA expression RANGE expression RBRACE """
         p[0] = Range('set', p[2], p[6], p[4])
 
-    def p_set_display_3(self, p):
+    # Set display
+
+    def p_set_display_1(self, p):
         """ set_display : LBRACE expression RBRACE """
         p[0] = Set([p[2]], p[2].coord)
 
-    def p_set_display_4(self, p):
+    def p_set_display_2(self, p):
         """ set_display : LBRACE expression COMMA argument_list RBRACE """
         lst = p[4].arguments
         expr = p[2]
         lst.insert(0, expr)
         p[0] = Set(lst, expr.coord)
 
-    def p_set_display_5(self, p):
+    def p_set_display_3(self, p):
         """ set_display : LBRACE RBRACE """
         p[0] = Set([])        
 
-    # List Display
+    # List Range
     
-    def p_list_display_1(self, p):
-       """ list_display : LBRACKET expression RANGE expression RBRACKET """
+    def p_list_range_1(self, p):
+       """ list_range : LBRACKET expression RANGE expression RBRACKET """
        p[0] = Range('list', p[2], p[4], None)
 
-    def p_list_display_2(self, p):
-        """ list_display : LBRACKET expression \
+    def p_list_range_2(self, p):
+        """ list_range : LBRACKET expression \
                            COMMA expression RANGE expression RBRACKET """
         p[0] = Range('list', p[2], p[6], p[4])
 
-    def p_list_display_3(self, p):
+    # List Display
+
+    def p_list_display_1(self, p):
         """ list_display : LBRACKET expression RBRACKET """
         p[0] = List([p[2]], p[2].coord)
 
-    def p_list_display_4(self, p):
+    def p_list_display_2(self, p):
         """ list_display : LBRACKET expression COMMA argument_list RBRACKET """
         lst = p[4].arguments
         expr = p[2]
         lst.insert(0, expr)
         p[0] = List(lst, expr.coord)
 
-    def p_list_display_5(self, p):
+    def p_list_display_3(self, p):
         """ list_display : LBRACKET RBRACKET """
         p[0] = List([])
         
@@ -444,16 +439,15 @@ class Parser():
         """ lambda_definition : lambda_parameters LAMBDADEF expression """
         p[0] = Lambda(p[1], p[3], p[1].coord)
 
-    def p_lambda_parameters(self, p):
-        """ lambda_parameters : identifier
-                              | LT  parameter_list GT
-        """
-        if len(p) == 2:
-            param = Param(p[1].name)
-            p[0] = ParamList([param], p[1].coord)
-        else:
-            p[0] = p[2]
-        
+    def p_lambda_parameters_1(self, p):
+        """ lambda_parameters : identifier """
+        param = p[1]
+        p[0] = ParamList([param], p[1].coord)
+
+    def p_lambda_parameters_2(self, p):
+        """ lambda_parameters : list_display """
+        lst = p[1].items
+        p[0] = ParamList(lst, p[1].coord)
 
     ##
     ## Assignment Statement

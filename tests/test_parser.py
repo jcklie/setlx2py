@@ -446,7 +446,7 @@ def test_slicing_both():
 ##
 
 def test_lambda_minimal_zero_params():
-    node = parse_single_statement('< > |-> true;')
+    node = parse_single_statement('[ ] |-> true;')
     eq_(node.to_tuples(),
         ('Lambda',
          ('ParamList', ),
@@ -456,23 +456,23 @@ def test_lamba_minimal_one_param_no_brackets():
     node = parse_single_statement("foo |-> 'bar';")
     eq_(node.to_tuples(),
         ('Lambda',
-         ('ParamList', ('Param', 'foo')),
+         ('ParamList', ('Identifier', 'foo')),
          ('Constant', 'literal', 'bar')))
 
 def test_lambda_minimal_one_param_brackets():
     node = parse_single_statement('x |-> x ** x;')
     eq_(node.to_tuples(),
         ('Lambda',
-         ('ParamList', ('Param', 'x')),
+         ('ParamList', ('Identifier', 'x')),
          ('BinaryOp', '**',
           ('Identifier', 'x'),
           ('Identifier', 'x'))))
 
 def test_lambda_two_params():
-    node = parse_single_statement('<x,y> |-> x+y;')
+    node = parse_single_statement('[x,y] |-> x+y;')
     eq_(node.to_tuples(),
         ('Lambda',
-         ('ParamList', ('Param', 'x'), ('Param', 'y')),
+         ('ParamList', ('Identifier', 'x'), ('Identifier', 'y')),
          ('BinaryOp', '+',
           ('Identifier', 'x'),
           ('Identifier', 'y'))))
