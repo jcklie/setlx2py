@@ -124,6 +124,12 @@ def test_atomic_value_false():
 def test_list_minimal():
     node = parse_single_statement('[];')
 
+def test_list_single_element():
+    node = parse_single_statement('[foo];')
+    eq_(node.to_tuples(),
+        ('List',
+         ('Identifier', 'foo')))
+
 ##
 ## Ranges
 ##
@@ -454,10 +460,10 @@ def test_assignment_explicit_minimal():
          ('Constant', 'int', 42)))
 
 def test_assignment_explicit_two():
-    node = parse_single_statement('foo,bar := "xy";')
+    node = parse_single_statement('[foo, bar] := "xy";')
     eq_(node.to_tuples(),
         ('Assignment', ':=',
-         ('TargetList',
+         ('List',
           ('Identifier', 'foo'),
           ('Identifier', 'bar')),
          ('Constant', 'string', 'xy')))

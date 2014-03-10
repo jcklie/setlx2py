@@ -462,17 +462,14 @@ class Lambda(Node):
     attr_names = ()
 
 class List(Node):
-    def __init__(self, lower, upper, step, coord=None):
-        self.lower = lower
-        self.upper = upper
-        self.step = step
+    def __init__(self, items, coord=None):
+        self.items = items
         self.coord = coord
 
     def children(self):
         nodelist = []
-        if self.lower is not None: nodelist.append(("lower", self.lower))
-        if self.upper is not None: nodelist.append(("upper", self.upper))
-        if self.step is not None: nodelist.append(("step", self.step))
+        for i, child in enumerate(self.items or []):
+            nodelist.append(("items[%d]" % i, child))
         return tuple(nodelist)
 
     attr_names = ()

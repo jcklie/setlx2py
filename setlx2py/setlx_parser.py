@@ -374,27 +374,31 @@ class Parser():
     ##
 
     def p_enclosure(self, p):
-        """ enclosure : parenth_form
-                      | set_display
+        """ enclosure : set_display
                       | list_display
         """
         p[0] = p[1]
 
-    def p_parenth_form(self, p):
-        """ parenth_form : LPAREN expression RPAREN """
-        p[0] = p[2]
+    # Set display
 
     def p_set_display_1(self, p):
         """ set_display : LBRACE expression RANGE expression RBRACE """
         p[0] = Range('set', p[2], p[4], None)
 
     def p_set_display_2(self, p):
-        " set_display : LBRACE expression COMMA expression RANGE expression RBRACE "
+        """ set_display : LBRACE expression \
+                          COMMA expression RANGE expression RBRACE """
         p[0] = Range('set', p[2], p[6], p[4])
 
     def p_set_display_3(self, p):
         """ set_display : LPAREN argument_list RPAREN """
-        p[0] = Set(p[2], p[2].coord)
+        lst = p[2].arguments
+        if len(lst) == 1: # (expression) is parenth_form, not set
+            p[0] = lst[0]
+        else:
+            p[0] = Set(lst, lst.coord)
+
+    # List Display
     
     def p_list_display_1(self, p):
        """ list_display : LBRACKET expression RANGE expression RBRACKET """
@@ -407,11 +411,18 @@ class Parser():
 
     def p_list_display_3(self, p):
         """ list_display : LBRACKET expression RBRACKET """
-        p[0] = List(p[2], p[2].coord)
+        p[0] = List([p[2]], p[2].coord)
 
     def p_list_display_4(self, p):
         """ list_display : LBRACKET expression COMMA argument_list RBRACKET """
-        p[0] = List(p[2], p[2].coord)
+        lst = p[4].arguments
+        expr = p[2]
+        lst.insert(0, expr)
+        p[0] = List(lst, expr.coord)
+
+    def p_list_display_5(self, p):
+        """ list_display : LBRACKET RBRACKET """
+        p[0] = List([])
         
     ##
     ## Lambda Definitions
