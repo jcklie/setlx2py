@@ -638,17 +638,23 @@ def test_return_statement_binop():
 ## Terms
 ##
 
+def test_term_no_arguments():
+    node = parse_single_statement('F();')
+    eq_(node.to_tuples(),
+        ('Term', 'F', ('ArgumentList',)))
+
 def test_term_single_arg():
-    term = parse_single_statement('F(true);')
-    eq_(term.to_tuples(),
+    node = parse_single_statement('F(true);')
+    eq_(node.to_tuples(),
         ('Term', 'F',
-         ('Constant', 'bool', True)))
+         (('ArgumentList'),
+          ('Constant', 'bool', True))))
 
 def test_term_multi_arg():
-    term = parse_single_statement('F(true, false);')
-    eq_(term.to_tuples(),
+    node = parse_single_statement('F(true, false);')
+    eq_(node.to_tuples(),
         ('Term', 'F',
-         ('ExprList', 
+         ('ArgumentList', 
           ('Constant', 'bool', True),
           ('Constant', 'bool', False))))
 

@@ -508,14 +508,13 @@ class Parser():
     ##
 
     def p_term(self, p):
-        """ term : TERM LPAREN term_arguments RPAREN """
+        """ term : TERM LPAREN argument_list RPAREN """
         p[0] = Term(p[1], p[3], p[3].coord)
 
-    def p_term_arguments(self, p):
-        """ term_arguments : expression_list
-                           | epsilon
-        """
-        p[0] = p[1] if p[1] is not None else ExprList([])
+    def p_term_2(self, p):
+        """ term : TERM LPAREN RPAREN """
+        lst = ArgumentList([])
+        p[0] = Term(p[1], lst)
 
     ##
     ## Procedures
