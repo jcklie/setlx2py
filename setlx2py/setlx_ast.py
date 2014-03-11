@@ -603,9 +603,10 @@ class Range (Node):
     attr_names = ('type',)
 
 class Regex (Node):
-    def __init__(self, expr, as_expr, block, coord=None):
+    def __init__(self, expr, as_expr, cond, block, coord=None):
         self.expr = expr
         self.as_expr = as_expr
+        self.cond = cond
         self.block = block
         self.coord = coord
 
@@ -613,6 +614,7 @@ class Regex (Node):
         nodelist = []
         if self.expr is not None: nodelist.append(("expr", self.expr))
         if self.as_expr is not None: nodelist.append(("as_expr", self.as_expr))
+        if self.cond is not None: nodelist.append(("cond", self.cond))
         if self.block is not None: nodelist.append(("block", self.block))
         return tuple(nodelist)
 

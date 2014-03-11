@@ -1085,6 +1085,27 @@ def test_match_one_regex_as():
            ('Block',
             ('Return', ('Constant', 'string', 'baz')))))))
 
+def test_match_regex_condition():
+    s = """
+    match(s) {
+        regex '\w+' as x | # x >= 42: return x;
+    }
+    """
+    node = parse_single_statement(s)
+    eq_(node.to_tuples(),
+        ('Match',
+         ('Identifier', 's'),
+         ('CaseList',
+          ('Regex',
+           ('Constant', 'literal', '\w+'),
+           ('As', ('Identifier', 'x')),
+           ('BinaryOp', '>=',
+            ('UnaryOp', '#', ('Identifier', 'x')),
+            ('Constant', 'int', 42)),
+           ('Block',
+            ('Return', ('Identifier', 'x')))))))
+    
+
 # Case + Regex
 
 def test_match_pattern_regex_as():

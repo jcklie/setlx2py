@@ -740,8 +740,8 @@ class Parser():
     # Regex case
 
     def p_regex_case(self, p):
-        """ regex_branch : REGEX expression as COLON block """
-        p[0] = Regex(p[2], p[3], p[5], p[2].coord)
+        """ regex_branch : REGEX expression as case_condition COLON block """
+        p[0] = Regex(p[2], p[3], p[4], p[6], p[2].coord)
 
     def p_as_1(self, p):
         """ as : AS expression """
