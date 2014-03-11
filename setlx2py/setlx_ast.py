@@ -151,6 +151,18 @@ class NodeVisitor(object):
             self.visit(c)
 
 
+class As (Node):
+    def __init__(self, expr, coord=None):
+        self.expr = expr
+        self.coord = coord
+
+    def children(self):
+        nodelist = []
+        if self.expr is not None: nodelist.append(("expr", self.expr))
+        return tuple(nodelist)
+
+    attr_names = ()
+
 class Assert(Node):
     def __init__(self, cond, expr, coord=None):
         self.cond = cond
@@ -575,14 +587,16 @@ class Range (Node):
     attr_names = ('type',)
 
 class Regex (Node):
-    def __init__(self, expr, block, coord=None):
+    def __init__(self, expr, as_expr, block, coord=None):
         self.expr = expr
+        self.as_expr = as_expr
         self.block = block
         self.coord = coord
 
     def children(self):
         nodelist = []
         if self.expr is not None: nodelist.append(("expr", self.expr))
+        if self.as_expr is not None: nodelist.append(("as_expr", self.as_expr))
         if self.block is not None: nodelist.append(("block", self.block))
         return tuple(nodelist)
 

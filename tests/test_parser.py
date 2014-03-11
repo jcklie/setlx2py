@@ -996,6 +996,24 @@ def test_match_one_regex():
            ('Block',
             ('Return', ('Constant', 'string', 'bar')))))))
 
+def test_match_one_regex_as():
+    s = """
+    match(s) {
+        regex 'foo' as [ bar ] : return "baz";
+    }
+    """    
+    node = parse_single_statement(s)
+    eq_(node.to_tuples(),
+        ('Match',
+         ('Identifier', 's'),
+         ('CaseList',
+          ('Regex',
+           ('Constant', 'literal', 'foo'),
+           ('As',
+            ('List', ('Identifier', 'bar'))),
+           ('Block',
+            ('Return', ('Constant', 'string', 'baz')))))))
+    
 def test_match_two_cases():
     s = """
     match (s) {

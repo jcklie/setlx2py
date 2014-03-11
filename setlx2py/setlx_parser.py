@@ -737,9 +737,19 @@ class Parser():
         """ match_case : CASE expression_list COLON block """
         p[0] = Case(p[2], p[4])
 
+    # Regex case
+
     def p_regex_case(self, p):
-        """ regex_branch : REGEX expression COLON block """
-        p[0] = Regex(p[2], p[4], p[2].coord)
+        """ regex_branch : REGEX expression as COLON block """
+        p[0] = Regex(p[2], p[3], p[5], p[2].coord)
+
+    def p_as_1(self, p):
+        """ as : AS expression """
+        p[0] = As(p[2], p[2].coord)
+
+    def p_as_2(self, p):
+        """ as : epsilon """
+        p[0] = None
 
     ##
     ## Loops

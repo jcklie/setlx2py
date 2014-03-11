@@ -95,6 +95,7 @@ class Lexer():
         'backtrack'       : 'BACKTRACK',
         'match'           : 'MATCH',
         'regex'           : 'REGEX',
+        'as'              : 'AS',
         'break'           : 'BREAK',
         'continue'        : 'CONTINUE',
         'exit'            : 'EXIT',

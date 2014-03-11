@@ -86,6 +86,7 @@ def test_keywords():
     assert_token_type('else', 'ELSE')
     assert_token_type('match', 'MATCH')
     assert_token_type('regex', 'REGEX')
+    assert_token_type('as', 'AS')
 
 def test_keywords_switch():
     assert_token_type('switch', 'SWITCH')
