@@ -574,6 +574,20 @@ class Range (Node):
 
     attr_names = ('type',)
 
+class Regex (Node):
+    def __init__(self, expr, block, coord=None):
+        self.expr = expr
+        self.block = block
+        self.coord = coord
+
+    def children(self):
+        nodelist = []
+        if self.expr is not None: nodelist.append(("expr", self.expr))
+        if self.block is not None: nodelist.append(("block", self.block))
+        return tuple(nodelist)
+
+    attr_names = ()
+
 class Return (Node):
     def __init__(self, expr, coord=None):
         self.expr = expr

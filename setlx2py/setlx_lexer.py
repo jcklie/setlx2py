@@ -94,6 +94,7 @@ class Lexer():
         'exists'          : 'EXISTS',
         'backtrack'       : 'BACKTRACK',
         'match'           : 'MATCH',
+        'regex'           : 'REGEX',
         'break'           : 'BREAK',
         'continue'        : 'CONTINUE',
         'exit'            : 'EXIT',

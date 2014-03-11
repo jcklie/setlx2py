@@ -717,19 +717,29 @@ class Parser():
         p[0] = Match(p[3], p[6], p[7])
 
     def p_match_list_1(self, p):
-        """ match_list : match_case  """
+        """ match_list : matchee  """
         p[0] = p[1]
     
     def p_match_list_2(self, p):
-        """ match_list : match_list match_case """
+        """ match_list : match_list matchee """
         if not isinstance(p[1], CaseList):
             p[1] = CaseList([p[1]], p[1].coord)
         p[1].cases.append(p[2])
-        p[0] = p[1]    
+        p[0] = p[1]
+
+    def p_matche(self, p):
+        """ matchee : match_case
+                    | regex_branch
+        """
+        p[0] = p[1]
 
     def p_match_case(self, p):
         """ match_case : CASE expression_list COLON block """
         p[0] = Case(p[2], p[4])
+
+    def p_regex_case(self, p):
+        """ regex_branch : REGEX expression COLON block """
+        p[0] = Regex(p[2], p[4], p[2].coord)
 
     ##
     ## Loops
