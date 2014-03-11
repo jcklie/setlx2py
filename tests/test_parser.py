@@ -935,7 +935,7 @@ def test_match_minimal():
         ('Match',
          ('Identifier', 's'),
          ('CaseList',
-          ('Case',
+          ('MatchCase',
            ('List', ),
            ('Block',
             ('Return', ('Identifier', 's')))))))
@@ -951,7 +951,7 @@ def test_match_one_pattern():
         ('Match',
          ('Identifier', 's'),
          ('CaseList',
-          ('Case',
+          ('MatchCase',
            ('Pattern',
             ('Identifier', 'h'),
             ('Identifier', 't')),
@@ -970,7 +970,7 @@ def test_match_one_pattern_default():
         ('Match',
          ('Identifier', 's'),
          ('CaseList',
-          ('Case',
+          ('MatchCase',
            ('Pattern',
             ('Identifier', 'h'),
             ('Identifier', 't')),
@@ -979,6 +979,77 @@ def test_match_one_pattern_default():
          ('Default',
           ('Block',
            ('Return', ('Constant', 'literal', 'Empty!'))))))
+
+def test_match_two_cases():
+    s = """
+    match (s) {
+      case [] : return "Empty";
+      case [h|t]: return "Not empty";
+    }
+    """
+    node = parse_single_statement(s)
+    eq_(node.to_tuples(),
+        ('Match',
+         ('Identifier', 's'),
+         ('CaseList',
+          ('MatchCase',
+           ('List',),
+           ('Block', ('Return', ('Constant', 'string', 'Empty')))),
+          ('MatchCase',
+           ('Pattern',
+            ('Identifier', 'h'),
+            ('Identifier', 't')),
+           ('Block',
+            ('Return', ('Constant', 'string', 'Not empty')))))))
+
+def test_match_two_cases_default():
+    s = """
+    match (s) {
+      case [h] : return h;
+      case [h|t]: return t;
+      default : return "Error!";
+    }
+    """
+    node = parse_single_statement(s)
+    eq_(node.to_tuples(),
+        ('Match',
+         ('Identifier', 's'),
+         ('CaseList',
+          ('MatchCase',
+           ('List', ('Identifier', 'h')),
+           ('Block', ('Return', ('Identifier', 'h')))),
+          ('MatchCase',
+           ('Pattern',
+            ('Identifier', 'h'),
+            ('Identifier', 't')),
+           ('Block',
+            ('Return', ('Identifier', 't'))))),
+          ('Default',
+           ('Block',
+            ('Return', ('Constant', 'string', 'Error!'))))))
+
+def test_match_pattern_condition():
+    s = """
+    match(s) {
+        case [h|t] | h != null: return h;
+    }
+    """
+    node = parse_single_statement(s)
+    eq_(node.to_tuples(),
+        ('Match',
+         ('Identifier', 's'),
+         ('CaseList',
+          ('MatchCase',
+           ('Pattern',
+            ('Identifier', 'h'),
+            ('Identifier', 't')),
+           ('BinaryOp', '!=',
+            ('Identifier', 'h'),
+            ('Identifier', 'null')),
+           ('Block',
+            ('Return', ('Identifier', 'h')))))))
+    
+# Regex
 
 def test_match_one_regex():
     s = """
@@ -1014,6 +1085,8 @@ def test_match_one_regex_as():
            ('Block',
             ('Return', ('Constant', 'string', 'baz')))))))
 
+# Case + Regex
+
 def test_match_pattern_regex_as():
     s = """
     match(s) {
@@ -1038,55 +1111,57 @@ def test_match_pattern_regex_as():
             ('Identifier', 't')),
            ('Block',
             ('Return', ('Constant', 'literal', 'Not empty!')))))))
-    
-    
-def test_match_two_cases():
-    s = """
-    match (s) {
-      case [] : return "Empty";
-      case [h|t]: return "Not empty";
-    }
-    """
-    node = parse_single_statement(s)
-    eq_(node.to_tuples(),
-        ('Match',
-         ('Identifier', 's'),
-         ('CaseList',
-          ('Case',
-           ('List',),
-           ('Block', ('Return', ('Constant', 'string', 'Empty')))),
-          ('Case',
-           ('Pattern',
-            ('Identifier', 'h'),
-            ('Identifier', 't')),
-           ('Block',
-            ('Return', ('Constant', 'string', 'Not empty')))))))
 
-def test_match_two_cases_default():
+def test_match_pattern_regex_as():
     s = """
-    match (s) {
-      case [h] : return h;
-      case [h|t]: return t;
-      default : return "Error!";
+    match(s) {
+        regex 'foo' as [ bar ] : return "baz";
+        case [h|t] : return 'Not empty!';
     }
-    """
+    """    
     node = parse_single_statement(s)
     eq_(node.to_tuples(),
         ('Match',
          ('Identifier', 's'),
          ('CaseList',
-          ('Case',
-           ('List', ('Identifier', 'h')),
-           ('Block', ('Return', ('Identifier', 'h')))),
+          ('Regex',
+           ('Constant', 'literal', 'foo'),
+           ('As',
+            ('List', ('Identifier', 'bar'))),
+           ('Block',
+            ('Return', ('Constant', 'string', 'baz')))),
+          ('MatchCase',
+           ('Pattern',
+            ('Identifier', 'h'),
+            ('Identifier', 't')),
+           ('Block',
+            ('Return', ('Constant', 'literal', 'Not empty!')))))))
+    
+@nottest    
+def test_match_pattern_regex_as_condition():
+    s = """
+    match(s) {
+        regex '\w+' as bar | 'foo' in bar  : return "bar";
+        case [h|t] : return '';
+    }
+    """    
+    node = parse_single_statement(s)
+    eq_(node.to_tuples(),
+        ('Match',
+         ('Identifier', 's'),
+         ('CaseList',
+          ('Regex',
+           ('Constant', 'literal', 'foo'),
+           ('As',
+            ('List', ('Identifier', 'bar'))),
+           ('Block',
+            ('Return', ('Constant', 'string', 'baz')))),
           ('Case',
            ('Pattern',
             ('Identifier', 'h'),
             ('Identifier', 't')),
            ('Block',
-            ('Return', ('Identifier', 't'))))),
-          ('Default',
-           ('Block',
-            ('Return', ('Constant', 'string', 'Error!'))))))
+            ('Return', ('Constant', 'literal', 'Not empty!')))))))
     
 ##
 ## While-Loop

@@ -734,8 +734,8 @@ class Parser():
         p[0] = p[1]
 
     def p_match_case(self, p):
-        """ match_case : CASE expression_list COLON block """
-        p[0] = Case(p[2], p[4])
+        """ match_case : CASE expression_list case_condition COLON block """
+        p[0] = MatchCase(p[2], p[3], p[5], p[2].coord)
 
     # Regex case
 
@@ -749,6 +749,14 @@ class Parser():
 
     def p_as_2(self, p):
         """ as : epsilon """
+        p[0] = None
+
+    def p_case_condition_1(self, p):
+        """ case_condition : PIPE expression """
+        p[0] = p[2]
+
+    def p_case_condition_2(self, p):
+        """ case_condition : epsilon """
         p[0] = None
 
     ##
