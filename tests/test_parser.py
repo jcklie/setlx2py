@@ -1013,6 +1013,32 @@ def test_match_one_regex_as():
             ('List', ('Identifier', 'bar'))),
            ('Block',
             ('Return', ('Constant', 'string', 'baz')))))))
+
+def test_match_pattern_regex_as():
+    s = """
+    match(s) {
+        regex 'foo' as [ bar ] : return "baz";
+        case [h|t] : return 'Not empty!';
+    }
+    """    
+    node = parse_single_statement(s)
+    eq_(node.to_tuples(),
+        ('Match',
+         ('Identifier', 's'),
+         ('CaseList',
+          ('Regex',
+           ('Constant', 'literal', 'foo'),
+           ('As',
+            ('List', ('Identifier', 'bar'))),
+           ('Block',
+            ('Return', ('Constant', 'string', 'baz')))),
+          ('Case',
+           ('Pattern',
+            ('Identifier', 'h'),
+            ('Identifier', 't')),
+           ('Block',
+            ('Return', ('Constant', 'literal', 'Not empty!')))))))
+    
     
 def test_match_two_cases():
     s = """
