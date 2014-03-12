@@ -320,6 +320,21 @@ class CaseList (Node):
 
     attr_names = ()
 
+class Comprehension (Node):
+    def __init__(self, klass, expr, iterators, coord=None):
+        self.klass = klass
+        self.expr = expr
+        self.iterators = iterators
+        self.coord = coord
+
+    def children(self):
+        nodelist = []
+        if self.expr is not None: nodelist.append(("expr", self.expr))
+        if self.iterators is not None: nodelist.append(("iterators", self.iterators))
+        return tuple(nodelist)
+
+    attr_names = ('klass',)
+
 class Continue(Node):
     def __init__(self, coord=None):
         self.coord = coord
@@ -330,8 +345,8 @@ class Continue(Node):
     attr_names = ()
 
 class Constant(Node):
-    def __init__(self, type, value, coord=None):
-        self.type = type
+    def __init__(self, klass, value, coord=None):
+        self.klass = klass
         self.value = value
         self.coord = coord
 
@@ -339,7 +354,7 @@ class Constant(Node):
         nodelist = []
         return tuple(nodelist)
 
-    attr_names = ('type','value',)
+    attr_names = ('klass','value',)
 
 class Default(Node):
     def __init__(self, block, coord=None):
@@ -586,8 +601,8 @@ class Quantor(Node):
     attr_names = ('name',)
 
 class Range (Node):
-    def __init__(self, type, lower, upper, step, coord=None):
-        self.type = type
+    def __init__(self, klass, lower, upper, step, coord=None):
+        self.klass = klass
         self.lower = lower
         self.upper = upper
         self.step = step
@@ -600,7 +615,7 @@ class Range (Node):
         if self.step is not None: nodelist.append(("step", self.step))
         return tuple(nodelist)
 
-    attr_names = ('type',)
+    attr_names = ('klass',)
 
 class Regex (Node):
     def __init__(self, expr, as_expr, cond, block, coord=None):

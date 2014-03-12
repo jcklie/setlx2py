@@ -210,6 +210,21 @@ def test_atomic_value_set_abc():
          ('Identifier', 'a'),
          ('Identifier', 'c'),
          ('Identifier', 'b')))
+
+##
+## Comprehension
+##
+
+# List
+
+def test_list_comprehension_minimal():
+    node = parse_single_statement('{p: p in x};')
+    eq_(node.to_tuples(),
+        ('Comprehension', 'set',
+         ('Identifier', 'p'),
+         ('Iterator',
+          ('Identifier', 'p'),
+          ('Identifier', 'x'))))
     
 ##
 ## Variables
@@ -1104,7 +1119,6 @@ def test_match_regex_condition():
             ('Constant', 'int', 42)),
            ('Block',
             ('Return', ('Identifier', 'x')))))))
-    
 
 # Case + Regex
 

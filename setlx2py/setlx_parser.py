@@ -375,6 +375,7 @@ class Parser():
     def p_enclosure(self, p):
         """ enclosure : set_range
                       | set_display
+                      | set_comprehension
                       | list_range
                       | list_display
                       | parenth_form
@@ -411,7 +412,14 @@ class Parser():
 
     def p_set_display_3(self, p):
         """ set_display : LBRACE RBRACE """
-        p[0] = Set([])        
+        p[0] = Set([])
+
+    # Set comprehension
+
+    def p_set_comprehension(self, p):
+        """ set_comprehension : LBRACE expression COLON iterator_chain RBRACE """
+        p[0] = Comprehension('set', p[2], p[4], p[2].coord)
+        
 
     # List Range
     
