@@ -225,6 +225,26 @@ def test_list_comprehension_minimal():
          ('Iterator',
           ('Identifier', 'p'),
           ('Identifier', 'x'))))
+
+def test_list_comprehension_two_iterators():
+    node = parse_single_statement('{a * b: a in {1..3}, b in {1..3}};')
+    eq_(node.to_tuples(),
+        ('Comprehension', 'set',
+         ('BinaryOp', '*',
+          ('Identifier', 'a'),
+          ('Identifier', 'b')),
+         ('IteratorChain',
+          ('Iterator',
+           ('Identifier', 'a'),
+           ('Range', 'set',
+            ('Constant', 'int', 1),
+            ('Constant', 'int', 3))),
+          ('Iterator',
+           ('Identifier', 'b'),
+           ('Range', 'set',
+            ('Constant', 'int', 1),
+            ('Constant', 'int', 3))))))
+
     
 ##
 ## Variables

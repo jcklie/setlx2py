@@ -419,7 +419,6 @@ class Parser():
     def p_set_comprehension(self, p):
         """ set_comprehension : LBRACE expression COLON iterator_chain RBRACE """
         p[0] = Comprehension('set', p[2], p[4], p[2].coord)
-        
 
     # List Range
     
