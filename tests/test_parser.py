@@ -245,6 +245,33 @@ def test_list_comprehension_two_iterators():
             ('Constant', 'int', 1),
             ('Constant', 'int', 3))))))
 
+def test_list_comprehension_prime():
+    s = """{ p : p in {2..100} | { x : x in {1..p} | p % x == 0 } == {1, p} };"""
+    node = parse_single_statement(s)
+    eq_(node.to_tuples(),
+        ('Comprehension', 'set',
+         ('Identifier', 'p'),
+         ('Iterator',
+          ('Identifier', 'p'),
+          ('Range', 'set',
+           ('Constant', 'int', 2),
+           ('Constant', 'int', 100))),
+         ('BinaryOp', '==',
+          ('Comprehension', 'set',
+           ('Identifier', 'x'),
+           ('Iterator',
+            ('Identifier','x'),
+            ('Range', 'set',
+             ('Constant', 'int', 1),
+             ('Identifier', 'p'))),
+           ('BinaryOp', '==',
+            ('BinaryOp', '%',
+             ('Identifier', 'p'),
+             ('Identifier', 'x')),
+            ('Constant', 'int', 0))),
+          ('Set',
+           ('Constant', 'int', 1),
+           ('Identifier', 'p')))))
     
 ##
 ## Variables

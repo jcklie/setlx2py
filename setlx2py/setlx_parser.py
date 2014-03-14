@@ -414,11 +414,25 @@ class Parser():
         """ set_display : LBRACE RBRACE """
         p[0] = Set([])
 
+    ##
+    ## Comprehension
+    ##
+
+    def p_comprehension_condition_1(self, p):
+        """ comprehension_condition : PIPE expression """
+        p[0] = p[2]
+
+    def p_comprehension_condition_2(self, p):
+        """ comprehension_condition : epsilon """
+        p[0] = None
+        
     # Set comprehension
 
     def p_set_comprehension(self, p):
-        """ set_comprehension : LBRACE expression COLON iterator_chain RBRACE """
-        p[0] = Comprehension('set', p[2], p[4], p[2].coord)
+        """ set_comprehension : LBRACE expression COLON \
+                                iterator_chain comprehension_condition RBRACE
+        """
+        p[0] = Comprehension('set', p[2], p[4], p[5], p[2].coord)
 
     # List Range
     
