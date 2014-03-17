@@ -85,6 +85,14 @@ def test_keywords():
     assert_token_type('if', 'IF')
     assert_token_type('else', 'ELSE')
     assert_token_type('match', 'MATCH')
+    assert_token_type('regex', 'REGEX')
+    assert_token_type('as', 'AS')
+    assert_token_type('scan', 'SCAN')
+    assert_token_type('using', 'USING')
+
+def test_keywords_class():
+    assert_token_type('class', 'CLASS')
+    assert_token_type('static', 'STATIC')
 
 def test_keywords_switch():
     assert_token_type('switch', 'SWITCH')

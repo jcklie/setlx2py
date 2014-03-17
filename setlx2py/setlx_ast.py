@@ -151,6 +151,18 @@ class NodeVisitor(object):
             self.visit(c)
 
 
+class As (Node):
+    def __init__(self, expr, coord=None):
+        self.expr = expr
+        self.coord = coord
+
+    def children(self):
+        nodelist = []
+        if self.expr is not None: nodelist.append(("expr", self.expr))
+        return tuple(nodelist)
+
+    attr_names = ()
+
 class Assert(Node):
     def __init__(self, cond, expr, coord=None):
         self.cond = cond
@@ -308,6 +320,41 @@ class CaseList (Node):
 
     attr_names = ()
 
+class Class(Node):
+    def __init__(self, name, params, block, static, coord=None):
+        self.name = name
+        self.params = params
+        self.block = block
+        self.static = static
+        self.coord = coord
+
+    def children(self):
+        nodelist = []
+        if self.name is not None: nodelist.append(("name", self.name))
+        if self.params is not None: nodelist.append(("params", self.params))
+        if self.block is not None: nodelist.append(("block", self.block))
+        if self.static is not None: nodelist.append(("static", self.static))
+        return tuple(nodelist)
+
+    attr_names = ()
+
+class Comprehension (Node):
+    def __init__(self, klass, expr, iterators, cond, coord=None):
+        self.klass = klass
+        self.expr = expr
+        self.iterators = iterators
+        self.cond = cond
+        self.coord = coord
+
+    def children(self):
+        nodelist = []
+        if self.expr is not None: nodelist.append(("expr", self.expr))
+        if self.iterators is not None: nodelist.append(("iterators", self.iterators))
+        if self.cond is not None: nodelist.append(("cond", self.cond))
+        return tuple(nodelist)
+
+    attr_names = ('klass',)
+
 class Continue(Node):
     def __init__(self, coord=None):
         self.coord = coord
@@ -318,8 +365,8 @@ class Continue(Node):
     attr_names = ()
 
 class Constant(Node):
-    def __init__(self, type, value, coord=None):
-        self.type = type
+    def __init__(self, klass, value, coord=None):
+        self.klass = klass
         self.value = value
         self.coord = coord
 
@@ -327,7 +374,7 @@ class Constant(Node):
         nodelist = []
         return tuple(nodelist)
 
-    attr_names = ('type','value',)
+    attr_names = ('klass','value',)
 
 class Default(Node):
     def __init__(self, block, coord=None):
@@ -462,17 +509,46 @@ class Lambda(Node):
     attr_names = ()
 
 class List(Node):
-    def __init__(self, lower, upper, step, coord=None):
-        self.lower = lower
-        self.upper = upper
-        self.step = step
+    def __init__(self, items, coord=None):
+        self.items = items
         self.coord = coord
 
     def children(self):
         nodelist = []
-        if self.lower is not None: nodelist.append(("lower", self.lower))
-        if self.upper is not None: nodelist.append(("upper", self.upper))
-        if self.step is not None: nodelist.append(("step", self.step))
+        for i, child in enumerate(self.items or []):
+            nodelist.append(("items[%d]" % i, child))
+        return tuple(nodelist)
+
+    attr_names = ()
+
+class Match(Node):
+    def __init__(self, matchee, case_list, default, coord=None):
+        self.matchee = matchee
+        self.case_list = case_list
+        self.default = default
+        self.coord = coord
+
+    def children(self):
+        nodelist = []
+        if self.matchee is not None: nodelist.append(("matchee", self.matchee))
+        if self.case_list is not None: nodelist.append(("case_list", self.case_list))
+        if self.default is not None: nodelist.append(("default", self.default))
+        return tuple(nodelist)
+
+    attr_names = ()
+
+class MatchCase(Node):
+    def __init__(self, expr, cond, block, coord=None):
+        self.expr = expr
+        self.cond = cond
+        self.block = block
+        self.coord = coord
+
+    def children(self):
+        nodelist = []
+        if self.expr is not None: nodelist.append(("expr", self.expr))
+        if self.cond is not None: nodelist.append(("cond", self.cond))
+        if self.block is not None: nodelist.append(("block", self.block))
         return tuple(nodelist)
 
     attr_names = ()
@@ -497,6 +573,20 @@ class ParamList (Node):
         nodelist = []
         for i, child in enumerate(self.params or []):
             nodelist.append(("params[%d]" % i, child))
+        return tuple(nodelist)
+
+    attr_names = ()
+
+class Pattern(Node):
+    def __init__(self, left, right, coord=None):
+        self.left = left
+        self.right = right
+        self.coord = coord
+
+    def children(self):
+        nodelist = []
+        if self.left is not None: nodelist.append(("left", self.left))
+        if self.right is not None: nodelist.append(("right", self.right))
         return tuple(nodelist)
 
     attr_names = ()
@@ -531,8 +621,8 @@ class Quantor(Node):
     attr_names = ('name',)
 
 class Range (Node):
-    def __init__(self, type, lower, upper, step, coord=None):
-        self.type = type
+    def __init__(self, klass, lower, upper, step, coord=None):
+        self.klass = klass
         self.lower = lower
         self.upper = upper
         self.step = step
@@ -545,7 +635,25 @@ class Range (Node):
         if self.step is not None: nodelist.append(("step", self.step))
         return tuple(nodelist)
 
-    attr_names = ('type',)
+    attr_names = ('klass',)
+
+class Regex (Node):
+    def __init__(self, expr, as_expr, cond, block, coord=None):
+        self.expr = expr
+        self.as_expr = as_expr
+        self.cond = cond
+        self.block = block
+        self.coord = coord
+
+    def children(self):
+        nodelist = []
+        if self.expr is not None: nodelist.append(("expr", self.expr))
+        if self.as_expr is not None: nodelist.append(("as_expr", self.as_expr))
+        if self.cond is not None: nodelist.append(("cond", self.cond))
+        if self.block is not None: nodelist.append(("block", self.block))
+        return tuple(nodelist)
+
+    attr_names = ()
 
 class Return (Node):
     def __init__(self, expr, coord=None):
@@ -559,18 +667,33 @@ class Return (Node):
 
     attr_names = ()
 
-class Set(Node):
-    def __init__(self, lower, upper, step, coord=None):
-        self.lower = lower
-        self.upper = upper
-        self.step = step
+class Scan(Node):
+    def __init__(self, expr, using, regex_list, default, coord=None):
+        self.expr = expr
+        self.using = using
+        self.regex_list = regex_list
+        self.default = default
         self.coord = coord
 
     def children(self):
         nodelist = []
-        if self.lower is not None: nodelist.append(("lower", self.lower))
-        if self.upper is not None: nodelist.append(("upper", self.upper))
-        if self.step is not None: nodelist.append(("step", self.step))
+        if self.expr is not None: nodelist.append(("expr", self.expr))
+        if self.using is not None: nodelist.append(("using", self.using))
+        if self.regex_list is not None: nodelist.append(("regex_list", self.regex_list))
+        if self.default is not None: nodelist.append(("default", self.default))
+        return tuple(nodelist)
+
+    attr_names = ()
+
+class Set(Node):
+    def __init__(self, items, coord=None):
+        self.items = items
+        self.coord = coord
+
+    def children(self):
+        nodelist = []
+        for i, child in enumerate(self.items or []):
+            nodelist.append(("items[%d]" % i, child))
         return tuple(nodelist)
 
     attr_names = ()

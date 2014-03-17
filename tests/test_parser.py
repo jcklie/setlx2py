@@ -121,10 +121,72 @@ def test_atomic_value_false():
 ## Collections
 ##
 
-@nottest    
+# List
+
 def test_list_minimal():
     node = parse_single_statement('[];')
 
+def test_list_single_element():
+    node = parse_single_statement('[foo];')
+    eq_(node.to_tuples(),
+        ('List',
+         ('Identifier', 'foo')))
+
+def test_list_two_elements():
+    node = parse_single_statement('[foo,bar];')
+    eq_(node.to_tuples(),
+        ('List',
+         ('Identifier', 'foo'),
+         ('Identifier', 'bar')))
+
+def test_list_three_elements():
+    node = parse_single_statement('[foo,bar,baz];')
+    eq_(node.to_tuples(),
+        ('List',
+         ('Identifier', 'foo'),
+         ('Identifier', 'bar'),
+         ('Identifier', 'baz')))
+
+def test_list_head_tail():
+    node = parse_single_statement('[h|t];')
+    eq_(node.to_tuples(),
+        ('Pattern',
+         ('Identifier', 'h'),
+         ('Identifier', 't')))
+
+# Set
+
+def test_set_minimal():
+    node = parse_single_statement('{};')
+
+def test_set_single_element():
+    node = parse_single_statement('{foo};')
+    eq_(node.to_tuples(),
+        ('Set',
+         ('Identifier', 'foo')))
+
+def test_set_two_elements():
+    node = parse_single_statement('{foo,bar};')
+    eq_(node.to_tuples(),
+        ('Set',
+         ('Identifier', 'foo'),
+         ('Identifier', 'bar')))
+
+def test_set_three_elements():
+    node = parse_single_statement('{foo,bar,baz};')
+    eq_(node.to_tuples(),
+        ('Set',
+         ('Identifier', 'foo'),
+         ('Identifier', 'bar'),
+         ('Identifier', 'baz')))
+
+def test_set_head_tail():
+    node = parse_single_statement('{h|t};')
+    eq_(node.to_tuples(),
+        ('Pattern',
+         ('Identifier', 'h'),
+         ('Identifier', 't')))
+    
 ##
 ## Ranges
 ##
@@ -164,6 +226,129 @@ def test_atomic_value_set_abc():
          ('Identifier', 'a'),
          ('Identifier', 'c'),
          ('Identifier', 'b')))
+
+##
+## Comprehension
+##
+
+# Set
+
+def test_set_comprehension_minimal():
+    node = parse_single_statement('{p: p in x};')
+    eq_(node.to_tuples(),
+        ('Comprehension', 'set',
+         ('Identifier', 'p'),
+         ('Iterator',
+          ('Identifier', 'p'),
+          ('Identifier', 'x'))))
+
+def test_set_comprehension_two_iterators():
+    node = parse_single_statement('{a * b: a in {1..3}, b in {1..3}};')
+    eq_(node.to_tuples(),
+        ('Comprehension', 'set',
+         ('BinaryOp', '*',
+          ('Identifier', 'a'),
+          ('Identifier', 'b')),
+         ('IteratorChain',
+          ('Iterator',
+           ('Identifier', 'a'),
+           ('Range', 'set',
+            ('Constant', 'int', 1),
+            ('Constant', 'int', 3))),
+          ('Iterator',
+           ('Identifier', 'b'),
+           ('Range', 'set',
+            ('Constant', 'int', 1),
+            ('Constant', 'int', 3))))))
+
+def test_set_comprehension_prime():
+    s = """{ p : p in {2..100} | { x : x in {1..p} | p % x == 0 } == {1, p} };"""
+    node = parse_single_statement(s)
+    eq_(node.to_tuples(),
+        ('Comprehension', 'set',
+         ('Identifier', 'p'),
+         ('Iterator',
+          ('Identifier', 'p'),
+          ('Range', 'set',
+           ('Constant', 'int', 2),
+           ('Constant', 'int', 100))),
+         ('BinaryOp', '==',
+          ('Comprehension', 'set',
+           ('Identifier', 'x'),
+           ('Iterator',
+            ('Identifier','x'),
+            ('Range', 'set',
+             ('Constant', 'int', 1),
+             ('Identifier', 'p'))),
+           ('BinaryOp', '==',
+            ('BinaryOp', '%',
+             ('Identifier', 'p'),
+             ('Identifier', 'x')),
+            ('Constant', 'int', 0))),
+          ('Set',
+           ('Constant', 'int', 1),
+           ('Identifier', 'p')))))
+
+# List
+
+@nottest    
+def test_list_comprehension_minimal():
+    node = parse_single_statement('[p: p in x];')
+    eq_(node.to_tuples(),
+        ('Comprehension', 'list',
+         ('Identifier', 'p'),
+         ('Iterator',
+          ('Identifier', 'p'),
+          ('Identifier', 'x'))))
+
+@nottest    
+def test_list_comprehension_two_iterators():
+    node = parse_single_statement('[a * b: a in {1..3}, b in {1..3}];')
+    eq_(node.to_tuples(),
+        ('Comprehension', 'list',
+         ('BinaryOp', '*',
+          ('Identifier', 'a'),
+          ('Identifier', 'b')),
+         ('IteratorChain',
+          ('Iterator',
+           ('Identifier', 'a'),
+           ('Range', 'set',
+            ('Constant', 'int', 1),
+            ('Constant', 'int', 3))),
+          ('Iterator',
+           ('Identifier', 'b'),
+           ('Range', 'set',
+            ('Constant', 'int', 1),
+            ('Constant', 'int', 3))))))
+
+@nottest    
+def test_list_comprehension_prime():
+    s = """[ p : p in {2..100} | [ x : x in {1..p} | p % x == 0 ] == {1, p} ];"""
+    node = parse_single_statement(s)
+    eq_(node.to_tuples(),
+        ('Comprehension', 'list',
+         ('Identifier', 'p'),
+         ('Iterator',
+          ('Identifier', 'p'),
+          ('Range', 'set',
+           ('Constant', 'int', 2),
+           ('Constant', 'int', 100))),
+         ('BinaryOp', '==',
+          ('Comprehension', 'list',
+           ('Identifier', 'x'),
+           ('Iterator',
+            ('Identifier','x'),
+            ('Range', 'set',
+             ('Constant', 'int', 1),
+             ('Identifier', 'p'))),
+           ('BinaryOp', '==',
+            ('BinaryOp', '%',
+             ('Identifier', 'p'),
+             ('Identifier', 'x')),
+            ('Constant', 'int', 0))),
+          ('Set',
+           ('Constant', 'int', 1),
+           ('Identifier', 'p')))))
     
 ##
 ## Variables
@@ -400,7 +585,7 @@ def test_slicing_both():
 ##
 
 def test_lambda_minimal_zero_params():
-    node = parse_single_statement('< > |-> true;')
+    node = parse_single_statement('[ ] |-> true;')
     eq_(node.to_tuples(),
         ('Lambda',
          ('ParamList', ),
@@ -410,23 +595,23 @@ def test_lamba_minimal_one_param_no_brackets():
     node = parse_single_statement("foo |-> 'bar';")
     eq_(node.to_tuples(),
         ('Lambda',
-         ('ParamList', ('Param', 'foo')),
+         ('ParamList', ('Identifier', 'foo')),
          ('Constant', 'literal', 'bar')))
 
 def test_lambda_minimal_one_param_brackets():
     node = parse_single_statement('x |-> x ** x;')
     eq_(node.to_tuples(),
         ('Lambda',
-         ('ParamList', ('Param', 'x')),
+         ('ParamList', ('Identifier', 'x')),
          ('BinaryOp', '**',
           ('Identifier', 'x'),
           ('Identifier', 'x'))))
 
 def test_lambda_two_params():
-    node = parse_single_statement('<x,y> |-> x+y;')
+    node = parse_single_statement('[x,y] |-> x+y;')
     eq_(node.to_tuples(),
         ('Lambda',
-         ('ParamList', ('Param', 'x'), ('Param', 'y')),
+         ('ParamList', ('Identifier', 'x'), ('Identifier', 'y')),
          ('BinaryOp', '+',
           ('Identifier', 'x'),
           ('Identifier', 'y'))))
@@ -457,10 +642,10 @@ def test_assignment_explicit_minimal():
          ('Constant', 'int', 42)))
 
 def test_assignment_explicit_two():
-    node = parse_single_statement('foo,bar := "xy";')
+    node = parse_single_statement('[foo, bar] := "xy";')
     eq_(node.to_tuples(),
         ('Assignment', ':=',
-         ('TargetList',
+         ('List',
           ('Identifier', 'foo'),
           ('Identifier', 'bar')),
          ('Constant', 'string', 'xy')))
@@ -592,17 +777,23 @@ def test_return_statement_binop():
 ## Terms
 ##
 
+def test_term_no_arguments():
+    node = parse_single_statement('F();')
+    eq_(node.to_tuples(),
+        ('Term', 'F', ('ArgumentList',)))
+
 def test_term_single_arg():
-    term = parse_single_statement('F(true);')
-    eq_(term.to_tuples(),
+    node = parse_single_statement('F(true);')
+    eq_(node.to_tuples(),
         ('Term', 'F',
-         ('Constant', 'bool', True)))
+         (('ArgumentList'),
+          ('Constant', 'bool', True))))
 
 def test_term_multi_arg():
-    term = parse_single_statement('F(true, false);')
-    eq_(term.to_tuples(),
+    node = parse_single_statement('F(true, false);')
+    eq_(node.to_tuples(),
         ('Term', 'F',
-         ('ExprList', 
+         ('ArgumentList', 
           ('Constant', 'bool', True),
           ('Constant', 'bool', False))))
 
@@ -611,18 +802,18 @@ def test_term_multi_arg():
 ##
 
 def test_quantifier_all():
-    quantor =  parse_single_statement('forall (x in 1 | true);')
-    iterator = quantor.lhs
-    condition = quantor.cond
-
-    eq_(quantor.name, 'all')
-    eq_(iterator.assignable.name, 'x')
-    eq_(iterator.expression.value, 1)
-    eq_(condition.value, True)
+    node =  parse_single_statement('forall (x in 1 | true);')
+    eq_(node.to_tuples(),
+        ('Quantor', 'all',
+         ('Iterator',
+          ('Identifier', 'x'),
+          ('Constant', 'int', 1)),
+         ('Constant', 'bool', True)))
+    
 
 def test_quantifier_exists():
-    quantor =  parse_single_statement('exists (x in 1 | true);')
-    eq_(quantor.to_tuples(),
+    node =  parse_single_statement('exists (x in 1 | true);')
+    eq_(node.to_tuples(),
         ('Quantor', 'any',
          ('Iterator',
           ('Identifier', 'x'),
@@ -631,7 +822,21 @@ def test_quantifier_exists():
 
 @nottest    
 def test_quantifier_cray():
-    quantor = parse_single_statement('forall (n in [1 .. 10] | n**2 <= 2**n);')
+    node = parse_single_statement('forall (n in [1 .. 10] | n**2 <= 2**n);')
+    eq_(node.to_tuples(),
+        ('Quantor', 'all',
+         ('Iterator',
+          ('Identifier', 'n'),
+          ('Range', 'list',
+           ('Constant', 'int', 1),
+           ('Constant', 'int', 10))),
+         ('BinaryOp', '<=',
+          ('BinaryOp', '**',
+           ('Identifier', 'n'),
+           ('Constant', 'int', 2)),
+          ('BinaryOp', '**',
+           ('Constant', 'int', 2),
+           ('Identifier', 'n')))))
     
 ####
 ##
@@ -857,7 +1062,7 @@ def test_switch_case_with_default():
 ## Match
 ##
 
-@nottest
+
 def test_match_minimal():
     s = """
     match(s) {
@@ -865,12 +1070,365 @@ def test_match_minimal():
     }
 
     """
-    node = parse_single_statement('switch {}')
+    node = parse_single_statement(s)
     eq_(node.to_tuples(),
         ('Match',
+         ('Identifier', 's'),
          ('CaseList',
+          ('MatchCase',
+           ('List', ),
+           ('Block',
+            ('Return', ('Identifier', 's')))))))
+
+def test_match_one_pattern():
+    s = """
+    match(s) {
+        case [h|t] : return h;
+    }
+    """
+    node = parse_single_statement(s)
+    eq_(node.to_tuples(),
+        ('Match',
+         ('Identifier', 's'),
+         ('CaseList',
+          ('MatchCase',
+           ('Pattern',
+            ('Identifier', 'h'),
+            ('Identifier', 't')),
+           ('Block',
+            ('Return', ('Identifier', 'h')))))))
+
+def test_match_one_pattern_default():
+    s = """
+    match(s) {
+        case [h|t] : return 'Not empty!';
+        default    : return 'Empty!';
+    }
+    """
+    node = parse_single_statement(s)
+    eq_(node.to_tuples(),
+        ('Match',
+         ('Identifier', 's'),
+         ('CaseList',
+          ('MatchCase',
+           ('Pattern',
+            ('Identifier', 'h'),
+            ('Identifier', 't')),
+           ('Block',
+            ('Return', ('Constant', 'literal', 'Not empty!'))))),
+         ('Default',
+          ('Block',
+           ('Return', ('Constant', 'literal', 'Empty!'))))))
+
+def test_match_two_cases():
+    s = """
+    match (s) {
+      case [] : return "Empty";
+      case [h|t]: return "Not empty";
+    }
+    """
+    node = parse_single_statement(s)
+    eq_(node.to_tuples(),
+        ('Match',
+         ('Identifier', 's'),
+         ('CaseList',
+          ('MatchCase',
+           ('List',),
+           ('Block', ('Return', ('Constant', 'string', 'Empty')))),
+          ('MatchCase',
+           ('Pattern',
+            ('Identifier', 'h'),
+            ('Identifier', 't')),
+           ('Block',
+            ('Return', ('Constant', 'string', 'Not empty')))))))
+
+def test_match_two_cases_default():
+    s = """
+    match (s) {
+      case [h] : return h;
+      case [h|t]: return t;
+      default : return "Error!";
+    }
+    """
+    node = parse_single_statement(s)
+    eq_(node.to_tuples(),
+        ('Match',
+         ('Identifier', 's'),
+         ('CaseList',
+          ('MatchCase',
+           ('List', ('Identifier', 'h')),
+           ('Block', ('Return', ('Identifier', 'h')))),
+          ('MatchCase',
+           ('Pattern',
+            ('Identifier', 'h'),
+            ('Identifier', 't')),
+           ('Block',
+            ('Return', ('Identifier', 't'))))),
+          ('Default',
+           ('Block',
+            ('Return', ('Constant', 'string', 'Error!'))))))
+
+def test_match_pattern_condition():
+    s = """
+    match(s) {
+        case [h|t] | h != null: return h;
+    }
+    """
+    node = parse_single_statement(s)
+    eq_(node.to_tuples(),
+        ('Match',
+         ('Identifier', 's'),
+         ('CaseList',
+          ('MatchCase',
+           ('Pattern',
+            ('Identifier', 'h'),
+            ('Identifier', 't')),
+           ('BinaryOp', '!=',
+            ('Identifier', 'h'),
+            ('Identifier', 'null')),
+           ('Block',
+            ('Return', ('Identifier', 'h')))))))
+    
+# Regex
+
+def test_match_one_regex():
+    s = """
+    match(s) {
+        regex 'foo' : return "bar";
+    }
+    """    
+    node = parse_single_statement(s)
+    eq_(node.to_tuples(),
+        ('Match',
+         ('Identifier', 's'),
+         ('CaseList',
+          ('Regex',
+           ('Constant', 'literal', 'foo'),
+           ('Block',
+            ('Return', ('Constant', 'string', 'bar')))))))
+
+def test_match_one_regex_as():
+    s = """
+    match(s) {
+        regex 'foo' as [ bar ] : return "baz";
+    }
+    """    
+    node = parse_single_statement(s)
+    eq_(node.to_tuples(),
+        ('Match',
+         ('Identifier', 's'),
+         ('CaseList',
+          ('Regex',
+           ('Constant', 'literal', 'foo'),
+           ('As',
+            ('List', ('Identifier', 'bar'))),
+           ('Block',
+            ('Return', ('Constant', 'string', 'baz')))))))
+
+def test_match_regex_condition():
+    s = """
+    match(s) {
+        regex '\w+' as x | # x >= 42: return x;
+    }
+    """
+    node = parse_single_statement(s)
+    eq_(node.to_tuples(),
+        ('Match',
+         ('Identifier', 's'),
+         ('CaseList',
+          ('Regex',
+           ('Constant', 'literal', '\w+'),
+           ('As', ('Identifier', 'x')),
+           ('BinaryOp', '>=',
+            ('UnaryOp', '#', ('Identifier', 'x')),
+            ('Constant', 'int', 42)),
+           ('Block',
+            ('Return', ('Identifier', 'x')))))))
+
+# Case + Regex
+
+def test_match_pattern_regex_as():
+    s = """
+    match(s) {
+        regex 'foo' as [ bar ] : return "baz";
+        case [h|t] : return 'Not empty!';
+    }
+    """    
+    node = parse_single_statement(s)
+    eq_(node.to_tuples(),
+        ('Match',
+         ('Identifier', 's'),
+         ('CaseList',
+          ('Regex',
+           ('Constant', 'literal', 'foo'),
+           ('As',
+            ('List', ('Identifier', 'bar'))),
+           ('Block',
+            ('Return', ('Constant', 'string', 'baz')))),
           ('Case',
-           ('List')))))
+           ('Pattern',
+            ('Identifier', 'h'),
+            ('Identifier', 't')),
+           ('Block',
+            ('Return', ('Constant', 'literal', 'Not empty!')))))))
+
+def test_match_pattern_regex_as():
+    s = """
+    match(s) {
+        regex 'foo' as [ bar ] : return "baz";
+        case [h|t] : return 'Not empty!';
+    }
+    """    
+    node = parse_single_statement(s)
+    eq_(node.to_tuples(),
+        ('Match',
+         ('Identifier', 's'),
+         ('CaseList',
+          ('Regex',
+           ('Constant', 'literal', 'foo'),
+           ('As',
+            ('List', ('Identifier', 'bar'))),
+           ('Block',
+            ('Return', ('Constant', 'string', 'baz')))),
+          ('MatchCase',
+           ('Pattern',
+            ('Identifier', 'h'),
+            ('Identifier', 't')),
+           ('Block',
+            ('Return', ('Constant', 'literal', 'Not empty!')))))))
+    
+@nottest    
+def test_match_pattern_regex_as_condition():
+    s = """
+    match(s) {
+        regex '\w+' as bar | 'foo' in bar  : return "bar";
+        case [h|t] : return '';
+    }
+    """    
+    node = parse_single_statement(s)
+    eq_(node.to_tuples(),
+        ('Match',
+         ('Identifier', 's'),
+         ('CaseList',
+          ('Regex',
+           ('Constant', 'literal', 'foo'),
+           ('As',
+            ('List', ('Identifier', 'bar'))),
+           ('Block',
+            ('Return', ('Constant', 'string', 'baz')))),
+          ('Case',
+           ('Pattern',
+            ('Identifier', 'h'),
+            ('Identifier', 't')),
+           ('Block',
+            ('Return', ('Constant', 'literal', 'Not empty!')))))))
+
+##
+## Scan
+##
+
+def test_scan_one_regex():
+    s = """
+    scan(s) {
+        regex 'foo' : return "bar";
+    }
+    """    
+    node = parse_single_statement(s)
+    eq_(node.to_tuples(),
+        ('Scan',
+         ('Identifier', 's'),
+         ('CaseList',
+          ('Regex',
+           ('Constant', 'literal', 'foo'),
+           ('Block',
+            ('Return', ('Constant', 'string', 'bar')))))))
+
+def test_scan_one_regex_using():
+    s = """
+    scan(x) using y {
+        regex 'foo' : return "bar";
+    }
+    """    
+    node = parse_single_statement(s)
+    eq_(node.to_tuples(),
+        ('Scan',
+         ('Identifier', 'x'),
+         ('As', ('Identifier', 'y')),
+         ('CaseList',
+          ('Regex',
+           ('Constant', 'literal', 'foo'),
+           ('Block',
+            ('Return', ('Constant', 'string', 'bar')))))))
+
+    
+def test_match_one_regex_as():
+    s = """
+    scan(s) {
+        regex 'foo' as [ bar ] : return "baz";
+    }
+    """    
+    node = parse_single_statement(s)
+    eq_(node.to_tuples(),
+        ('Scan',
+         ('Identifier', 's'),
+         ('CaseList',
+          ('Regex',
+           ('Constant', 'literal', 'foo'),
+           ('As',
+            ('List', ('Identifier', 'bar'))),
+           ('Block',
+            ('Return', ('Constant', 'string', 'baz')))))))
+
+def test_scan_two_regex():
+    s = """
+    scan(s) {
+        regex 'foo' : return "bar";
+        regex 'bar' : return "baz";
+    }
+    """    
+    node = parse_single_statement(s)
+    eq_(node.to_tuples(),
+        ('Scan',
+         ('Identifier', 's'),
+         ('CaseList',
+          ('Regex',
+           ('Constant', 'literal', 'foo'),
+           ('Block',
+            ('Return', ('Constant', 'string', 'bar')))),
+          ('Regex',
+           ('Constant', 'literal', 'bar'),
+           ('Block',
+            ('Return', ('Constant', 'string', 'baz')))))))
+
+def test_scan_two_regex_using_default():
+    s = """
+    scan(c) using chr {
+        regex '[0-9]' : return "Number";
+        regex '[a-zA-Z]' : return "Character";
+        default: return "Neither number nor character";
+    }
+    """    
+    node = parse_single_statement(s)
+    eq_(node.to_tuples(),
+        ('Scan',
+         ('Identifier', 'c'),
+         ('As', ('Identifier','chr')),
+         ('CaseList',
+          ('Regex',
+           ('Constant', 'literal', '[0-9]'),
+           ('Block',
+            ('Return', ('Constant', 'string', 'Number')))),
+          ('Regex',
+           ('Constant', 'literal', '[a-zA-Z]'),
+           ('Block',
+            ('Return', ('Constant', 'string', 'Character'))))),
+          ('Default',
+           ('Block',
+            ('Return', ('Constant', 'string', 'Neither number nor character'))))))
+    
+##
+## Try/Catch
+##    
     
 ##
 ## While-Loop
@@ -1100,3 +1658,70 @@ def test_cached_procedure_fac():
              ('Assignment', '-=', ('Identifier', 'n'), ('Constant', 'int', 1)))),
             ('Return', ('Identifier', 'i'))))))
 
+##
+##
+##
+
+def test_class_minimal():
+    node = parse_single_statement('class point() {}')
+    eq_(node.to_tuples(),
+        ('Class',
+         ('Identifier', 'point'),
+         ('ParamList', ),
+         ('Block', ),
+         ('Block', )))
+
+def test_class_with_parameters():
+    node = parse_single_statement('class point(x,y) {}')
+    eq_(node.to_tuples(),
+        ('Class',
+         ('Identifier', 'point'),
+         ('ParamList',
+          ('Param', 'x'),
+          ('Param', 'y')),
+         ('Block', ),
+         ('Block', )))
+
+def test_class_with_parameters_and_body():
+    s = """
+    class point(x,y) {
+        mX := x;
+        mY := y;
+    }
+    """
+    node = parse_single_statement(s)
+    eq_(node.to_tuples(),
+        ('Class',
+         ('Identifier', 'point'),
+         ('ParamList',
+          ('Param', 'x'),
+          ('Param', 'y')),
+         ('Block',
+          ('Assignment', ':=',
+           ('Identifier', 'mX'),
+           ('Identifier', 'x')),
+          ('Assignment', ':=',
+           ('Identifier', 'mY'),
+           ('Identifier', 'y'))),
+         ('Block', )))
+
+def test_class_with_static_body():
+    s = """
+    class universal() {
+        static {
+            gAnswer := 42;
+        }
+    }
+    """
+    node = parse_single_statement(s)
+    eq_(node.to_tuples(),
+        ('Class',
+         ('Identifier', 'universal'),
+         ('ParamList', ),
+         ('Block', ),
+         ('Block', 
+          ('Assignment', ':=',
+           ('Identifier', 'gAnswer'),
+           ('Constant', 'int', 42)))))
+
+        

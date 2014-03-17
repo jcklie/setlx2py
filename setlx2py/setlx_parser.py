@@ -12,6 +12,7 @@ from ply import yacc
 
 from setlx2py.setlx_lexer import Lexer
 from setlx2py.setlx_ast import *
+from setlx2py.setlx_semcheck import *
 
 class Parser():
 
@@ -128,18 +129,16 @@ class Parser():
     ##
     ## Expressions
     ##
-
     def p_expression_list_1(self, p):
         """ expression_list : expression  """
         p[0] = p[1]
-
+    
     def p_expression_list_2(self, p):
         """ expression_list : expression_list COMMA expression """
         if not isinstance(p[1], ExprList):
             p[1] = ExprList([p[1]], p[1].coord)
         p[1].exprs.append(p[3])
-        p[0] = p[1]
-        
+        p[0] = p[1]    
 
     def p_expression_1(self, p):
         """ expression : implication
@@ -374,8 +373,13 @@ class Parser():
     ##
 
     def p_enclosure(self, p):
-        """ enclosure : parenth_form
+        """ enclosure : set_range
                       | set_display
+                      | set_comprehension
+                      | list_range
+                      | list_display
+   
+                      | parenth_form
         """
         p[0] = p[1]
 
@@ -383,27 +387,107 @@ class Parser():
         """ parenth_form : LPAREN expression RPAREN """
         p[0] = p[2]
 
-    def p_set_display_1(self, p):
-        """ set_display : LBRACE expression RANGE expression RBRACE """
+    ##
+    ## Comprehension
+    ##
+
+    def p_comprehension_condition_1(self, p):
+        """ comprehension_condition : PIPE expression """
+        p[0] = p[2]
+
+    def p_comprehension_condition_2(self, p):
+        """ comprehension_condition : epsilon """
+        p[0] = None
+        
+    # Set comprehension
+
+    def p_set_comprehension(self, p):
+        """ set_comprehension : LBRACE expression COLON \
+                                iterator_chain comprehension_condition RBRACE
+        """
+        p[0] = Comprehension('set', p[2], p[4], p[5], p[2].coord)
+        '''
+    # List comprehension
+
+    def p_list_comprehension(self, p):
+        """ list_comprehension : LBRACKET expression COLON \
+                                 iterator_chain comprehension_condition LBRACKET
+        """
+        p[0] = Comprehension('list', p[2], p[4], p[5], p[2].coord)
+'''
+    ##
+    ## Range
+    ##
+
+    # Set range
+
+    def p_set_range_1(self, p):
+        """ set_range : LBRACE expression RANGE expression RBRACE """
         p[0] = Range('set', p[2], p[4], None)
 
-    def p_set_display_2(self, p):
-        " set_display : LBRACE expression COMMA expression RANGE expression RBRACE "
+    def p_set_range_2(self, p):
+        """ set_range : LBRACE expression \
+                        COMMA expression RANGE expression RBRACE
+        """
         p[0] = Range('set', p[2], p[6], p[4])
-        '''
-    def p_list_display_1(self, p):
-       """ list_display : LBRACKET expression RANGE expression RBRACKET """
+
+    # List Range
+    
+    def p_list_range_1(self, p):
+       """ list_range : LBRACKET expression RANGE expression RBRACKET """
        p[0] = Range('list', p[2], p[4], None)
 
-    def p_list_display_2(self, p):
-        """ list_display : LBRACKET expression \
-                           COMMA expression RANGE expression RBRACKET """
+    def p_list_range_2(self, p):
+        """ list_range : LBRACKET expression \
+                         COMMA expression RANGE expression RBRACKET """
         p[0] = Range('list', p[2], p[6], p[4])
 
+    ##
+    ## Displays
+    ##
+
+    # Set Display
+
+    def p_set_display_1(self, p):
+        """ set_display : LBRACE expression RBRACE """
+        p[0] = Set([p[2]], p[2].coord)
+
+    def p_set_display_2(self, p):
+        """ set_display : LBRACE expression COMMA argument_list RBRACE """
+        lst = p[4].arguments
+        expr = p[2]
+        lst.insert(0, expr)
+        p[0] = Set(lst, expr.coord)
+
+    def p_set_display_3(self, p):
+        """ set_display : LBRACE RBRACE """
+        p[0] = Set([])
+
+    def p_set_display_4(self, p):
+        """ set_display : LBRACE expression PIPE expression RBRACE  """
+        p[0] = Pattern(p[2], p[4], p[2].coord)
+
+    # List Display
+
+    def p_list_display_1(self, p):
+        """ list_display : LBRACKET expression RBRACKET """
+        p[0] = List([p[2]], p[2].coord)
+
+    def p_list_display_2(self, p):
+        """ list_display : LBRACKET expression COMMA argument_list RBRACKET """
+        lst = p[4].arguments
+        expr = p[2]
+        lst.insert(0, expr)
+        p[0] = List(lst, expr.coord)
+
     def p_list_display_3(self, p):
-        """ list_display : LBRACKET argument_list RBRACKET """
-        pass
-        '''
+        """ list_display : LBRACKET RBRACKET """
+        p[0] = List([])
+        
+    def p_list_display_4(self, p):
+        """ list_display : LBRACKET expression PIPE expression RBRACKET """
+        p[0] = Pattern(p[2], p[4], p[2].coord)
+        
     ##
     ## Lambda Definitions
     ##
@@ -412,16 +496,17 @@ class Parser():
         """ lambda_definition : lambda_parameters LAMBDADEF expression """
         p[0] = Lambda(p[1], p[3], p[1].coord)
 
-    def p_lambda_parameters(self, p):
-        """ lambda_parameters : identifier
-                              | LT parameter_list GT
-        """
-        if len(p) == 2:
-            param = Param(p[1].name)
-            p[0] = ParamList([param], p[1].coord)
-        else:
-            p[0] = p[2]
-        
+    def p_lambda_parameters_1(self, p):
+        """ lambda_parameters : identifier """
+        param = p[1]
+        p[0] = ParamList([param], p[1].coord)
+
+    def p_lambda_parameters_2(self, p):
+        """ lambda_parameters : list_display """
+        lst = p[1].items
+        params = ParamList(lst, p[1].coord)
+        check_lambda(params)
+        p[0] = params
 
     ##
     ## Assignment Statement
@@ -429,31 +514,15 @@ class Parser():
 
     # TODO : recursive assignment
     def p_assignment_statement(self, p):
-        """ assignment_statement : target_list ASSIGN expression """
+        """ assignment_statement : target ASSIGN expression """
         p[0] = Assignment(p[2], p[1], p[3],  p[3].coord)
+
+    def p_target(self, p):
+        """ target : expression """
+        ast = p[1]
+        check_target(ast)
+        p[0] = p[1]
         
-    def p_target_list_1(self, p):
-        """ target_list : target """
-        p[0] = p[1]
-
-    def p_target_list_2(self, p):
-        """ target_list : target_list COMMA target """
-        if not isinstance(p[1], TargetList):
-             p[1] = TargetList([p[1]], p[1].coord)
-        p[1].targets.append(p[3])
-        p[0] = p[1]
-
-    def p_target_1(self, p):
-        """ target : identifier
-                   | attributeref
-                   | subscription        
-        """
-        p[0] = p[1]
-
-    def p_target_2(self, p):
-        """ target : LBRACKET target_list RBRACKET """
-        p[0] = p[2]
-
     ##
     ## Augmented Assignment Statement
     ##
@@ -492,14 +561,13 @@ class Parser():
     ##
 
     def p_term(self, p):
-        """ term : TERM LPAREN term_arguments RPAREN """
+        """ term : TERM LPAREN argument_list RPAREN """
         p[0] = Term(p[1], p[3], p[3].coord)
 
-    def p_term_arguments(self, p):
-        """ term_arguments : expression_list
-                           | epsilon
-        """
-        p[0] = p[1] if p[1] is not None else ExprList([])
+    def p_term_2(self, p):
+        """ term : TERM LPAREN RPAREN """
+        lst = ArgumentList([])
+        p[0] = Term(p[1], lst)
 
     ##
     ## Procedures
@@ -509,22 +577,28 @@ class Parser():
         """ procedure : PROCEDURE LPAREN parameter_list RPAREN \
                         LBRACE block RBRACE
         """
-        p[0] = Procedure(p[3], p[6], p[3].coord)
+        p[0] = Procedure(p[3], p[6], p[6].coord)
 
     def p_procedure_2(self, p):
         """ procedure : CPROCEDURE LPAREN parameter_list RPAREN \
                         LBRACE block RBRACE
         """
-        p[0] = CachedProcedure(p[3], p[6], p[3].coord)
+        p[0] = CachedProcedure(p[3], p[6], p[6].coord)
 
-    def p_parameter_list(self, p):
-        """ parameter_list : procedure_param
-                           | parameter_list COMMA procedure_param
-                           | epsilon
+    def p_parameter_list_1(self, p):
+        """ parameter_list : params """
+        p[0] = p[1]
+
+    def p_parameter_list_2(self, p):
+        """ parameter_list : epsilon """
+        p[0] = ParamList([])
+
+    def p_params(self, p):
+        """ params : procedure_param
+                   | params COMMA procedure_param
         """
-        if len(p) == 2:
-            if p[1] is None: p[0] = ParamList([])
-            else: p[0] = ParamList([p[1]], p[1].coord)
+        if len(p) == 2: # single parameter
+            p[0] = ParamList([p[1]], p[1].coord)
         else:
             p[1].params.append(p[3])
             p[0] = p[1]
@@ -572,8 +646,10 @@ class Parser():
     ##
 
     def p_iterator(self, p):
-        """ iterator : target IN expression """
-        p[0] = Iterator(p[1], p[3], p[1].coord)
+        """ iterator : comparison """
+        ast = p[1]
+        check_iterator(ast)
+        p[0] = Iterator(ast.left, ast.right, ast.coord)
 
     def p_iterator_chain_1(self, p):
         """ iterator_chain : iterator """
@@ -585,7 +661,6 @@ class Parser():
             p[1] = IteratorChain([p[1]], p[1].coord)
         p[1].iterators.append(p[3])
         p[0] = p[1]
-        
 
     ####
     ##
@@ -597,9 +672,11 @@ class Parser():
         """ compound_statement : if_statement
                                | switch_statement
                                | match_statement
+                               | scan_statement
                                | while_loop
                                | do_while_loop
                                | for_loop
+                               | class
         """
         p[0] = p[1]
         
@@ -676,8 +753,89 @@ class Parser():
     ##
 
     def p_match_statement(self, p):
-        """ match_statement : MATCH """
+        """ match_statement : MATCH LPAREN expression RPAREN \
+                              LBRACE match_list default_case RBRACE 
+        """
+        if not isinstance(p[6], CaseList):
+            p[6] = CaseList([p[6]], p[3].coord)
+
+        p[0] = Match(p[3], p[6], p[7], p[3].coord)
+
+    def p_match_list_1(self, p):
+        """ match_list : matchee  """
+        p[0] = p[1]
+    
+    def p_match_list_2(self, p):
+        """ match_list : match_list matchee """
+        if not isinstance(p[1], CaseList):
+            p[1] = CaseList([p[1]], p[1].coord)
+        p[1].cases.append(p[2])
+        p[0] = p[1]
+
+    def p_matche(self, p):
+        """ matchee : match_case
+                    | regex_branch
+        """
+        p[0] = p[1]
+
+    def p_match_case(self, p):
+        """ match_case : CASE expression_list case_condition COLON block """
+        p[0] = MatchCase(p[2], p[3], p[5], p[2].coord)
+
+    # Regex case
+
+    def p_regex_branch(self, p):
+        """ regex_branch : REGEX expression as case_condition COLON block """
+        p[0] = Regex(p[2], p[3], p[4], p[6], p[2].coord)
+
+    def p_as_1(self, p):
+        """ as : AS expression """
+        p[0] = As(p[2], p[2].coord)
+
+    def p_as_2(self, p):
+        """ as : epsilon """
+        p[0] = None
+
+    def p_case_condition_1(self, p):
+        """ case_condition : PIPE expression """
+        p[0] = p[2]
+
+    def p_case_condition_2(self, p):
+        """ case_condition : epsilon """
+        p[0] = None
+
+    ##
+    ## Scan
+    ##
+
+    def p_scan_statement(self, p):
+        """ scan_statement : SCAN LPAREN expression RPAREN using \
+                             LBRACE regex_list default_case RBRACE
+        """
+        if not isinstance(p[7], CaseList):
+            p[7] = CaseList([p[7]], p[7].coord)
+
+        p[0] = Scan(p[3], p[5], p[7], p[8], p[3].coord)
+
+    def p_using_1(self, p):
+        """ using : USING identifier """
+        p[0] = As(p[2], p[2].coord)
+
+    def p_using_2(self, p):
+        """ using : epsilon """
         
+
+    def p_regex_list_1(self, p):
+        """ regex_list : regex_branch  """
+        p[0] = p[1]
+    
+    def p_regex_list_2(self, p):
+        """ regex_list : regex_list regex_branch """
+        if not isinstance(p[1], CaseList):
+            p[1] = CaseList([p[1]], p[1].coord)
+        p[1].cases.append(p[2])
+        p[0] = p[1]
+
     ##
     ## Loops
     ##
@@ -696,24 +854,18 @@ class Parser():
         """ for_loop : FOR LPAREN iterator_chain  RPAREN LBRACE block RBRACE """
         p[0] = For(p[3], p[6], p[3].coord)
 
-        
-    # ##
-    # ## Values
-    # ##
+    ##
+    ## Class
+    ##
 
-    # def p_unused(self, p):
-    #     """ unused : UNUSED """
-    #     p[0] = Variable('unused', 'unused')
-        
-    # def p_value_1(self, p):
-    #     """ value : atomic_value """
-    #     p[0] = p[1]
+    def p_class(self, p):
+        """ class : CLASS identifier LPAREN parameter_list RPAREN LBRACE block static_block RBRACE """
+        p[0] = Class(p[2], p[4], p[7],p[8], p[2].coord)
 
+    def p_static_block_1(self, p):
+        """ static_block : STATIC LBRACE block RBRACE """
+        p[0] = p[3]
 
-    # def p_value_4(self, p):
-    #     """ value : unused """
-    #     p[0] = p[1]
-
-    # ## Atomic Value
-        
-
+    def p_static_block_2(self, p):
+        """ static_block : epsilon """
+        p[0] = Block([])

@@ -94,6 +94,8 @@ class Lexer():
         'exists'          : 'EXISTS',
         'backtrack'       : 'BACKTRACK',
         'match'           : 'MATCH',
+        'regex'           : 'REGEX',
+        'as'              : 'AS',
         'break'           : 'BREAK',
         'continue'        : 'CONTINUE',
         'exit'            : 'EXIT',
@@ -109,6 +111,10 @@ class Lexer():
         'while'           : 'WHILE',
         'procedure'       : 'PROCEDURE',
         'cachedProcedure' : 'CPROCEDURE',
+        'class'           : 'CLASS',
+        'static'          : 'STATIC',
+        'scan'            : 'SCAN',
+        'using'           : 'USING',
     }
     
     tokens = [
