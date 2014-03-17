@@ -1,30 +1,55 @@
-from nose.tools import with_setup
+#------------------------------------------------------------------------------
+# setlx2py: test_parsable
+#
+# Unit tests for the Parser class in setlx_parser.py
+# Beware: Only the fact whether example code can 
+#         be parsed is tested here!
+#
+# Copyright (C) 2014, Jan-Christoph Klie
+# License: Apache v2
+#------------------------------------------------------------------------------
 
-import types
+import os
 
-def create_function(name, args):
-    def y(): pass
+from nose.tools import eq_, with_setup, nottest
+
+from setlx2py.setlx_parser import Parser
+
+##
+## Test housekeeping
+##
+
+parser = Parser()
+
+def setup_func():
+    global parser
+    parser = Parser()
     
-    y_code = types.CodeType(args, \
-                            y.func_code.co_nlocals, \
-                            y.func_code.co_stacksize, \
-                            y.func_code.co_flags, \
-                            y.func_code.co_code, \
-                            y.func_code.co_consts, \
-                            y.func_code.co_names, \
-                            y.func_code.co_varnames, \
-                            y.func_code.co_filename, \
-                            name, \
-                            y.func_code.co_firstlineno, \
-                            y.func_code.co_lnotab)
+def teardown_func():
+    parser = None
+
+def is_parsable(path):
+    with open(path, 'r') as f:
+        s = unicode(f.read(), errors='replace')
+    try:
+        parser.parse(s)
+    except:
+        return False
+
+    return True
+        
+@with_setup(setup_func, teardown_func)
+def test_parsable():
+    all_parsable = True
+    not_parsable_files = []
     
-    return types.FunctionType(y_code, y.func_globals, name)
+    for f in os.listdir('tests/fixtures/logic'):
+        path = os.path.join('tests/fixtures/logic', f)
+        current_parsable = is_parsable(path)
 
+        if not current_parsable:
+            all_parsable = False
+            not_parsable_files.append(path)
 
-def setup():
-    myfunc = create_function('myfunc', 3)
-
-@with_setup(setup)    
-def test_dummy(): pass
-
-
+    msg = 'Cannot parse the following files: \n{0}'.format('\n'.join(not_parsable_files))
+    assert all_parsable, msg
