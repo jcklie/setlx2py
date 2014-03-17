@@ -111,6 +111,7 @@ class Lexer():
         'while'           : 'WHILE',
         'procedure'       : 'PROCEDURE',
         'cachedProcedure' : 'CPROCEDURE',
+        'class'           : 'CLASS',
     }
     
     tokens = [

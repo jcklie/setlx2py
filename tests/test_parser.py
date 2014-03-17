@@ -147,6 +147,13 @@ def test_list_three_elements():
          ('Identifier', 'bar'),
          ('Identifier', 'baz')))
 
+def test_list_head_tail():
+    node = parse_single_statement('[h|t];')
+    eq_(node.to_tuples(),
+        ('Pattern',
+         ('Identifier', 'h'),
+         ('Identifier', 't')))
+
 # Set
 
 def test_set_minimal():
@@ -172,6 +179,13 @@ def test_set_three_elements():
          ('Identifier', 'foo'),
          ('Identifier', 'bar'),
          ('Identifier', 'baz')))
+
+def test_set_head_tail():
+    node = parse_single_statement('{h|t};')
+    eq_(node.to_tuples(),
+        ('Pattern',
+         ('Identifier', 'h'),
+         ('Identifier', 't')))
     
 ##
 ## Ranges
@@ -215,9 +229,9 @@ def test_atomic_value_set_abc():
 ## Comprehension
 ##
 
-# List
+# Set
 
-def test_list_comprehension_minimal():
+def test_set_comprehension_minimal():
     node = parse_single_statement('{p: p in x};')
     eq_(node.to_tuples(),
         ('Comprehension', 'set',
@@ -226,7 +240,7 @@ def test_list_comprehension_minimal():
           ('Identifier', 'p'),
           ('Identifier', 'x'))))
 
-def test_list_comprehension_two_iterators():
+def test_set_comprehension_two_iterators():
     node = parse_single_statement('{a * b: a in {1..3}, b in {1..3}};')
     eq_(node.to_tuples(),
         ('Comprehension', 'set',
@@ -245,7 +259,7 @@ def test_list_comprehension_two_iterators():
             ('Constant', 'int', 1),
             ('Constant', 'int', 3))))))
 
-def test_list_comprehension_prime():
+def test_set_comprehension_prime():
     s = """{ p : p in {2..100} | { x : x in {1..p} | p % x == 0 } == {1, p} };"""
     node = parse_single_statement(s)
     eq_(node.to_tuples(),
@@ -258,6 +272,67 @@ def test_list_comprehension_prime():
            ('Constant', 'int', 100))),
          ('BinaryOp', '==',
           ('Comprehension', 'set',
+           ('Identifier', 'x'),
+           ('Iterator',
+            ('Identifier','x'),
+            ('Range', 'set',
+             ('Constant', 'int', 1),
+             ('Identifier', 'p'))),
+           ('BinaryOp', '==',
+            ('BinaryOp', '%',
+             ('Identifier', 'p'),
+             ('Identifier', 'x')),
+            ('Constant', 'int', 0))),
+          ('Set',
+           ('Constant', 'int', 1),
+           ('Identifier', 'p')))))
+
+# List
+
+@nottest    
+def test_list_comprehension_minimal():
+    node = parse_single_statement('[p: p in x];')
+    eq_(node.to_tuples(),
+        ('Comprehension', 'list',
+         ('Identifier', 'p'),
+         ('Iterator',
+          ('Identifier', 'p'),
+          ('Identifier', 'x'))))
+
+@nottest    
+def test_list_comprehension_two_iterators():
+    node = parse_single_statement('[a * b: a in {1..3}, b in {1..3}];')
+    eq_(node.to_tuples(),
+        ('Comprehension', 'list',
+         ('BinaryOp', '*',
+          ('Identifier', 'a'),
+          ('Identifier', 'b')),
+         ('IteratorChain',
+          ('Iterator',
+           ('Identifier', 'a'),
+           ('Range', 'set',
+            ('Constant', 'int', 1),
+            ('Constant', 'int', 3))),
+          ('Iterator',
+           ('Identifier', 'b'),
+           ('Range', 'set',
+            ('Constant', 'int', 1),
+            ('Constant', 'int', 3))))))
+
+@nottest    
+def test_list_comprehension_prime():
+    s = """[ p : p in {2..100} | [ x : x in {1..p} | p % x == 0 ] == {1, p} ];"""
+    node = parse_single_statement(s)
+    eq_(node.to_tuples(),
+        ('Comprehension', 'list',
+         ('Identifier', 'p'),
+         ('Iterator',
+          ('Identifier', 'p'),
+          ('Range', 'set',
+           ('Constant', 'int', 2),
+           ('Constant', 'int', 100))),
+         ('BinaryOp', '==',
+          ('Comprehension', 'list',
            ('Identifier', 'x'),
            ('Iterator',
             ('Identifier','x'),
@@ -1473,3 +1548,47 @@ def test_cached_procedure_fac():
              ('Assignment', '-=', ('Identifier', 'n'), ('Constant', 'int', 1)))),
             ('Return', ('Identifier', 'i'))))))
 
+##
+##
+##
+
+def test_class_minimal():
+    node = parse_single_statement('class point() {}')
+    eq_(node.to_tuples(),
+        ('Class',
+         ('Identifier', 'point'),
+         ('ParamList', ),
+         ('Block', )))
+
+def test_class_with_parameters():
+    node = parse_single_statement('class point(x,y) {}')
+    eq_(node.to_tuples(),
+        ('Class',
+         ('Identifier', 'point'),
+         ('ParamList',
+          ('Param', 'x'),
+          ('Param', 'y')),
+         ('Block', )))
+
+def test_class_with_parameters_and_body():
+    s = """
+    class point(x,y) {
+        mX := x;
+        mY := y;
+    }
+    """
+    node = parse_single_statement(s)
+    eq_(node.to_tuples(),
+        ('Class',
+         ('Identifier', 'point'),
+         ('ParamList',
+          ('Param', 'x'),
+          ('Param', 'y')),
+         ('Block',
+          ('Assignment', ':=',
+           ('Identifier', 'mX'),
+           ('Identifier', 'x')),
+          ('Assignment', ':=',
+           ('Identifier', 'mY'),
+           ('Identifier', 'y')))))
+    

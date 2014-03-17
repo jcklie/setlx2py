@@ -378,6 +378,7 @@ class Parser():
                       | set_comprehension
                       | list_range
                       | list_display
+   
                       | parenth_form
         """
         p[0] = p[1]
@@ -385,34 +386,6 @@ class Parser():
     def p_parenth_form(self, p):
         """ parenth_form : LPAREN expression RPAREN """
         p[0] = p[2]
-
-    # Set range
-
-    def p_set_range_1(self, p):
-        """ set_range : LBRACE expression RANGE expression RBRACE """
-        p[0] = Range('set', p[2], p[4], None)
-
-    def p_set_range_2(self, p):
-        """ set_range : LBRACE expression \
-                          COMMA expression RANGE expression RBRACE """
-        p[0] = Range('set', p[2], p[6], p[4])
-
-    # Set display
-
-    def p_set_display_1(self, p):
-        """ set_display : LBRACE expression RBRACE """
-        p[0] = Set([p[2]], p[2].coord)
-
-    def p_set_display_2(self, p):
-        """ set_display : LBRACE expression COMMA argument_list RBRACE """
-        lst = p[4].arguments
-        expr = p[2]
-        lst.insert(0, expr)
-        p[0] = Set(lst, expr.coord)
-
-    def p_set_display_3(self, p):
-        """ set_display : LBRACE RBRACE """
-        p[0] = Set([])
 
     ##
     ## Comprehension
@@ -433,6 +406,30 @@ class Parser():
                                 iterator_chain comprehension_condition RBRACE
         """
         p[0] = Comprehension('set', p[2], p[4], p[5], p[2].coord)
+        '''
+    # List comprehension
+
+    def p_list_comprehension(self, p):
+        """ list_comprehension : LBRACKET expression COLON \
+                                 iterator_chain comprehension_condition LBRACKET
+        """
+        p[0] = Comprehension('list', p[2], p[4], p[5], p[2].coord)
+'''
+    ##
+    ## Range
+    ##
+
+    # Set range
+
+    def p_set_range_1(self, p):
+        """ set_range : LBRACE expression RANGE expression RBRACE """
+        p[0] = Range('set', p[2], p[4], None)
+
+    def p_set_range_2(self, p):
+        """ set_range : LBRACE expression \
+                        COMMA expression RANGE expression RBRACE
+        """
+        p[0] = Range('set', p[2], p[6], p[4])
 
     # List Range
     
@@ -442,8 +439,33 @@ class Parser():
 
     def p_list_range_2(self, p):
         """ list_range : LBRACKET expression \
-                           COMMA expression RANGE expression RBRACKET """
+                         COMMA expression RANGE expression RBRACKET """
         p[0] = Range('list', p[2], p[6], p[4])
+
+    ##
+    ## Displays
+    ##
+
+    # Set Display
+
+    def p_set_display_1(self, p):
+        """ set_display : LBRACE expression RBRACE """
+        p[0] = Set([p[2]], p[2].coord)
+
+    def p_set_display_2(self, p):
+        """ set_display : LBRACE expression COMMA argument_list RBRACE """
+        lst = p[4].arguments
+        expr = p[2]
+        lst.insert(0, expr)
+        p[0] = Set(lst, expr.coord)
+
+    def p_set_display_3(self, p):
+        """ set_display : LBRACE RBRACE """
+        p[0] = Set([])
+
+    def p_set_display_4(self, p):
+        """ set_display : LBRACE expression PIPE expression RBRACE  """
+        p[0] = Pattern(p[2], p[4], p[2].coord)
 
     # List Display
 
@@ -461,7 +483,7 @@ class Parser():
     def p_list_display_3(self, p):
         """ list_display : LBRACKET RBRACKET """
         p[0] = List([])
-
+        
     def p_list_display_4(self, p):
         """ list_display : LBRACKET expression PIPE expression RBRACKET """
         p[0] = Pattern(p[2], p[4], p[2].coord)
@@ -653,6 +675,7 @@ class Parser():
                                | while_loop
                                | do_while_loop
                                | for_loop
+                               | class
         """
         p[0] = p[1]
         
@@ -797,3 +820,11 @@ class Parser():
     def p_for_loop(self, p):
         """ for_loop : FOR LPAREN iterator_chain  RPAREN LBRACE block RBRACE """
         p[0] = For(p[3], p[6], p[3].coord)
+
+    ##
+    ## Class
+    ##
+
+    def p_class(self, p):
+        """ class : CLASS identifier LPAREN parameter_list RPAREN LBRACE block RBRACE """
+        p[0] = Class(p[2], p[4], p[7], p[2].coord)

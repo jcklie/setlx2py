@@ -320,6 +320,22 @@ class CaseList (Node):
 
     attr_names = ()
 
+class Class(Node):
+    def __init__(self, name, params, defs, coord=None):
+        self.name = name
+        self.params = params
+        self.defs = defs
+        self.coord = coord
+
+    def children(self):
+        nodelist = []
+        if self.name is not None: nodelist.append(("name", self.name))
+        if self.params is not None: nodelist.append(("params", self.params))
+        if self.defs is not None: nodelist.append(("defs", self.defs))
+        return tuple(nodelist)
+
+    attr_names = ()
+
 class Comprehension (Node):
     def __init__(self, klass, expr, iterators, cond, coord=None):
         self.klass = klass
