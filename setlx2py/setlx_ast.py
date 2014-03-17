@@ -321,17 +321,19 @@ class CaseList (Node):
     attr_names = ()
 
 class Class(Node):
-    def __init__(self, name, params, defs, coord=None):
+    def __init__(self, name, params, block, static, coord=None):
         self.name = name
         self.params = params
-        self.defs = defs
+        self.block = block
+        self.static = static
         self.coord = coord
 
     def children(self):
         nodelist = []
         if self.name is not None: nodelist.append(("name", self.name))
         if self.params is not None: nodelist.append(("params", self.params))
-        if self.defs is not None: nodelist.append(("defs", self.defs))
+        if self.block is not None: nodelist.append(("block", self.block))
+        if self.static is not None: nodelist.append(("static", self.static))
         return tuple(nodelist)
 
     attr_names = ()

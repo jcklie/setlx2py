@@ -826,5 +826,13 @@ class Parser():
     ##
 
     def p_class(self, p):
-        """ class : CLASS identifier LPAREN parameter_list RPAREN LBRACE block RBRACE """
-        p[0] = Class(p[2], p[4], p[7], p[2].coord)
+        """ class : CLASS identifier LPAREN parameter_list RPAREN LBRACE block static_block RBRACE """
+        p[0] = Class(p[2], p[4], p[7],p[8], p[2].coord)
+
+    def p_static_block_1(self, p):
+        """ static_block : STATIC LBRACE block RBRACE """
+        p[0] = p[3]
+
+    def p_static_block_2(self, p):
+        """ static_block : epsilon """
+        p[0] = Block([])

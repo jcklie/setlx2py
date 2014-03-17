@@ -1558,6 +1558,7 @@ def test_class_minimal():
         ('Class',
          ('Identifier', 'point'),
          ('ParamList', ),
+         ('Block', ),
          ('Block', )))
 
 def test_class_with_parameters():
@@ -1568,6 +1569,7 @@ def test_class_with_parameters():
          ('ParamList',
           ('Param', 'x'),
           ('Param', 'y')),
+         ('Block', ),
          ('Block', )))
 
 def test_class_with_parameters_and_body():
@@ -1590,5 +1592,26 @@ def test_class_with_parameters_and_body():
            ('Identifier', 'x')),
           ('Assignment', ':=',
            ('Identifier', 'mY'),
-           ('Identifier', 'y')))))
-    
+           ('Identifier', 'y'))),
+         ('Block', )))
+
+def test_class_with_static_body():
+    s = """
+    class universal() {
+        static {
+            gAnswer := 42;
+        }
+    }
+    """
+    node = parse_single_statement(s)
+    eq_(node.to_tuples(),
+        ('Class',
+         ('Identifier', 'universal'),
+         ('ParamList', ),
+         ('Block', ),
+         ('Block', 
+          ('Assignment', ':=',
+           ('Identifier', 'gAnswer'),
+           ('Constant', 'int', 42)))))
+
+        
