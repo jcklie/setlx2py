@@ -378,7 +378,7 @@ class Parser():
                       | set_comprehension
                       | list_range
                       | list_display
-   
+                      | list_comprehension   
                       | parenth_form
         """
         p[0] = p[1]
@@ -406,7 +406,7 @@ class Parser():
                                 iterator_chain comprehension_condition RBRACE
         """
         p[0] = Comprehension('set', p[2], p[4], p[5], p[2].coord)
-        '''
+
     # List comprehension
 
     def p_list_comprehension(self, p):
@@ -414,7 +414,7 @@ class Parser():
                                  iterator_chain comprehension_condition LBRACKET
         """
         p[0] = Comprehension('list', p[2], p[4], p[5], p[2].coord)
-'''
+
     ##
     ## Range
     ##

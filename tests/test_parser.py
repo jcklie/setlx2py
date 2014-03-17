@@ -289,7 +289,6 @@ def test_set_comprehension_prime():
 
 # List
 
-@nottest    
 def test_list_comprehension_minimal():
     node = parse_single_statement('[p: p in x];')
     eq_(node.to_tuples(),
@@ -299,7 +298,6 @@ def test_list_comprehension_minimal():
           ('Identifier', 'p'),
           ('Identifier', 'x'))))
 
-@nottest    
 def test_list_comprehension_two_iterators():
     node = parse_single_statement('[a * b: a in {1..3}, b in {1..3}];')
     eq_(node.to_tuples(),
@@ -319,7 +317,6 @@ def test_list_comprehension_two_iterators():
             ('Constant', 'int', 1),
             ('Constant', 'int', 3))))))
 
-@nottest    
 def test_list_comprehension_prime():
     s = """[ p : p in {2..100} | [ x : x in {1..p} | p % x == 0 ] == {1, p} ];"""
     node = parse_single_statement(s)
@@ -1294,7 +1291,6 @@ def test_match_pattern_regex_as():
            ('Block',
             ('Return', ('Constant', 'literal', 'Not empty!')))))))
     
-@nottest    
 def test_match_pattern_regex_as_condition():
     s = """
     match(s) {
