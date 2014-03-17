@@ -113,6 +113,8 @@ class Lexer():
         'cachedProcedure' : 'CPROCEDURE',
         'class'           : 'CLASS',
         'static'          : 'STATIC',
+        'scan'            : 'SCAN',
+        'using'           : 'USING',
     }
     
     tokens = [

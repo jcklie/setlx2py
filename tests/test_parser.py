@@ -1319,6 +1319,113 @@ def test_match_pattern_regex_as_condition():
             ('Identifier', 't')),
            ('Block',
             ('Return', ('Constant', 'literal', 'Not empty!')))))))
+
+##
+## Scan
+##
+
+def test_scan_one_regex():
+    s = """
+    scan(s) {
+        regex 'foo' : return "bar";
+    }
+    """    
+    node = parse_single_statement(s)
+    eq_(node.to_tuples(),
+        ('Scan',
+         ('Identifier', 's'),
+         ('CaseList',
+          ('Regex',
+           ('Constant', 'literal', 'foo'),
+           ('Block',
+            ('Return', ('Constant', 'string', 'bar')))))))
+
+def test_scan_one_regex_using():
+    s = """
+    scan(x) using y {
+        regex 'foo' : return "bar";
+    }
+    """    
+    node = parse_single_statement(s)
+    eq_(node.to_tuples(),
+        ('Scan',
+         ('Identifier', 'x'),
+         ('As', ('Identifier', 'y')),
+         ('CaseList',
+          ('Regex',
+           ('Constant', 'literal', 'foo'),
+           ('Block',
+            ('Return', ('Constant', 'string', 'bar')))))))
+
+    
+def test_match_one_regex_as():
+    s = """
+    scan(s) {
+        regex 'foo' as [ bar ] : return "baz";
+    }
+    """    
+    node = parse_single_statement(s)
+    eq_(node.to_tuples(),
+        ('Scan',
+         ('Identifier', 's'),
+         ('CaseList',
+          ('Regex',
+           ('Constant', 'literal', 'foo'),
+           ('As',
+            ('List', ('Identifier', 'bar'))),
+           ('Block',
+            ('Return', ('Constant', 'string', 'baz')))))))
+
+def test_scan_two_regex():
+    s = """
+    scan(s) {
+        regex 'foo' : return "bar";
+        regex 'bar' : return "baz";
+    }
+    """    
+    node = parse_single_statement(s)
+    eq_(node.to_tuples(),
+        ('Scan',
+         ('Identifier', 's'),
+         ('CaseList',
+          ('Regex',
+           ('Constant', 'literal', 'foo'),
+           ('Block',
+            ('Return', ('Constant', 'string', 'bar')))),
+          ('Regex',
+           ('Constant', 'literal', 'bar'),
+           ('Block',
+            ('Return', ('Constant', 'string', 'baz')))))))
+
+def test_scan_two_regex_using_default():
+    s = """
+    scan(c) using chr {
+        regex '[0-9]' : return "Number";
+        regex '[a-zA-Z]' : return "Character";
+        default: return "Neither number nor character";
+    }
+    """    
+    node = parse_single_statement(s)
+    eq_(node.to_tuples(),
+        ('Scan',
+         ('Identifier', 'c'),
+         ('As', ('Identifier','chr')),
+         ('CaseList',
+          ('Regex',
+           ('Constant', 'literal', '[0-9]'),
+           ('Block',
+            ('Return', ('Constant', 'string', 'Number')))),
+          ('Regex',
+           ('Constant', 'literal', '[a-zA-Z]'),
+           ('Block',
+            ('Return', ('Constant', 'string', 'Character'))))),
+          ('Default',
+           ('Block',
+            ('Return', ('Constant', 'string', 'Neither number nor character'))))))
+    
+##
+## Try/Catch
+##    
     
 ##
 ## While-Loop

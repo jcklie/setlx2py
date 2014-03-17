@@ -672,6 +672,7 @@ class Parser():
         """ compound_statement : if_statement
                                | switch_statement
                                | match_statement
+                               | scan_statement
                                | while_loop
                                | do_while_loop
                                | for_loop
@@ -758,7 +759,7 @@ class Parser():
         if not isinstance(p[6], CaseList):
             p[6] = CaseList([p[6]], p[3].coord)
 
-        p[0] = Match(p[3], p[6], p[7])
+        p[0] = Match(p[3], p[6], p[7], p[3].coord)
 
     def p_match_list_1(self, p):
         """ match_list : matchee  """
@@ -783,7 +784,7 @@ class Parser():
 
     # Regex case
 
-    def p_regex_case(self, p):
+    def p_regex_branch(self, p):
         """ regex_branch : REGEX expression as case_condition COLON block """
         p[0] = Regex(p[2], p[3], p[4], p[6], p[2].coord)
 
@@ -802,6 +803,38 @@ class Parser():
     def p_case_condition_2(self, p):
         """ case_condition : epsilon """
         p[0] = None
+
+    ##
+    ## Scan
+    ##
+
+    def p_scan_statement(self, p):
+        """ scan_statement : SCAN LPAREN expression RPAREN using \
+                             LBRACE regex_list default_case RBRACE
+        """
+        if not isinstance(p[7], CaseList):
+            p[7] = CaseList([p[7]], p[7].coord)
+
+        p[0] = Scan(p[3], p[5], p[7], p[8], p[3].coord)
+
+    def p_using_1(self, p):
+        """ using : USING identifier """
+        p[0] = As(p[2], p[2].coord)
+
+    def p_using_2(self, p):
+        """ using : epsilon """
+        
+
+    def p_regex_list_1(self, p):
+        """ regex_list : regex_branch  """
+        p[0] = p[1]
+    
+    def p_regex_list_2(self, p):
+        """ regex_list : regex_list regex_branch """
+        if not isinstance(p[1], CaseList):
+            p[1] = CaseList([p[1]], p[1].coord)
+        p[1].cases.append(p[2])
+        p[0] = p[1]
 
     ##
     ## Loops

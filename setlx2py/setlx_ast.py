@@ -667,6 +667,24 @@ class Return (Node):
 
     attr_names = ()
 
+class Scan(Node):
+    def __init__(self, expr, using, regex_list, default, coord=None):
+        self.expr = expr
+        self.using = using
+        self.regex_list = regex_list
+        self.default = default
+        self.coord = coord
+
+    def children(self):
+        nodelist = []
+        if self.expr is not None: nodelist.append(("expr", self.expr))
+        if self.using is not None: nodelist.append(("using", self.using))
+        if self.regex_list is not None: nodelist.append(("regex_list", self.regex_list))
+        if self.default is not None: nodelist.append(("default", self.default))
+        return tuple(nodelist)
+
+    attr_names = ()
+
 class Set(Node):
     def __init__(self, items, coord=None):
         self.items = items
