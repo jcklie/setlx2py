@@ -93,8 +93,6 @@ class Parser():
                              | continue_statement
                              | exit_statement
                              | return_statement
-                             | quantor
-                             | term
         """
         p[0] = p[1]
 
@@ -258,6 +256,12 @@ class Parser():
     def p_unary_expression_3(self, p):
         """ unary_expression : BANG unary_expression """
         p[0] = UnaryOp('not', p[2], p[2].coord)
+
+    def p_unary_expression_4(self, p):
+        """ unary_expression : quantor
+                             | term
+        """
+        p[0] = p[1]
 
     def p_power_1(self, p):
         """ power : primary """
