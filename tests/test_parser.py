@@ -1291,31 +1291,6 @@ def test_match_pattern_regex_as():
            ('Block',
             ('Return', ('Constant', 'literal', 'Not empty!')))))))
     
-def test_match_pattern_regex_as_condition():
-    s = """
-    match(s) {
-        regex '\w+' as bar | 'foo' in bar  : return "bar";
-        case [h|t] : return '';
-    }
-    """    
-    node = parse_single_statement(s)
-    eq_(node.to_tuples(),
-        ('Match',
-         ('Identifier', 's'),
-         ('CaseList',
-          ('Regex',
-           ('Constant', 'literal', 'foo'),
-           ('As',
-            ('List', ('Identifier', 'bar'))),
-           ('Block',
-            ('Return', ('Constant', 'string', 'baz')))),
-          ('Case',
-           ('Pattern',
-            ('Identifier', 'h'),
-            ('Identifier', 't')),
-           ('Block',
-            ('Return', ('Constant', 'literal', 'Not empty!')))))))
-
 ##
 ## Scan
 ##

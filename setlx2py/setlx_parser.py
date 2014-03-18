@@ -411,7 +411,7 @@ class Parser():
 
     def p_list_comprehension(self, p):
         """ list_comprehension : LBRACKET expression COLON \
-                                 iterator_chain comprehension_condition LBRACKET
+                                 iterator_chain comprehension_condition RBRACKET
         """
         p[0] = Comprehension('list', p[2], p[4], p[5], p[2].coord)
 
