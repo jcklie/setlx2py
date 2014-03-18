@@ -57,8 +57,7 @@ class Lexer():
         self.line_head_pos = t.lexpos + 1
 
     def t_error(self, t):
-        s = t.value[0]
-        raise SyntaxError("bad character", self, t.value[0])
+        raise SyntaxError("Bad character: ", self, t.value[0])
 
     ##
     ## Regexes for use in tokens
@@ -71,15 +70,18 @@ class Lexer():
 
     # character sequences
 
-    char_sequence = r'' 
-    string = '''"(\\.|[^"])*"'''
-    literal= """'(\\.|[^'])*'"""
+    string = r'"([^\\"]|(\\.))*"'
+    literal = r"'([^\\']|(\\.))*'"    
     
     # integer constants    
     integer_constant = '0|([1-9][0-9]*)'
 
     # floating constants
-    double_constant = '(' + integer_constant + ')\.(' + integer_constant + ')'
+    exponent_part = r"""([eE][-+]?[0-9]+)"""
+    fractional_constant = r"""([0-9]*\.(?!\.)[0-9]+)|([0-9]+\.(?!\.))"""
+    double_constant = '(((('+ fractional_constant + ')'+ \
+                        exponent_part + '?)|([0-9]+'+ \
+                        exponent_part + '))[FfLl]?)'
 
     ##
     ## List of tokens recognized by the lexer
@@ -155,7 +157,7 @@ class Lexer():
         'DIVIDE_EQUAL', 'IDIVIDE_EQUAL',
         'LAMBDADEF',
 
-    ] + list(keywords.values())           
+    ] + list(keywords.values())
 
     ##
     ## Rules for the normal state
@@ -240,10 +242,29 @@ class Lexer():
 
     @TOKEN(string)
     def t_STRING(self, t):
-        t.value = t.value.lstrip('"').rstrip('"')
+        t.value = self.escape(t.value)
         return t
 
     @TOKEN(literal)
     def t_LITERAL(self, t):
-        t.value = t.value.lstrip("'").rstrip("'")
+        t.value = self.escape(t.value)
         return t
+
+    def escape(self, string):
+        escaped = False
+        s = string[1:-1]
+        new_str = ""
+        for i, c  in enumerate(s):
+            if escaped:
+                if c == "n":
+                    c = "\n"
+                elif c == "t":
+                    c = "\t"
+                new_str += c
+                escaped = True
+            else:
+                if c == r"\\":
+                    escaped = True
+                else:
+                    new_str += c
+        return new_str

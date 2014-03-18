@@ -109,16 +109,22 @@ def test_keywords_procedures():
     assert_token_type('cachedProcedure', 'CPROCEDURE')
 
 def test_constants_integer():
-    assert_token_types('1337', ['INTEGER'])
-    assert_token_types('0', ['INTEGER'])
+    assert_token_type('1337', 'INTEGER')
+    assert_token_type('0', 'INTEGER')
 
 def test_constants_double():
 
     # More digits - More digits
-    assert_token_types('1337.42', ['DOUBLE'])
+    assert_token_type('1337.42', 'DOUBLE')
         
     # Single digit - Single digit
-    assert_token_types('0.0', ['DOUBLE'])
+    assert_token_type('0.0', 'DOUBLE')
+    assert_token_type('.2', 'DOUBLE')    
+
+def test_constants_double_exponential():
+    assert_token_type('1.23E+02', 'DOUBLE')
+    assert_token_type('1.23E-04', 'DOUBLE')
+    assert_token_type('.5e2', 'DOUBLE')
     
     # Zero Digit - More digits
 #    assert_token_types('.42', ['DOUBLE'])    
@@ -185,3 +191,16 @@ def test_case_statements():
 def test_range():
     assert_token_types("[1..10]", ['LBRACKET', 'INTEGER', 'RANGE',
                                    'INTEGER', 'RBRACKET'])
+
+##
+## Test escape stuffs
+##
+
+def test_escape_doublequote():
+    s = r'''"The formula \""'''
+    assert_token_types(s, ['STRING'])
+
+def test_escape_singleuote():
+    s = r"""'The formula \''"""
+    assert_token_types(s, ['LITERAL'])
+    
