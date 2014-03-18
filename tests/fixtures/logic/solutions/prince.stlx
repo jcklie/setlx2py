@@ -1,18 +1,18 @@
 load("davis-putnam.stlx");
 load("knf.stlx");
 
-// Aufgabe: Der König führt den Prinzen in einen Raum mit 9 Türen. An
-// jeder Tür hängt ein Schild. In einem Zimmer ist eine Prinzessin, jedes
-// andere Zimmer ist leer oder es steckt ein Tiger drin. Der Prinz möchte
+// Aufgabe: Der KÃ¶nig fÃ¼hrt den Prinzen in einen Raum mit 9 TÃ¼ren. An
+// jeder TÃ¼r hÃ¤ngt ein Schild. In einem Zimmer ist eine Prinzessin, jedes
+// andere Zimmer ist leer oder es steckt ein Tiger drin. Der Prinz mÃ¶chte
 // die Prinzessin haben.
 
 // Die Prozedur computeClauses berechnet eine Menge von Klauseln, die das Problem
 // als aussagenlogische Formel beschreibt.  Die Variable 
-//     P(i)    ist für i in { 1, ..., n }
+//     P(i)    ist fÃ¼r i in { 1, ..., n }
 // genau dann wahr, wenn die Prinzessin in dem i-ten Zimmer ist.  Die Variable
-//     T(i)    ist für i in { 1, ..., n }
+//     T(i)    ist fÃ¼r i in { 1, ..., n }
 // genau dann wahr, wenn in dem i-ten Zimmer ein Tiger ist.  Die Variable
-//     Z(i)    ist für i in { 1, ..., n }
+//     Z(i)    ist fÃ¼r i in { 1, ..., n }
 // genau dann wahr, wenn die Aufschrift des i-ten Zimmers wahr ist.  Die Variable
 //     w       
 // ist genau dann wahr, wenn alle Aufschriften an leeren Zimmern wahr sind.
@@ -21,7 +21,7 @@ computeClauses := procedure() {
     clauses := { { P(i) : i in [1 .. 9] } };
     // Es gibt nur eine Prinzessin.
     clauses += atMostOne( { P(i) : i in [1 .. 9] } );
-    // Der König sagt: In dem Zimmer, wo die Prinzessin ist, ist die Aufschrift
+    // Der KÃ¶nig sagt: In dem Zimmer, wo die Prinzessin ist, ist die Aufschrift
     // wahr. 
     clauses += { { !P(i), Z(i) } : i in [1 .. 9] };
     // In Zimmern wo Tiger drin sind, ist die Aufschrift falsch.  
@@ -70,7 +70,7 @@ parseKNF := procedure(f) {
 };
 solve := procedure() {
     clauses := computeClauses();
-    possible := {};  // Räume, in denen die Prinzessin sein könnte
+    possible := {};  // RÃ¤ume, in denen die Prinzessin sein kÃ¶nnte
     for (r in {1 .. 9}) {
         if (davisPutnam(clauses + {{ P(r) }}, {}) != {{}}) {
             possible += { r };
@@ -80,7 +80,7 @@ solve := procedure() {
         r := arb(possible);
         print("Die Prinzessin ist im Zimmer Nr. $r$.");
     } else {
-        print("Das Problem ist nicht eindeutig lösbar!");
+        print("Das Problem ist nicht eindeutig lÃ¶sbar!");
     }   
 };
 

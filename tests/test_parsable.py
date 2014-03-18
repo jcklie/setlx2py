@@ -15,6 +15,11 @@ from nose.tools import eq_, with_setup, nottest
 
 from setlx2py.setlx_parser import Parser
 
+try:
+    unicode('foo', errors='replace')
+except NameError:
+    def unicode(s, **kwargs): return s
+
 ##
 ## Test housekeeping
 ##
@@ -30,13 +35,17 @@ def teardown_func():
 
 def is_parsable(path):
     with open(path, 'r') as f:
-        s = f.read()
+        try:
+            s = unicode(f.read(), errors='replace')
+        except Exception as e:
+            print(path)
+            raise 
+
     try:
         parser.parse(s)
-    except:
+        return True        
+    except SyntaxError as e:
         return False
-
-    return True
 
 def assert_parsable(folder):
     all_parsable = True

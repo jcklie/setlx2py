@@ -1,7 +1,7 @@
 //////////////////////////////////////////////////////////////////////////
 //                                                                      //
 // Die folgenden Prozeduren sind 1-zu-1 aus dem Programm zur            //
-// Lösung des Wolf-Ziege-Kohl-Problems kopiert.                         //
+// LÃ¶sung des Wolf-Ziege-Kohl-Problems kopiert.                         //
 //                                                                      //
 //////////////////////////////////////////////////////////////////////////
 
@@ -39,7 +39,7 @@ add := procedure(p, q) {
 
 //////////////////////////////////////////////////////////////////////////
 //                                                                      //
-// printPath ist die Funktion zur Ausgabe der Lösung.                   //
+// printPath ist die Funktion zur Ausgabe der LÃ¶sung.                   //
 //                                                                      //
 //////////////////////////////////////////////////////////////////////////
 
@@ -69,17 +69,17 @@ printPath := procedure(path, all) {
 };
 
 // Ein Polizist, ein Verbrecher, Mutter, Vater, Anton, Bruno, Cindy, und Doris wollen einen 
-// Fluss überqueren.  Dabei sollen die folgenden Spielregeln eingehalten werden:
+// Fluss Ã¼berqueren.  Dabei sollen die folgenden Spielregeln eingehalten werden:
 // 1.  Wenn der Verbrecher auf einer Seite des Flusses ist und sich auf dieser Seite noch andere 
 //     Personen aufhalten, dann soll er von dem Polizisten bewacht werden.
 // 2.  Wenn Cindy oder Doris auf einer Seite des Flusses ist und sich der Vater ebenfalls
 //     auf dieser Seite befindet, dann muss auch die Mutter auf dieser Seite sein.
-//     (Die beiden Töchter Cindy und Doris dürfen also nicht mit ihrem Vater allein sein.)
+//     (Die beiden TÃ¶chter Cindy und Doris dÃ¼rfen also nicht mit ihrem Vater allein sein.)
 // 3.  Wenn Anton oder Bruno auf einer Seite des Flusses ist und sich die Mutter ebenfalls
 //     auf dieser Seite befindet, dann muss auch der Vater auf dieser Seite sein.
-//     (Die beiden Söhne Anton und Bruno dürfen also nicht mit ihrer Mutter allein sein.)
-// 4.  Im Boot können höchstens zwei Personen fahren.
-// 5.  Nur der Polizist, die Mutter und der Vater können das Boot steuern.
+//     (Die beiden SÃ¶hne Anton und Bruno dÃ¼rfen also nicht mit ihrer Mutter allein sein.)
+// 4.  Im Boot kÃ¶nnen hÃ¶chstens zwei Personen fahren.
+// 5.  Nur der Polizist, die Mutter und der Vater kÃ¶nnen das Boot steuern.
 
 all := { "Polizist", "Verbrecher", "Mutter", "Vater", "Anton", "Bruno", 
          "Cindy", "Doris", "Boot" 
@@ -100,7 +100,7 @@ bootOK := procedure(b) {
 };
 r1 := { [s, s-b] : s in p, b in 2 ** s | bootOK(b) && !verboten(s-b) };
 r2 := { [x, y] : [y, x] in r1 };
-// R ist die Menge aller möglichen Verbindungen zwischen zwei Punkten.
+// R ist die Menge aller mÃ¶glichen Verbindungen zwischen zwei Punkten.
 r := r1 + r2;
 
 // Am Anfang sind alle links.
@@ -109,6 +109,6 @@ start := all;
 goal := {};
 // Berechne einen Pfad zum Ziel.
 path := findPath(start, goal, r);
-// Gebe diesen Pfad Schritt für Schritt aus.
+// Gebe diesen Pfad Schritt fÃ¼r Schritt aus.
 printPath(path, all);
 print(#path);
