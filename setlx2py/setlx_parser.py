@@ -264,7 +264,7 @@ class Parser():
         p[0] = p[1]
 
     def p_power_2(self, p):
-        """ power : primary POW unary_expression """
+        """ power : primary POW power """
         p[0] = BinaryOp(p[2], p[1], p[3], p[1].coord)
 
     ## Primary
