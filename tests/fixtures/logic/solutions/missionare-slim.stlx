@@ -1,5 +1,5 @@
-// Drei Missionare und drei Kannibalen wollen zusammen einen Fluß 
-// überqueren. Das Boot hat nur Platz für zwei Passagiere.  Die Kannibalen
+// Drei Missionare und drei Kannibalen wollen zusammen einen FluÃ 
+// Ã¼berqueren. Das Boot hat nur Platz fÃ¼r zwei Passagiere.  Die Kannibalen
 // sind hungrig, wenn die Missionare an einem Ufer in der Unterzahl sind, 
 // haben sie ein Problem.  Die Aufgabe besteht darin, einen Fahrplan zu 
 // erstellen, so dass hinterher alle am anderen Ufer ankommen und die
@@ -7,14 +7,14 @@
 
 //////////////////////////////////////////////////////////////////////////
 //                                                                      //
-// Die folgenden Prozeduren dienen nur dem Ausdrucken der Lösung und    //
+// Die folgenden Prozeduren dienen nur dem Ausdrucken der LÃ¶sung und    //
 // zum Debuggen.
 //                                                                      //
 //////////////////////////////////////////////////////////////////////////    
 
-// Dieses Prädikat druckt die Lösung aus.
+// Dieses PrÃ¤dikat druckt die LÃ¶sung aus.
 printPath := procedure(path) {
-    print("Lösung:\n");
+    print("LÃ¶sung:\n");
     for (i in [1 .. #path - 1]) {
         [ m1, k1, b1 ] := path[i];
         [ m2, k2, b2 ] := path[i+1];
@@ -39,7 +39,7 @@ printState := procedure(m, k, b) {
 };
 
 // Die Prozedur printBoat(m1, k1, b1, m2, k2, b2) druckt den Zustand des
-// Bootes, wenn der Zustand sich von [m1, k1, b1] zu [m2, k2, b2] ändert.
+// Bootes, wenn der Zustand sich von [m1, k1, b1] zu [m2, k2, b2] Ã¤ndert.
 printBoat := procedure(m1, k1, b1, m2, k2, b2) {
     if (b1 == 1) {
         if (m1 < m2) {
@@ -60,24 +60,24 @@ printBoat := procedure(m1, k1, b1, m2, k2, b2) {
     }
 };
 
-// Die Prozedur fillCharsLeft(x, n) wandelt x in einen String der Länge n um.
-// Dabei wird der String von links mit Leerzeichen aufgefüllt.
+// Die Prozedur fillCharsLeft(x, n) wandelt x in einen String der LÃ¤nge n um.
+// Dabei wird der String von links mit Leerzeichen aufgefÃ¼llt.
 fillCharsLeft := procedure(x, n) {
     s := x + "";
     m := n - #s;
     return m * " " + s;
 };
 
-// Die Prozedur fillCharsRight(x, n) wandelt x in einen String der Länge n um.
-// Dabei wird der String von rechts mit Leerzeichen aufgefüllt.
+// Die Prozedur fillCharsRight(x, n) wandelt x in einen String der LÃ¤nge n um.
+// Dabei wird der String von rechts mit Leerzeichen aufgefÃ¼llt.
 fillCharsRight := procedure(x, n) {
     s := x + "";
     m := n - #s;
     return s + m * " ";
 };
 
-// Die Prozedur fillCharsBoth(x, n) wandelt x in einen String der Länge n um.
-// Dabei wird der String von links und rechts mit Leerzeichen aufgefüllt.
+// Die Prozedur fillCharsBoth(x, n) wandelt x in einen String der LÃ¤nge n um.
+// Dabei wird der String von links und rechts mit Leerzeichen aufgefÃ¼llt.
 fillCharsBoth := procedure(x, n) {
     s  := x + "";
     ml := (n     - #s) \ 2;
@@ -87,8 +87,8 @@ fillCharsBoth := procedure(x, n) {
 
 //////////////////////////////////////////////////////////////////////////
 //                                                                      //
-// Die unten aufgeführten Prozeduren sind 1-zu-1 aus dem Programm zur   //
-// Lösung des Wolf-Ziege-Kohl-Problems kopiert.                         //
+// Die unten aufgefÃ¼hrten Prozeduren sind 1-zu-1 aus dem Programm zur   //
+// LÃ¶sung des Wolf-Ziege-Kohl-Problems kopiert.                         //
 //                                                                      //
 //////////////////////////////////////////////////////////////////////////
 
@@ -126,12 +126,12 @@ add := procedure(p, q) {
 
 //////////////////////////////////////////////////////////////////////////
 //                                                                      //
-// Ab hier beginnt der Code zur Lösung des Problems.                    //
+// Ab hier beginnt der Code zur LÃ¶sung des Problems.                    //
 //                                                                      //
 //////////////////////////////////////////////////////////////////////////
 
 // Es gibt ein Problem, wenn es an einem Ufer weniger Missionare als 
-// Kannbialen sind, es sei denn, dass an dem Ufer überhaupt keine 
+// Kannbialen sind, es sei denn, dass an dem Ufer Ã¼berhaupt keine 
 // Missionare sind.
 problem := procedure(m, k) {
     return m > 0 && m < k;
@@ -142,21 +142,21 @@ problem := procedure(m, k) {
 // automatisch 3 - m, die Zahl der Kannibalen am rechten Ufer ist 3 - k
 // und die Zahl der Boote am rechten Ufer ist 1 - b.
 
-// P beschreibt alle möglichen Zustände.
+// P beschreibt alle mÃ¶glichen ZustÃ¤nde.
 p := { [ m, k, b ] : m in {0..3}, k in {0..3}, b in {0,1} 
                    | !problem(m, k) && !problem(3-m, 3-k)
      };
 print("#p  = $#p$");
-// r1 beschreibt Zustandsübergänge, bei denen das Boot vom linken Ufer
-// zum rechten Ufer fährt. pm ist die Anzahl der Missionare, die im Boot
-// übersetzen und pk ist die Anzahl der Kannibalen im Boot.
+// r1 beschreibt ZustandsÃ¼bergÃ¤nge, bei denen das Boot vom linken Ufer
+// zum rechten Ufer fÃ¤hrt. pm ist die Anzahl der Missionare, die im Boot
+// Ã¼bersetzen und pk ist die Anzahl der Kannibalen im Boot.
 r1 := { [ [ m, k, 1 ], [ m - pm, k - pk, 0 ] ] 
       : [ m, k, b ] in p, pm in {0..m}, pk in {0..k} 
       | pm + pk in {1,2} && [m - pm, k - pk, 0] in p         
       };  
 print("#r1 = $#r1$");
-// r2 beschreibt Zustandsübergänge, bei denen das Boot vom rechten Ufer
-// zum linken Ufer fährt. Die Relation r2 ist die zu r1 inverse Relation.
+// r2 beschreibt ZustandsÃ¼bergÃ¤nge, bei denen das Boot vom rechten Ufer
+// zum linken Ufer fÃ¤hrt. Die Relation r2 ist die zu r1 inverse Relation.
 r2 := { [b, a] : [a, b] in r1 };
 // r ist die Menge aller Verbindungen zwischen Punkten.
 r := r1 + r2;
@@ -164,9 +164,9 @@ r := r1 + r2;
 start := [3,3,1];
 // Am Ende sollen alle rechts sein, links ist dann niemand mehr.
 goal  := [0,0,0];
-// Berechne alle möglichen Pfade.
+// Berechne alle mÃ¶glichen Pfade.
 path  := findPath(start, goal, r);
-// und geben diesen Schritt für Schritt aus.
+// und geben diesen Schritt fÃ¼r Schritt aus.
 if (path != om) {
     printPath(path);
 } else {

@@ -9,16 +9,13 @@
 # License: Apache v2
 #------------------------------------------------------------------------------
 
+from __future__ import unicode_literals
+
 import os
 
 from nose.tools import eq_, with_setup, nottest
 
 from setlx2py.setlx_parser import Parser
-
-try:
-    unicode('foo', errors='replace')
-except NameError:
-    def unicode(s, **kwargs): return s
 
 ##
 ## Test housekeeping
@@ -36,7 +33,7 @@ def teardown_func():
 def is_parsable(path):
     with open(path, 'r') as f:
         try:
-            s = unicode(f.read(), errors='replace')
+            s = f.read()
         except Exception as e:
             print(path)
             raise 
@@ -62,7 +59,9 @@ def assert_parsable(folder):
             all_parsable = False
             not_parsable_files.append(f)
 
-    msg = 'Cannot parse the following files: \n{0}'.format('\n'.join(not_parsable_files))
+    msg =  'Parsed [{0}/{1}]\n'.format(len(files) - len(not_parsable_files), len(files))
+    msg += 'Cannot parse the following files: \n{0}'.format('\n'.join(not_parsable_files))
+    
     assert all_parsable, msg
 
 @with_setup(setup_func, teardown_func)
