@@ -1,0 +1,46 @@
+// The procedure call product(r1, r2) computes the relational
+// product r1 o r2.
+product := procedure(r1, r2) {
+    return { [x,z] : [x,y1] in r1, [y2,z] in r2 | y1 == y2 };
+};
+
+// Compute the set of all permutations on the set S_n = { 1, ..., n }
+allPermutations := procedure(n) {
+	return { toPermutation(l) : l in toList({1 .. n}) };
+};
+// transform a list into a relation
+toPermutation := procedure(l) {
+	return { [i, l[i]] : i in [1 .. #l] };
+};
+
+// For a given set s, this function computes the set of all those lists 
+// that contain each of the elements of s exactly once.  In effect, these 
+// are all permutations of the set s.
+toList := procedure(s) {
+    if (s == {}) {
+        return { [] };
+    }
+    return { [ x ] + l : x in s, l in toList(s - { x }) };
+};
+n  := 3;
+sn := allPermutations(n);
+[a, b] := arb({ [a, b] : a in sn, b in sn | product(a,b) != product(b, a) });
+print("$a$ * $b$ = $product(a, b)$");
+print("$b$ * $a$ = $product(b, a)$");
+
+inverse := procedure(r) {
+    return { [y, x] : [x, y] in r };
+};
+isSubgroup := procedure(u, n) {
+    return forall (x in u, y in u | product(x, y) in u) &&
+           forall (x in u | inverse(x) in u)            &&
+           { [x, x] : x in {1 .. n} } in u;
+};
+allSubgroups := procedure(n) {
+    sn := allPermutations(n);
+    return { u : u in 2 ** sn | isSubgroup(u, n) };
+};
+for (u in allSubgroups(4)) {
+    print(u);
+}
+

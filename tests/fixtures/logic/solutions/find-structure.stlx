@@ -1,0 +1,23 @@
+load("fol-evaluate.stlx");
+
+findStructures := procedure(n) {
+    f := parse("forall (x in u | exists (y in u | P(x,y))) => exists (y in u | forall (x in u | P(x,y)))");
+    u := { 1 .. n };
+    i := { [ "x", 1 ], [ "y", 1 ] };
+    all := {};
+    for (pj in 2 ** (u >< u)) {
+        j := { [ "P", pj ] };
+        s := [ u, j ];
+        if (!evalFormula(f, s, i)) {            
+            all += { pj };
+        }
+    }
+    return all;
+};
+
+for (pj in findStructures(4)) {
+    print(pj); 
+}
+
+
+

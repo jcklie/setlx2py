@@ -1,0 +1,87 @@
+load("davis-putnam.stlx");
+load("knf.stlx");
+
+// Aufgabe: Der König führt den Prinzen in einen Raum mit 9 Türen. An
+// jeder Tür hängt ein Schild. In einem Zimmer ist eine Prinzessin, jedes
+// andere Zimmer ist leer oder es steckt ein Tiger drin. Der Prinz möchte
+// die Prinzessin haben.
+
+// Die Prozedur computeClauses berechnet eine Menge von Klauseln, die das Problem
+// als aussagenlogische Formel beschreibt.  Die Variable 
+//     P(i)    ist für i in { 1, ..., n }
+// genau dann wahr, wenn die Prinzessin in dem i-ten Zimmer ist.  Die Variable
+//     T(i)    ist für i in { 1, ..., n }
+// genau dann wahr, wenn in dem i-ten Zimmer ein Tiger ist.  Die Variable
+//     Z(i)    ist für i in { 1, ..., n }
+// genau dann wahr, wenn die Aufschrift des i-ten Zimmers wahr ist.  Die Variable
+//     w       
+// ist genau dann wahr, wenn alle Aufschriften an leeren Zimmern wahr sind.
+computeClauses := procedure() {
+    // Die Prinzessin muss irgendwo sein
+    clauses := { { P(i) : i in [1 .. 9] } };
+    // Es gibt nur eine Prinzessin.
+    clauses += atMostOne( { P(i) : i in [1 .. 9] } );
+    // Der König sagt: In dem Zimmer, wo die Prinzessin ist, ist die Aufschrift
+    // wahr. 
+    clauses += { { !P(i), Z(i) } : i in [1 .. 9] };
+    // In Zimmern wo Tiger drin sind, ist die Aufschrift falsch.  
+    clauses += { { !T(i), !Z(i) } : i in [1 .. 9] };
+    // 1. Zimmer: Prinzessin ist in einem Zimmer mit ungerader Zimmernummer.
+    //            In den Zimmern mit gerader Nummer ist kein Tiger.
+    clauses += parseKNF("Z(1) <==> (P(1) || P(3) || P(5) || P(7) || P(9)) && !T(2) && !T(4) && !T(6) && !T(8)"); 
+    // 2. Zimmer: Dieses Zimmer ist leer.
+    clauses += parseKNF("Z(2) <==> !P(2) && !T(2)");
+    // 3. Zimmer: Die Aufschrift an Zimmer 5 ist wahr, die Aufschrift an Zimmer 7 ist falsch
+    //            und in Zimmer 3 ist ein Tiger. 
+    clauses += parseKNF("Z(3) <==> Z(5) && !Z(7) && T(3)");
+    // 4. Zimmer: Die Aufschrift an Zimmer 1 ist falsch, in Zimmer 8 ist kein Tiger,
+    //            und die Aufschrift an Zimmer 9 ist richtig.
+    clauses += parseKNF("Z(4) <==> !Z(1) && !T(8) && Z(9)");
+    // 5. Zimmer: Wenn die Aufschrift an Zimmer 2 oder an Zimmer 4 wahr ist,
+    //            dann ist kein Tiger im Zimmer 1.
+    clauses += parseKNF("Z(5) <==> (Z(2) || Z(4) => !T(1))");
+    // 6. Zimmer: Die Aufschrift an Zimmer 3 ist falsch, die Prinzessin ist im Zimmer 2 
+    //            und im Zimmer 2 ist kein Tiger.
+    clauses += parseKNF("Z(6) <==> !Z(3) && P(2) && !T(2)");
+    // 7. Zimmer: Die Prinzessin ist im Zimmer 1 und die Aufschrift an Zimmer 5 ist wahr.
+    clauses += parseKNF("Z(7) <==> P(1) && Z(5)");
+    // 8. Zimmer: In diesem Zimmer ist kein Tiger und Zimmer 9 ist leer.
+    clauses += parseKNF("Z(8) <==> !T(8) && !P(9) && !T(9)");
+    // 9. Zimmer: Weder in diesem Zimmer noch in Zimmer 1 ist ein Tiger und die Aufschrift 
+    //            an Zimmer 6 ist wahr.
+    clauses += parseKNF("Z(9) <==> !T(9) && !T(1) && Z(6)");
+    // Entweder sind alle Aufschriften an leeren Zimmern wahr, oder alle Aufschriften an
+    // leeren Zimmern sind falsch.
+    for (i in [1 .. 9]) {
+        clauses += parseKNF("!P($i$) && !T($i$) => (Z($i$) <==> w)");
+    }
+    return clauses;
+};
+// s is a set of propositional variables. The call atMostOne(s) creates
+// a set of clauses.  This set expresses the fact that at most one of
+// the variables in s is true.
+atMostOne := procedure(s) {
+    return { { !p, !q } : p in s, q in s | p != q };
+};
+// Parse a propositional formula and transform the result into a conjunctive
+// normal form in set notation.
+parseKNF := procedure(f) {
+    return normalize(parse(f));
+};
+solve := procedure() {
+    clauses := computeClauses();
+    possible := {};  // Räume, in denen die Prinzessin sein könnte
+    for (r in {1 .. 9}) {
+        if (davisPutnam(clauses + {{ P(r) }}, {}) != {{}}) {
+            possible += { r };
+        }
+    }
+    if (#possible == 1) {
+        r := arb(possible);
+        print("Die Prinzessin ist im Zimmer Nr. $r$.");
+    } else {
+        print("Das Problem ist nicht eindeutig lösbar!");
+    }   
+};
+
+solve();

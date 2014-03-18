@@ -30,26 +30,36 @@ def teardown_func():
 
 def is_parsable(path):
     with open(path, 'r') as f:
-        s = unicode(f.read(), errors='replace')
+        s = f.read()
     try:
         parser.parse(s)
     except:
         return False
 
     return True
-        
-@with_setup(setup_func, teardown_func)
-def test_parsable():
+
+def assert_parsable(folder):
     all_parsable = True
     not_parsable_files = []
+    folder = os.path.abspath(folder)
+
+    entries = [os.path.join(folder,f) for f in os.listdir(folder)]
+    files = [f for f in entries if os.path.isfile(f)]
     
-    for f in os.listdir('tests/fixtures/logic'):
-        path = os.path.join('tests/fixtures/logic', f)
-        current_parsable = is_parsable(path)
+    for f in files:
+        current_parsable = is_parsable(f)
 
         if not current_parsable:
             all_parsable = False
-            not_parsable_files.append(path)
+            not_parsable_files.append(f)
 
     msg = 'Cannot parse the following files: \n{0}'.format('\n'.join(not_parsable_files))
     assert all_parsable, msg
+
+@with_setup(setup_func, teardown_func)
+def test_parsable_logic():
+    assert_parsable('tests/fixtures/logic') 
+
+@with_setup(setup_func, teardown_func)
+def test_parsable_logic_solutions():
+    assert_parsable('tests/fixtures/logic/solutions')     
