@@ -37,7 +37,8 @@ def is_parsable(path):
         return False
 
     return True
-        
+
+@nottest    
 @with_setup(setup_func, teardown_func)
 def test_parsable():
     all_parsable = True
