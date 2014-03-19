@@ -1742,4 +1742,14 @@ def test_try_catch_lng_minimal():
           ('CatchClause',
            'catchLng',
            ('Identifier', 'e'),
-           ('Block', )))))        
+           ('Block', )))))
+
+##
+## Backtrack
+##
+
+def test_check_minimal():
+    node =  parse_single_statement('check {}')
+    eq_(node.to_tuples(),
+        ('Check',
+         ('Block',)))

@@ -2,7 +2,7 @@ test := procedure(n) {
     print("n = $n$");
     try {
         print("check($n$ == 5)");
-        check(n == 5);
+        validate(n == 5);
         print("done!");
         return;
     } catch (e) {
@@ -17,7 +17,7 @@ test := procedure(n) {
 };
 
 // throw an exception if condition is false
-check := procedure(condition) {
+validate := procedure(condition) {
     print(condition);
     if (!condition) {
         throw("backtrack");

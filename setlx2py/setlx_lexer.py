@@ -98,6 +98,7 @@ class Lexer():
         'forall'          : 'FORALL',
         'exists'          : 'EXISTS',
         'backtrack'       : 'BACKTRACK',
+        'check'           : 'CHECK',
         'match'           : 'MATCH',
         'regex'           : 'REGEX',
         'as'              : 'AS',

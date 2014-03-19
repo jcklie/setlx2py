@@ -682,6 +682,8 @@ class Parser():
                                | for_loop
                                | class
                                | try_statement
+                               | check_statement
+                               
         """
         p[0] = p[1]
         
@@ -908,4 +910,10 @@ class Parser():
         """
         p[0] = p[1]
 
-        
+    ##
+    ## Backtrack
+    ##
+
+    def p_check_statement(self, p):
+        """ check_statement : CHECK LBRACE block RBRACE """
+        p[0] = Check(p[3], p[3].coord)

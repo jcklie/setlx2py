@@ -348,6 +348,18 @@ class Catches (Node):
 
     attr_names = ()
 
+class Check(Node):
+    def __init__(self, block, coord=None):
+        self.block = block
+        self.coord = coord
+
+    def children(self):
+        nodelist = []
+        if self.block is not None: nodelist.append(("block", self.block))
+        return tuple(nodelist)
+
+    attr_names = ()
+
 class Class(Node):
     def __init__(self, name, params, block, static, coord=None):
         self.name = name

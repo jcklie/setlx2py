@@ -268,12 +268,12 @@ test := procedure(s) {
     l := scanFormula(s);
     f := parseFormula(l);
     print(f);
-    check := tautology(f);
-    if (check == {}) {
+    checked := tautology(f);
+    if (checked == {}) {
         print("The formula \"" + prettyPrint(f) + "\" is a tautology.");
     } else {
         print("The formula \"" + prettyPrint(f) + "\" isn't a tautology.");
-        print("Counter example: ", check );
+        print("Counter example: ", checked );
     }
 };
 
