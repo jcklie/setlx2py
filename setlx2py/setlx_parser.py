@@ -681,6 +681,7 @@ class Parser():
                                | do_while_loop
                                | for_loop
                                | class
+                               | try_statement
         """
         p[0] = p[1]
         
@@ -863,7 +864,9 @@ class Parser():
     ##
 
     def p_class(self, p):
-        """ class : CLASS identifier LPAREN parameter_list RPAREN LBRACE block static_block RBRACE """
+        """ class : CLASS identifier LPAREN parameter_list RPAREN \
+                    LBRACE block static_block RBRACE
+        """
         p[0] = Class(p[2], p[4], p[7],p[8], p[2].coord)
 
     def p_static_block_1(self, p):
@@ -873,3 +876,36 @@ class Parser():
     def p_static_block_2(self, p):
         """ static_block : epsilon """
         p[0] = Block([])
+
+    ##
+    ## Try/Catch
+    ##
+
+    def p_try_statement(self, p):
+        """ try_statement : TRY LBRACE block RBRACE catches """
+        p[0] = Try(p[3], p[5], p[3].coord)
+
+    def p_catches_1(self, p):
+        """ catches : catch_clause """
+        p[0] = Catches([p[1]], p[1].coord)
+        
+    def p_catches_2(self, p):
+        """ catches : catches catch_clause """
+        p[1].clauses.append(p[2].clauses)
+        p[0] = p[1]
+
+    def p_catch_clause(self, p):
+        """ catch_clause : catch_type LPAREN identifier RPAREN \
+                           LBRACE block RBRACE
+        """
+       
+        p[0] = CatchClause(p[1], p[3], p[6], p[3].coord)
+
+    def p_catch_type(self, p):
+        """ catch_type : CATCH
+                       | CATCH_USR
+                       | CATCH_LNG
+        """
+        p[0] = p[1]
+
+        

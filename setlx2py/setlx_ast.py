@@ -320,6 +320,34 @@ class CaseList (Node):
 
     attr_names = ()
 
+class CatchClause(Node):
+    def __init__(self, type, name, block, coord=None):
+        self.type = type
+        self.name = name
+        self.block = block
+        self.coord = coord
+
+    def children(self):
+        nodelist = []
+        if self.name is not None: nodelist.append(("name", self.name))
+        if self.block is not None: nodelist.append(("block", self.block))
+        return tuple(nodelist)
+
+    attr_names = ('type',)
+
+class Catches (Node):
+    def __init__(self, clauses, coord=None):
+        self.clauses = clauses
+        self.coord = coord
+
+    def children(self):
+        nodelist = []
+        for i, child in enumerate(self.clauses or []):
+            nodelist.append(("clauses[%d]" % i, child))
+        return tuple(nodelist)
+
+    attr_names = ()
+
 class Class(Node):
     def __init__(self, name, params, block, static, coord=None):
         self.name = name
@@ -450,6 +478,17 @@ class For(Node):
         return tuple(nodelist)
 
     attr_names = ()
+
+class Identifier(Node):
+    def __init__(self, name, coord=None):
+        self.name = name
+        self.coord = coord
+
+    def children(self):
+        nodelist = []
+        return tuple(nodelist)
+
+    attr_names = ('name',)
 
 class If(Node):
     def __init__(self, cond, iftrue, iffalse, coord=None):
@@ -768,6 +807,20 @@ class Term(Node):
 
     attr_names = ('name',)
 
+class Try(Node):
+    def __init__(self, block, catches, coord=None):
+        self.block = block
+        self.catches = catches
+        self.coord = coord
+
+    def children(self):
+        nodelist = []
+        if self.block is not None: nodelist.append(("block", self.block))
+        if self.catches is not None: nodelist.append(("catches", self.catches))
+        return tuple(nodelist)
+
+    attr_names = ()
+
 class UnaryOp(Node):
     def __init__(self, op, expr, coord=None):
         self.op = op
@@ -780,17 +833,6 @@ class UnaryOp(Node):
         return tuple(nodelist)
 
     attr_names = ('op',)
-
-class Identifier(Node):
-    def __init__(self, name, coord=None):
-        self.name = name
-        self.coord = coord
-
-    def children(self):
-        nodelist = []
-        return tuple(nodelist)
-
-    attr_names = ('name',)
 
 class While(Node):
     def __init__(self, cond, body, coord=None):

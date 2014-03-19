@@ -180,6 +180,12 @@ def test_assign():
     assert_token_type('%=',  'MOD_EQUAL')
     assert_token_type('|->', 'LAMBDADEF')
 
+def test_try_catch():
+    assert_token_type('try', 'TRY')
+    assert_token_type('catch', 'CATCH')
+    assert_token_type('catchUsr', 'CATCH_USR')
+    assert_token_type('catchLng', 'CATCH_LNG')
+
 ##
 ## More complex examples
 ##
@@ -203,4 +209,4 @@ def test_escape_doublequote():
 def test_escape_singleuote():
     s = r"""'The formula \''"""
     assert_token_types(s, ['LITERAL'])
-    
+

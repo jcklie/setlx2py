@@ -1692,4 +1692,54 @@ def test_class_with_static_body():
            ('Identifier', 'gAnswer'),
            ('Constant', 'int', 42)))))
 
-        
+##
+## Try/Catch
+##
+
+def test_try_catch_minimal():
+    s = """
+    try {
+    } catch(e) {
+    }
+    """
+    node = parse_single_statement(s)
+    eq_(node.to_tuples(),
+        ('Try',
+         ('Block', ),
+         ('Catches',
+          ('CatchClause',
+           'catch',
+           ('Identifier', 'e'),
+           ('Block', )))))
+
+def test_try_catch_usr_minimal():
+    s = """
+    try {
+    } catchUsr(e) {
+    }
+    """
+    node = parse_single_statement(s)
+    eq_(node.to_tuples(),
+        ('Try',
+         ('Block', ),
+         ('Catches',
+          ('CatchClause',
+           'catchUsr',
+           ('Identifier', 'e'),
+           ('Block', )))))
+
+def test_try_catch_lng_minimal():
+    s = """
+    try {
+    } catchLng(e) {
+    }
+    """
+    node = parse_single_statement(s)
+    eq_(node.to_tuples(),
+        ('Try',
+         ('Block', ),
+         ('Catches',
+          ('CatchClause',
+           'catchLng',
+           ('Identifier', 'e'),
+           ('Block', )))))        

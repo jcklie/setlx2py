@@ -120,6 +120,10 @@ class Lexer():
         'static'          : 'STATIC',
         'scan'            : 'SCAN',
         'using'           : 'USING',
+        'try'             : 'TRY',
+        'catch'           : 'CATCH',
+        'catchUsr'        : 'CATCH_USR',
+        'catchLng'        : 'CATCH_LNG',
     }
     
     tokens = [
