@@ -48,8 +48,11 @@ class Lexer():
     ## Lexer configuration
     ##
 
-    t_ignore = ' \t\r\f\v'          # Whitespace skipped
-    t_ignore_comment = r'//.*'      # Ignore comments
+    # Whitespace skipped
+    t_ignore = ' \t\r\f\v'
+
+    # Ignore comments
+    t_ignore_comment = r'(/\*(.|\n)*?\*/)|(//.*)'      
 
     def t_newline(self, t):
         r'\n'
