@@ -23,7 +23,7 @@ class SyntaxError (Exception):
 class Lexer():
 
     def __init__(self):
-        self.line_head_pos = 0
+        pass
 
     def build(self, **kwargs):
         """ Builds the lexer from the specification. Must be
@@ -34,6 +34,7 @@ class Lexer():
             __init__
         """
         self.lexer = lex.lex(object=self, **kwargs)
+        self.reset()
 
     def input(self, text):
         """ Sets the input for the lexer
@@ -43,6 +44,9 @@ class Lexer():
     def token(self):
         self.last_token = self.lexer.token()
         return self.last_token
+
+    def reset(self):
+        self.lexer.lineno = 1
 
     ##
     ## Lexer configuration

@@ -23,13 +23,6 @@ from setlx2py.setlx_parser import Parser
 
 parser = Parser()
 
-def setup_func():
-    global parser
-    parser = Parser()
-    
-def teardown_func():
-    parser = None
-
 def is_parsable(path):
     with open(path, 'r') as f:
         try:
@@ -64,10 +57,8 @@ def assert_parsable(folder):
     
     assert all_parsable, msg
 
-@with_setup(setup_func, teardown_func)
 def test_parsable_logic():
     assert_parsable('tests/fixtures/logic') 
 
-@with_setup(setup_func, teardown_func)
 def test_parsable_logic_solutions():
     assert_parsable('tests/fixtures/logic/solutions')     

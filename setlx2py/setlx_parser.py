@@ -28,6 +28,7 @@ class Parser():
         self.parser = yacc.yacc(module=self, start='file_input')
 
     def parse(self, text):
+        self.lexer.reset()
         return self.parser.parse(input=text, lexer=self.lexer)
 
     def p_error(self, t):

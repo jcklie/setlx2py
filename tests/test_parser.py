@@ -2,7 +2,8 @@
 # setlx2py: test_parser.py
 #
 # Unit tests for the Parser class in setlx_parser.py
-# Beware: Only syntax is tested here!
+# Beware: Only the syntax is tested here!
+#         Some of the code does not make semantically sense at all!
 #
 # Copyright (C) 2013, Jan-Christoph Klie
 # License: Apache v2
@@ -20,23 +21,14 @@ from setlx2py.setlx_ast import *
 
 parser = Parser()
 
-def setup_func():
-    global parser
-    parser = Parser()
-
-def teardown_func():
-    parser = None
-
 ##
 ## Parse helper
 ##
 
-@with_setup(setup_func, teardown_func)        
 def parse_statements(text):    
     root = parser.parse(text) # FileAST
     return root # List of statements
 
-@with_setup(setup_func, teardown_func)    
 def parse_single_statement(text):
     return parse_statements(text).stmts[0] # first statement after FileAST
 
@@ -93,7 +85,6 @@ def assert_assignment_explicit(text, operator, left, right):
 #      | |  __\__ | |_\__ \
 #      |_|\___|___/\__|___/
                                        
-@with_setup(setup_func, teardown_func)        
 def test_should_be_creatable():
     assert parser is not None
     
