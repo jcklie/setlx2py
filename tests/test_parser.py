@@ -196,8 +196,8 @@ def test_atomic_value_list_abc():
     eq_(node.to_tuples(),
         ('Range', 'list',
          ('Identifier', 'a'),
-         ('Identifier', 'c'),
-         ('Identifier', 'b')))    
+         ('Identifier', 'b'),
+         ('Identifier', 'c')))    
     
 # Set
 
@@ -213,8 +213,8 @@ def test_atomic_value_set_abc():
     eq_(node.to_tuples(),
         ('Range', 'set',
          ('Identifier', 'a'),
-         ('Identifier', 'c'),
-         ('Identifier', 'b')))
+         ('Identifier', 'b'),
+         ('Identifier', 'c')))
 
 ##
 ## Comprehension

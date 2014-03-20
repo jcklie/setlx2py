@@ -49,8 +49,8 @@ class Codegen(object):
         return str(n.value)
 
     def visit_BinaryOp(self, n):
-        lval_str = self._paren_if_not_simple(n.left)
-        rval_str = self._paren_if_not_simple(n.right)
+        lval_str = self._parenthesize_unless_simple(n.left)
+        rval_str = self._parenthesize_unless_simple(n.right)
 
         s = '{0} {1} {2}'
 
@@ -82,6 +82,28 @@ class Codegen(object):
     def visit_List(self, n):
         items = ','.join(self.visit(x) for x in n.items)
         return '[{0}]'.format(items)
+
+    def visit_Range(self, n):
+        if n.klass == 'set':
+            collection = 'frozenset'
+        elif n.klass == 'list':
+            collection = 'list'
+        else:
+            msg = 'Invalid range: {0}'.format(n.klass)
+            raise Exception(msg)
+            
+        lower = self._parenthesize_unless_simple(n.a)
+        middle = self._parenthesize_unless_simple(n.b)
+        upper = self._parenthesize_unless_simple(n.c)
+
+        if middle:
+            s = '{0}(range({1},{2}, {3}))'
+            step = '{0} - {1}'.format(middle, lower)
+        else:
+            s = '{0}(range({1},{2} + 1, {3}))'
+            step = '1'
+        
+        return s.format(collection, lower, upper, step)
         
     def visit_UnaryOp(self, n):
         op = n.op
@@ -96,14 +118,6 @@ class Codegen(object):
 
     # Helper functions
 
-    def _parenthesize_if(self, n, condition):
-        s = self.visit(n)
-        return '(' + s + ')' if condition(n) else s
-
-    def _parenthesize_unless_simple(self, n):
-        """ Common use case for _parenthesize_if """
-        return self._parenthesize_if(n, lambda d: not self._is_simple_node(d))
-
     def _is_simple_node(self, n):
         """ Returns True for nodes that are "simple" - i.e. nodes that always
             have higher precedence than operators.
@@ -112,8 +126,17 @@ class Codegen(object):
             Constant,
             Identifier
         )
-        return isinstance(n, simple_nodes)
+        return isinstance(n, simple_nodes) or n is None
 
-    def _paren_if_not_simple(self, n):
-        return  self._parenthesize_if(n,
-                                      lambda d: not self._is_simple_node(d))
+    def _parenthesize_if(self, n, condition):
+        s = self.visit(n)
+        return '(' + s + ')' if condition(n) else s
+
+    def _parenthesize_unless_simple(self, n):
+        """ Common use case for _parenthesize_if """
+        return self._parenthesize_if(n, lambda d: not self._is_simple_node(d))
+
+    def _parenthesize_if_simple(self, n):
+        """ Common use case for _parenthesize_if """
+        return self._parenthesize_if(n, self._is_simple_node)
+        

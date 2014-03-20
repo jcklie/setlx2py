@@ -428,24 +428,24 @@ class Parser():
 
     def p_set_range_1(self, p):
         """ set_range : LBRACE expression RANGE expression RBRACE """
-        p[0] = Range('set', p[2], p[4], None)
+        p[0] = Range('set', p[2], None, p[4], p[2].coord)
 
     def p_set_range_2(self, p):
         """ set_range : LBRACE expression \
                         COMMA expression RANGE expression RBRACE
         """
-        p[0] = Range('set', p[2], p[6], p[4])
+        p[0] = Range('set', p[2], p[4], p[6], p[2].coord)
 
     # List Range
     
     def p_list_range_1(self, p):
        """ list_range : LBRACKET expression RANGE expression RBRACKET """
-       p[0] = Range('list', p[2], p[4], None)
+       p[0] = Range('list', p[2], None, p[4], p[2].coord)
 
     def p_list_range_2(self, p):
         """ list_range : LBRACKET expression \
                          COMMA expression RANGE expression RBRACKET """
-        p[0] = Range('list', p[2], p[6], p[4])
+        p[0] = Range('list', p[2], p[4], p[6], p[2].coord)
 
     ##
     ## Displays

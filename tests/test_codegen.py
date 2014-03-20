@@ -18,11 +18,11 @@ from setlx2py.setlx_codegen import Codegen
 generator = Codegen()
 parser = Parser()
 
+set = frozenset
+
 ##
 ## Helper methods
 ##
-
-import sys
 
 def run(source, ns={}, verbose=False):
     ns.update(builtin)
@@ -34,9 +34,15 @@ def run(source, ns={}, verbose=False):
     code = compile(compiled, '<string>', 'exec')
     exec(code, ns)
 
-def assert_res(source, variables):
+try:
+    xrange(0,2)
+    range = xrange
+except:
+    pass
+
+def assert_res(source, variables, verbose=False):
     ns = {}
-    run(source, ns)
+    run(source, ns, verbose)
     for key, value in variables.items():
         eq_(ns[key], value)
         
@@ -66,22 +72,40 @@ def test_assignment_augmented():
     assert_res('x := 6; x /= 2;', {'x' : 3})
     assert_res('x := 5; x %= 2;', {'x' : 1})
 
+##
 ## Collections
+##
+
+# Syntax sugar for creating
 
 def test_set():
-    assert_res('x := {};', {'x' : frozenset([])})
-    assert_res('x := {1};', {'x' : frozenset([1])})
-    assert_res('x := {1,2};', {'x' : frozenset([1,2])})
-    assert_res('x := {1,2,3};', {'x' : frozenset([1,2,3])})
-    assert_res('x := {1+3,2-4,3**0};', {'x' : frozenset([4,-2,1])})    
+    assert_res('x := {};', {'x' : set([])})
+    assert_res('x := {1};', {'x' : set([1])})
+    assert_res('x := {1,2};', {'x' : set([1,2])})
+    assert_res('x := {1,2,3};', {'x' : set([1,2,3])})
+    assert_res('x := {1+3,2-4,3**0};', {'x' : set([4,-2,1])})    
 
 def test_list():
     assert_res('x := [];', {'x' :[]})
     assert_res('x := [1];', {'x' : [1]})
     assert_res('x := [1,2];', {'x' : [1,2]})
     assert_res('x := [1,2,3];', {'x' : [1,2,3]})
-    assert_res('x := [1+3,2-4,3**0];', {'x' : [4,-2,1]})    
-    
+    assert_res('x := [1+3,2-4,3**0];', {'x' : [4,-2,1]})
+
+# Range
+
+def test_range_set():
+    assert_res('x := {1..16};', {'x' : set(range(1,16+1)) })
+    assert_res('x := {1..-1};', {'x' : set([]) })
+    assert_res('x := {1,3..10};', {'x' : set([1,3,5,7,9]) })
+    assert_res('x := {10,8..1};', {'x' : set([10,8,6,4,2]) })
+
+def test_range_list():
+    assert_res('x := [1..16];', {'x' : list(range(1,16+1)) })
+    assert_res('x := [1..-1];', {'x' : list([]) })
+    assert_res('x := [1,3..10];', {'x' : [1,3,5,7,9] })
+    assert_res('x := [10,8..1];', {'x' : [10,8,6,4,2] })
+
 ## Binop
 
 def test_binop_simple():
