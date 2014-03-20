@@ -66,6 +66,22 @@ def test_assignment_augmented():
     assert_res('x := 6; x /= 2;', {'x' : 3})
     assert_res('x := 5; x %= 2;', {'x' : 1})
 
+## Collections
+
+def test_set():
+    assert_res('x := {};', {'x' : frozenset([])})
+    assert_res('x := {1};', {'x' : frozenset([1])})
+    assert_res('x := {1,2};', {'x' : frozenset([1,2])})
+    assert_res('x := {1,2,3};', {'x' : frozenset([1,2,3])})
+    assert_res('x := {1+3,2-4,3**0};', {'x' : frozenset([4,-2,1])})    
+
+def test_list():
+    assert_res('x := [];', {'x' :[]})
+    assert_res('x := [1];', {'x' : [1]})
+    assert_res('x := [1,2];', {'x' : [1,2]})
+    assert_res('x := [1,2,3];', {'x' : [1,2,3]})
+    assert_res('x := [1+3,2-4,3**0];', {'x' : [4,-2,1]})    
+    
 ## Binop
 
 def test_binop_simple():
@@ -115,3 +131,4 @@ def test_binop_comparison_set():
 def test_unary_simple():
     assert_res('x := 5!;', {'x' : 120})
     assert_res('x := -5;', {'x' : -5})
+

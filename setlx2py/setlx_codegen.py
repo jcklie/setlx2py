@@ -75,6 +75,14 @@ class Codegen(object):
         
         return s.format(lval_str, op, rval_str)
 
+    def visit_Set(self, n):
+        items = ','.join(self.visit(x) for x in n.items)
+        return 'frozenset([{0}])'.format(items)
+
+    def visit_List(self, n):
+        items = ','.join(self.visit(x) for x in n.items)
+        return '[{0}]'.format(items)
+        
     def visit_UnaryOp(self, n):
         op = n.op
         operand = self._parenthesize_unless_simple(n.expr)
