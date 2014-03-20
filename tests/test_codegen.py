@@ -59,6 +59,13 @@ def test_constant():
 def test_assignment_simple():
     assert_res('x := 1;', {'x' : 1})
 
+def test_assignment_augmented():
+    assert_res('x := 1; x += 2;', {'x' : 3})
+    assert_res('x := 3; x -= 2;', {'x' : 1})
+    assert_res('x := 1; x *= 2;', {'x' : 2})
+    assert_res('x := 6; x /= 2;', {'x' : 3})
+    assert_res('x := 5; x %= 2;', {'x' : 1})
+
 ## Binop
 
 def test_binop_simple():

@@ -37,7 +37,7 @@ class Codegen(object):
     def visit_FileAST(self, n):
         s = ''
         for stmt in n.stmts:
-            s += self.visit(stmt)
+            s += self.visit(stmt) + '\n'
         return s
 
     def visit_Assignment(self, n):
@@ -85,6 +85,8 @@ class Codegen(object):
             s = op + ' {0}'
 
         return s.format(operand)
+
+    # Helper functions
 
     def _parenthesize_if(self, n, condition):
         s = self.visit(n)
