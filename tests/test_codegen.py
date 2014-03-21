@@ -44,7 +44,7 @@ def error_msg(source, compiled=None, e=None):
     if e:
         msg += 'Reason:\n'
         msg += e.__class__.__name__ + '\n'
-        msg += e.message + '\n'
+        msg += str(e) + '\n'
     return msg
 
 def run(source, ns={}, verbose=False):
@@ -157,13 +157,28 @@ def test_range_list():
 # ~~~~~~~~~~~~~
 
 def test_set_comprehension_minimal():
-    s = "x := {2*n : n in [1..5]};"
+    s = 'x := {2*n : n in [1..5]};'
     assert_res(s, {'x' : Set([2,4,6,8,10]) })
 
 def test_set_comprehension_two_iterators():
-    s = "x := {a ** b: a in {1..3}, b in {2..4}};"
-    assert_res(s, {'x' : Set([1, 4, 8, 9, 16, 27, 81]) }, True)
+    s = 'x := {a ** b: a in {1..3}, b in {2..4}};'
+    assert_res(s, {'x' : Set([1, 4, 8, 9, 16, 27, 81]) })
 
+def test_set_comprehension_cond():
+    s = """
+    p := 42;
+    divisors := { t:t in {2..p-1} | p % t == 0 };
+    """
+    assert_res(s, {'divisors' : Set([2, 3, 6, 7, 14, 21])}, True)
+    
+
+def test_set_comprehension_cray():
+    s = 'primes := { p:p in {2..100} | { t:t in {2..p-1} | p % t == 0 } == {} };'
+    primes = [2, 3, 5, 7, 11, 13, 17, 19, 23,
+              29, 31, 37, 41, 43, 47, 53, 59,
+              61, 67, 71, 73, 79, 83, 89, 97]
+    assert_res(s, {'primes' : Set(primes)}, True)
+    
 # Binop
 # -----
 
@@ -277,7 +292,7 @@ def test_exists_simple():
 
 def test_exists_two_iterators():
     s = 'result := exists ([x, y] in [[a,b] : a in {1..10}, b in {1..10}] | 3*x - 4*y == 5);'
-    assert_res(s, {'result' : True}, verbose=True)
+    assert_res(s, {'result' : True})
     
 #### 
 ##   Compund statements
@@ -404,7 +419,7 @@ def test_for_loop_double():
         accum += x + y;
     }
     """
-    assert_res(s, {'accum' : 0}, True)
+    assert_res(s, {'accum' : 0})
     
 
     

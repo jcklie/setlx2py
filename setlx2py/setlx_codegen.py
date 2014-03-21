@@ -145,9 +145,12 @@ class Codegen(object):
         expr = self.visit(n.expr)
         iterators = self.visit(n.iterators)
         cond = self._parenthesize_unless_simple(n.cond)
-        
-        s = '{0}([{1} for {2}])'
-        return s.format(collection, expr, iterators)
+
+        if cond:
+            s = '{0}([{1} for {2} if {3}])'
+        else:
+            s = '{0}([{1} for {2}] )'
+        return s.format(collection, expr, iterators, cond)
         
         
     def visit_If(self, n):

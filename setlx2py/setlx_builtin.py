@@ -10,6 +10,7 @@
 import math
 import collections
 import operator
+import functools
 
 import itertools as it
 
@@ -19,7 +20,7 @@ import itertools as it
 class Set(frozenset):
 
     def __init__(self, iterable):
-        super(Set, self).__init__(iterable)
+        super(Set, self).__init__()
 
     def __add__(self, other):
         return self.union(other)
@@ -67,7 +68,7 @@ def powerset(s):
     return Set(it.chain.from_iterable(it.combinations(lst, r) for r in range(len(lst)+1)))
 
 def product(factors):
-    return reduce(operator.mul, factors, 1)
+    return functools.reduce(operator.mul, factors, 1)
 
 builtin = {
     # Classes
