@@ -47,13 +47,19 @@ def error_msg(source, compiled=None, e=None):
         msg += str(e) + '\n'
     return msg
 
-def run(source, ns={}, verbose=False):
+def run(source, ns={}, verbose=False, print_ast=False):
     ns.update(builtin)
     ast = parser.parse(source)
-    compiled = generator.visit(ast)
+    
     if verbose:
         print('Source: \n' + source)
-        print('Target: \n' + compiled)
+
+    if print_ast:
+        print(ast)
+
+    compiled = generator.visit(ast)
+    if verbose:
+        print('Compliled: \n' + compiled)
 
     try:
         code = compile(compiled, '<string>', 'exec')
@@ -62,9 +68,9 @@ def run(source, ns={}, verbose=False):
         msg = error_msg(source, compiled, e=e)
         raise AssertionError(msg)
 
-def assert_res(source, variables={}, verbose=False):
+def assert_res(source, variables={}, verbose=False, print_ast=False):
     ns = {}
-    run(source, ns, verbose)
+    run(source, ns, verbose, print_ast)
     for key, value in variables.items():
         eq_(ns.get(key, None), value)
                 
@@ -337,15 +343,57 @@ def test_slice():
     assert_res('l := [1..10]; x := l[..4];', {'x' : [1,2,3,4]})
     assert_res('l := [1..10]; x := l[4..];', {'x' : [4,5,6,7,8,9,10]})
     
-#### 
-##   Compund statements
-####
+# Compund statements
+# ==================
 
-##
-## If-Else
-##
+# Procedures
+# ----------
+
+def test_procedure_primes():
+    s = Template("""
+    primes := procedure(n) {
+        s := { 2..n };
+        return s - { p*q : [p, q] in s >< s };
+    };
+    result := primes($n);
+    """)
+
+    cases = {
+        '2'   : [2],
+        '10'  : [2,3,5,7],
+        '50' : [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47],
+    }
+    for n, result in cases.items():
+        source = s.substitute(n=n)
+        assert_res(source, {'result' : Set(result)})
+
+def test_procedure_max():
+    s = Template("""
+    max := procedure(a, b) {
+        if(a > b) {
+            return a;
+        } else {
+            return b;
+        }
+    };
+    result := max($a,$b);
+    """)
+    cases = [
+        (42, 3, 42),
+        (23, 1337, 1337),
+        (7, 7, 7),
+    ]
+    for a, b, result in cases:
+        source = s.substitute(a=a, b=b)
+        assert_res(source, {'result' : result})
+
+
+
+# If-Else
+# -------
 
 # If-No-Else
+# ~~~~~~~~~~
 
 def test_if_no_else_minimal():
     assert_res('if(true) {}', {})

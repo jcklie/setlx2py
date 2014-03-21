@@ -12,8 +12,8 @@ from setlx2py.setlx_ast import *
 class Codegen(object):
 
     def __init__(self):
-        self.output = ''
         self.cur_indent = 0
+        self.func_count = 0
         self.indent = ' ' * 4
 
     def visit(self, node):
@@ -49,7 +49,15 @@ class Codegen(object):
         op = n.op if n.op != ':=' else '='
         lhs = self.visit(n.target)
         rhs = self.visit(n.right)
-        return s.format(lhs, op, rhs)
+
+        if isinstance(n.right, Procedure):
+            assert op == '=', 'Cannot use other operator for procedures than ":="'
+            s = '{0}\n'
+            s += '{1} = {2}'
+            return s.format(rhs, lhs, self._get_function_name())
+        else:
+            s = '{0} {1} {2}'
+            return s.format(lhs, op, rhs)
 
     def visit_Constant(self, n):
         # Types which do not need special treatment;
@@ -138,8 +146,7 @@ class Codegen(object):
         if lower:
             lower = '(' + lower + ' - 1)'
 
-            
-        s = '{0}[{1}:{2}]'
+        s = '{0}[{1}: {2}]'
         return s.format(obj, lower, upper) 
 
     def visit_Range(self, n):
@@ -228,9 +235,42 @@ class Codegen(object):
         cond = self.visit(n.cond)
         return s.format(n.name, cond, iterator)
 
+    def visit_Procedure(self, n):
+        s = 'def {0}({1}):\n'
+        s += '{2}'
+        name = self._generate_function_name()
+        params = self.visit(n.params)
+        body = self.visit(n.body)
+        return s.format(name, params, body)
+
+    def visit_ParamList(self, n):
+        return ', '.join(self.visit(param) for param in n.params)
+
+    def visit_Param(self, n):
+        return n.name
+
+    def visit_Return(self, n):
+        s = 'return'
+        if n.expr: s += ' ' + self.visit(n.expr)
+        return s
+
+    def visit_ArgumentList(self, n):
+        return ', '.join(self.visit(arg) for arg in n.arguments)
+
+    def visit_Call(self, n):
+        fref = self._parenthesize_unless_simple(n.name)
+        return fref + '(' + self.visit(n.args) + ')'
+
     #
     # Helper functions
     #
+
+    def _get_function_name(self):
+        return '_fun' + str(self.func_count)
+        
+    def _generate_function_name(self):
+        self.func_count += 1
+        return self._get_function_name()
 
     def _get_collection_name(self, clazz):
         if clazz == 'set':
