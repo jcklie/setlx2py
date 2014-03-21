@@ -169,15 +169,21 @@ def test_set_comprehension_cond():
     p := 42;
     divisors := { t:t in {2..p-1} | p % t == 0 };
     """
-    assert_res(s, {'divisors' : Set([2, 3, 6, 7, 14, 21])}, True)
-    
+    assert_res(s, {'divisors' : Set([2, 3, 6, 7, 14, 21])}, True)    
 
 def test_set_comprehension_cray():
     s = 'primes := { p:p in {2..100} | { t:t in {2..p-1} | p % t == 0 } == {} };'
     primes = [2, 3, 5, 7, 11, 13, 17, 19, 23,
               29, 31, 37, 41, 43, 47, 53, 59,
               61, 67, 71, 73, 79, 83, 89, 97]
-    assert_res(s, {'primes' : Set(primes)}, True)
+    assert_res(s, {'primes' : Set(primes)})
+
+def test_list_comprehension_cray():
+    s = 'primes := [ p:p in [2..100] | [ t:t in [2..p-1] | p % t == 0 ] == [] ];'
+    primes = [2, 3, 5, 7, 11, 13, 17, 19, 23,
+              29, 31, 37, 41, 43, 47, 53, 59,
+              61, 67, 71, 73, 79, 83, 89, 97]
+    assert_res(s, {'primes' : primes})
     
 # Binop
 # -----
