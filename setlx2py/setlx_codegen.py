@@ -126,9 +126,21 @@ class Codegen(object):
 
     def visit_Subscription(self, n):
         s = '{0}[{1} - 1]'
-        arrref = self._parenthesize_unless_simple(n.obj)
+        obj = self._parenthesize_unless_simple(n.obj)
         subscript =  self.visit(n.subscript)
-        return s.format(arrref, subscript)
+        return s.format(obj, subscript)
+
+    def visit_Slice(self, n):
+        obj = self._parenthesize_unless_simple(n.obj)
+        lower = self._parenthesize_unless_simple(n.lower)
+        upper = self._parenthesize_unless_simple(n.upper)
+
+        if lower:
+            lower = '(' + lower + ' - 1)'
+
+            
+        s = '{0}[{1}:{2}]'
+        return s.format(obj, lower, upper) 
 
     def visit_Range(self, n):
         collection = self._get_collection_name(n.klass)

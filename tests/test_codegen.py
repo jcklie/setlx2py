@@ -119,6 +119,10 @@ def test_assignment_augmented_set():
         source = s.substitute(op=op)
         assert_res(source, {'s1' : result})
 
+def test_assignment_list_simultaneous():
+    assert_res('[x,y] := [1,2];', {'x' : 1, 'y' : 2})
+    assert_res('[x,y] := [1,2]; [y,x] := [x,y];', {'x' : 2, 'y' : 1})
+
 # Collections
 # -----------
 
@@ -324,6 +328,14 @@ def test_subscription_chained():
     x := lst[2][1]; 
     """
     assert_res(s, {'x' : 4})
+
+# Slice
+# -----
+
+def test_slice():
+    assert_res('l := [1..100]; x := l[5..10];', {'x' : [5,6,7,8,9,10]})
+    assert_res('l := [1..10]; x := l[..4];', {'x' : [1,2,3,4]})
+    assert_res('l := [1..10]; x := l[4..];', {'x' : [4,5,6,7,8,9,10]})
     
 #### 
 ##   Compund statements
