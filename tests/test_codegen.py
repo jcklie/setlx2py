@@ -169,7 +169,7 @@ def test_set_comprehension_cond():
     p := 42;
     divisors := { t:t in {2..p-1} | p % t == 0 };
     """
-    assert_res(s, {'divisors' : Set([2, 3, 6, 7, 14, 21])}, True)    
+    assert_res(s, {'divisors' : Set([2, 3, 6, 7, 14, 21])})    
 
 def test_set_comprehension_cray():
     s = 'primes := { p:p in {2..100} | { t:t in {2..p-1} | p % t == 0 } == {} };'
@@ -265,7 +265,11 @@ def test_set_cartesian():
     s1 := { 1, 2 };
     result := s1 ** 2;
     """
-    assert_res(s, {'result' : Set([(1,1), (1,2), (2,1), (2,2)])})        
+    assert_res(s, {'result' : Set([(1,1), (1,2), (2,1), (2,2)])})
+
+def binop_list():
+    assert_res('x := [1..3] + [5..10];', {'x' : [1, 2, 3, 5, 6, 7, 8, 9, 10]})
+    assert_res('x := [1..3] * 3;', {'x' : [1, 2, 3] * 3})
 
 # Unary
 # ~~~~~ 
@@ -279,7 +283,11 @@ def test_unary_set():
     assert_res('x := # {5, 7, 13};', {'x' : 3})
     assert_res('x := +/ {1..6**2};', {'x' : 666})
     assert_res('x := */ {1..5};', {'x' : 120})
-    
+
+def test_unary_list():
+    assert_res('x := # [5, 7, 13];', {'x' : 3})
+    assert_res('x := +/ [1..6**2];', {'x' : 666})
+    assert_res('x := */ [1..5];', {'x' : 120})
 
 # Quantors
 # --------
@@ -299,6 +307,23 @@ def test_exists_simple():
 def test_exists_two_iterators():
     s = 'result := exists ([x, y] in [[a,b] : a in {1..10}, b in {1..10}] | 3*x - 4*y == 5);'
     assert_res(s, {'result' : True})
+
+# Subscription
+# ------------
+
+def test_subscription_minimal():
+    s = """
+    lst := [99, 88, 44];
+    x := lst[2]; 
+    """
+    assert_res(s, {'x' : 88})
+
+def test_subscription_chained():
+    s = """
+    lst := [[1,2], [4,5], [9,2]];
+    x := lst[2][1]; 
+    """
+    assert_res(s, {'x' : 4})
     
 #### 
 ##   Compund statements

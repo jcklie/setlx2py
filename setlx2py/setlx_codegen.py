@@ -124,6 +124,12 @@ class Codegen(object):
         items = ','.join(self.visit(x) for x in n.items)
         return '[{0}]'.format(items)
 
+    def visit_Subscription(self, n):
+        s = '{0}[{1} - 1]'
+        arrref = self._parenthesize_unless_simple(n.obj)
+        subscript =  self.visit(n.subscript)
+        return s.format(arrref, subscript)
+
     def visit_Range(self, n):
         collection = self._get_collection_name(n.klass)
         lower = self._parenthesize_unless_simple(n.a)
@@ -151,7 +157,6 @@ class Codegen(object):
         else:
             s = '{0}([{1} for {2}] )'
         return s.format(collection, expr, iterators, cond)
-        
         
     def visit_If(self, n):
         s  = 'if {0}:'
