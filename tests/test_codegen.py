@@ -264,7 +264,7 @@ def test_if_four_else_if_else():
         source = s.substitute(grade=grade)
         assert_res(source, {'grade' : grade, 'descr' : descr})
 
-def test_if_nested_else():
+def test_if_nested_else_simple():
     s = Template("""
     if($num1 == $num2) {
         relation := "Equal";
