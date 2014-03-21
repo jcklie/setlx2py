@@ -101,6 +101,24 @@ def test_assignment_augmented():
     assert_res('x := 6; x /= 2;', {'x' : 3})
     assert_res('x := 5; x %= 2;', {'x' : 1})
 
+def test_assignment_augmented_set():
+    s = Template("""
+    s1 := { 1, 2 };
+    s2 := { 2, 3 };
+    s1 $op s2;
+    """)
+    
+    cases = {
+        '+='  : Set((1, 2, 3)), 
+        '-='  : Set((1,)),
+        '*='  : Set((2,)),
+        '%='  : Set((1, 3)),
+    }
+
+    for op, result in cases.items():
+        source = s.substitute(op=op)
+        assert_res(source, {'s1' : result})
+
 # Collections
 # -----------
 
