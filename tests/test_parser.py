@@ -833,6 +833,13 @@ def test_quantifier_cray():
 ## If statements
 ##
 
+def test_if_minimal():
+    node = parse_single_statement('if(true) {}')
+    eq_(node.to_tuples(),
+        ('If',
+         ('Constant', 'bool', True),
+         ('Block', )))
+
 def test_if_no_else():
     node = parse_single_statement('if(x >= 5) { return true; }')
     eq_(node.to_tuples(),
@@ -862,6 +869,17 @@ def test_if_no_else_longer_block():
            ('Constant', 'string', 'Let it snow!')),
           ('Return', ('Identifier', 'prediction')))))
 
+# If-Else
+
+def test_if_else_minimal():
+    node = parse_single_statement("if(foo) {} else {}")
+    eq_(node.to_tuples(),
+        ('If',
+         ('Identifier', 'foo'),
+         ('Block',),
+         ('Block',)))
+    
+
 def test_if_single_else():
     s = """
     if(i % 2 == 0) {
@@ -880,15 +898,6 @@ def test_if_single_else():
           ('Constant', 'int', 0)),
          ('Block', ('Return', ('Constant', 'string', 'Even'))),
          ('Block', ('Return', ('Constant', 'string', 'Odd')))))
-
-def test_if_single_else_empty():
-    node = parse_single_statement("if(foo) {} else {}")
-    eq_(node.to_tuples(),
-        ('If',
-         ('Identifier', 'foo'),
-         ('Block',),
-         ('Block',)))
-
 
 def test_if_else_if_else_simple():
     s = """

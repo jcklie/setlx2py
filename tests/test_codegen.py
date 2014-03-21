@@ -9,6 +9,8 @@
 # License: Apache v2
 #------------------------------------------------------------------------------
 
+from string import Template
+
 from nose.tools import nottest, eq_
 
 from setlx2py.setlx_builtin import builtin
@@ -18,21 +20,11 @@ from setlx2py.setlx_codegen import Codegen
 generator = Codegen()
 parser = Parser()
 
+##
+## Hack redefines
+## 
+
 set = frozenset
-
-##
-## Helper methods
-##
-
-def run(source, ns={}, verbose=False):
-    ns.update(builtin)
-    ast = parser.parse(source)
-    compiled = generator.visit(ast)
-    if verbose:
-        print('Source: ' + source)
-        print('Target: ' + compiled)
-    code = compile(compiled, '<string>', 'exec')
-    exec(code, ns)
 
 try:
     xrange(0,2)
@@ -40,12 +32,44 @@ try:
 except:
     pass
 
+
+##
+## Helper methods
+##
+
+def error_msg(source, compiled=None, e=None):
+    msg = 'Could not run stuff:\n'
+    
+    msg += 'Source:\n' + source + '\n'
+    if compiled:
+        msg += 'Compiled:\n' + compiled
+    if e:
+        msg += 'Reason:\n'
+        msg += e.__class__.__name__ + '\n'
+        msg += e.message + '\n'
+    return msg
+
+def run(source, ns={}, verbose=False):
+    ns.update(builtin)
+    ast = parser.parse(source)
+    compiled = generator.visit(ast)
+    if verbose:
+        print('Source: \n' + source)
+        print('Target: \n' + compiled)
+
+    try:
+        code = compile(compiled, '<string>', 'exec')
+        exec(code, ns)
+    except Exception, e:
+        msg = error_msg(source, compiled, e=e)
+        raise AssertionError(msg)
+
 def assert_res(source, variables, verbose=False):
     ns = {}
     run(source, ns, verbose)
     for key, value in variables.items():
-        eq_(ns[key], value)
-        
+        eq_(ns.get(key, None), value)
+                
 ##
 ## Tests
 ##
@@ -57,8 +81,15 @@ def test_identifier():
     ns = {'a' : 42}
     run('a;', ns)
 
-def test_constant():
+def test_constant_int():
     run('42;')
+
+def test_constant_str():
+    assert_res('x := "foo";', {'x' : "foo"}, True)
+
+def test_constant_literal():
+    assert_res("x := 'foo';", {'x' : "foo"})
+    
 
 ## Assignment
 
@@ -148,7 +179,6 @@ def test_binop_logic_complex():
     assert_res('x := false <==> false;', {'x' : True})
     assert_res('x := true <!=> false;',  {'x' : True})
 
-@nottest    
 def test_binop_comparison_set():
     assert_res('x := 2 in {1..42};', {'x' : True})
 
@@ -156,3 +186,99 @@ def test_unary_simple():
     assert_res('x := 5!;', {'x' : 120})
     assert_res('x := -5;', {'x' : -5})
 
+##  
+## Compund statements
+##
+
+# If-No-Else
+
+def test_if_no_else_minimal():
+    assert_res('if(true) {}', {})
+    
+def test_if_no_else_single():
+    s = """
+    x := 42;
+    if(x >= 5) { y := 3; }
+    """
+    assert_res(s, {'x' : 42, 'y' : 3})
+
+def test_if_no_else_double():
+    s = """
+    x := 6;
+    if(x >= 5 && x != 7) {
+        y := "Foo";
+        z := "Bar";
+    }
+    """
+    assert_res(s, {'x' : 6, 'y' : "Foo", 'z' : "Bar"})
+    
+# If-Else
+
+def test_if_else_minimal():
+    assert_res('if(true) {} else {}', {})
+
+def test_if_else_single():
+    s = """
+    i := 23; // Illuminati
+    if(i % 2 == 0) {
+        parity := "Even";
+    } else {
+        parity := "Odd";
+    }
+    """
+    assert_res(s, {'parity' : "Odd"})
+
+def test_if_four_else_if_else():
+    s = Template("""
+    grade := '$grade';
+    if(grade == "A") {
+        descr := "Excellent";
+    } else if(grade == "B") {
+        descr := "Good";
+    } else if(grade == "C") {
+        descr := "Satisfactory";
+    } else if(grade == "D") {
+        descr := "Pass";
+    } else if(grade == "F") {
+        descr := "Fail";
+    } else {
+        descr := "Invalid input";
+    }
+    """)
+    
+    permutations = {
+        'A' : 'Excellent',
+        'B' : 'Good',
+        'C' : 'Satisfactory',
+        'D' : 'Pass',
+        'F' : 'Fail',
+        'J' : 'Invalid input',
+    }
+    
+    for grade, descr in permutations.items():
+        source = s.substitute(grade=grade)
+        assert_res(source, {'grade' : grade, 'descr' : descr})
+
+def test_if_nested_else():
+    s = Template("""
+    if($num1 == $num2) {
+        relation := "Equal";
+    } else {
+        if($num1 > $num2) { 
+            relation := "Num1 greater";
+        } else {
+            relation := "Num2 greater";
+        }
+    }
+    """)
+    
+    permutations = [
+        (1,1, "Equal"),
+        (2,1, "Num1 greater"),
+        (1,2, "Num2 greater"),
+    ]
+    
+    for x, y, relation in permutations:
+        source = s.substitute(num1=x, num2=y)
+        assert_res(source, {'relation' : relation}, True)
+    

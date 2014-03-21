@@ -13,10 +13,8 @@ class Codegen(object):
 
     def __init__(self):
         self.output = ''
-        self.ident_level = 0
-
-    def _make_indent(self):
-        return ' ' * self.indent_level
+        self.cur_indent = 0
+        self.indent = ' ' * 4
 
     def visit(self, node):
         method = 'visit_' + node.__class__.__name__
@@ -27,7 +25,13 @@ class Codegen(object):
        if node is None:
            return ''
        else:
-           return ''.join(self.visit(c) for c in node.children())
+           try:
+               return ''.join(self.visit(c) for c in node.children())
+           except AttributeError, e:
+               msg = 'Cannot visit : \n'
+               msg += str(node) + '\n'
+               msg += 'Reason: ' + str(e)
+               raise Exception(msg)
 
     ## Visit functions
 
@@ -43,10 +47,27 @@ class Codegen(object):
     def visit_Assignment(self, n):
         s = '{0} {1} {2}'
         op = n.op if n.op != ':=' else '='
-        return s.format(self.visit(n.target), op, self.visit(n.right))
+        lhs = self.visit(n.target)
+        rhs = self.visit(n.right)
+        return s.format(lhs, op, rhs)
 
     def visit_Constant(self, n):
-        return str(n.value)
+        # Types which do not need special treatment;
+        # they can be generated without any problem
+        simple_constants = [
+            'int',
+            'bool',
+        ]
+        
+        if n.klass == 'string': 
+            return "'" + str(n.value) + "'"
+        elif n.klass == 'literal':
+            return "'" + str(n.value) + "'"
+        elif n.klass in simple_constants:
+            return str(n.value)
+        else:
+            msg = 'Invalid constant: {0}'.format(n)
+            raise Exception(msg)
 
     def visit_BinaryOp(self, n):
         lval_str = self._parenthesize_unless_simple(n.left)
@@ -116,7 +137,83 @@ class Codegen(object):
 
         return s.format(operand)
 
+    def visit_If(self, n):
+        s  = 'if {0}:'
+        s += '\n'
+        s += '{1}'        
+
+        cond = self.visit(n.cond)
+        if_body = self._generate_stmt(n.iftrue, add_indent=True)
+
+        if n.iffalse:
+            if isinstance(n.iffalse, If):
+                else_body = self._generate_stmt(n.iffalse, add_indent=False)
+                s += 'el'
+                s += '{2}'
+            else:
+                else_body = self._generate_stmt(n.iffalse, add_indent=True)
+                s += self._make_indent() + 'else:\n{2}'
+        else:
+            else_body = ''
+
+        return s.format(cond, if_body, else_body)
+
+    def visit_Block(self, n):
+        s = ''
+        self._indent()
+        
+        if n.stmts:
+            s += ''.join(self._generate_stmt(stmt) for stmt in n.stmts)
+        else:
+            s += self._make_indent() + 'pass\n'
+
+        self._unindent()
+
+        return s
+
+    #
     # Helper functions
+    #
+
+    # Indent
+
+    def _indent(self):
+        self.cur_indent += 1
+
+    def _unindent(self):
+        self.cur_indent -= 1
+
+    def _make_indent(self):
+        return self.indent * self.cur_indent
+
+    def _generate_stmt(self, n, add_indent=False):
+        """ Generation from a statement node. This method exists as a wrapper
+        for individual visit_* methods to handle different treatment of
+        some statements in this context.
+        """
+        typ = type(n)
+        if add_indent: self._indent()
+        indent = self._make_indent()
+        if add_indent: self._unindent()
+
+        # These can also appear in an expression context so no semicolon
+        # is added to them automatically
+        simple_stmts = [
+            Assignment, UnaryOp, BinaryOp, Call, Subscription,
+            AttributeRef, Constant, Identifier
+        ]
+        
+        if typ in simple_stmts:
+            return indent + self.visit(n) + '\n'
+        elif typ in (Block,):
+            # No extra indentation required before the opening brace of a
+            # block - because it consists of multiple lines it has to
+            # compute its own indentation.
+            return self.visit(n)
+        else:
+            return indent + self.visit(n) + '\n'
+            
+    # Parenthesize
 
     def _is_simple_node(self, n):
         """ Returns True for nodes that are "simple" - i.e. nodes that always
@@ -139,4 +236,5 @@ class Codegen(object):
     def _parenthesize_if_simple(self, n):
         """ Common use case for _parenthesize_if """
         return self._parenthesize_if(n, self._is_simple_node)
-        
+
+    
