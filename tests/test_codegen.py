@@ -13,7 +13,7 @@ from string import Template
 
 from nose.tools import nottest, eq_
 
-from setlx2py.setlx_builtin import builtin
+from setlx2py.setlx_builtin import builtin, Set
 from setlx2py.setlx_parser import Parser
 from setlx2py.setlx_codegen import Codegen
 
@@ -23,8 +23,6 @@ parser = Parser()
 ##
 ## Hack redefines
 ## 
-
-set = frozenset
 
 try:
     xrange(0,2)
@@ -70,9 +68,8 @@ def assert_res(source, variables={}, verbose=False):
     for key, value in variables.items():
         eq_(ns.get(key, None), value)
                 
-##
-## Tests
-##
+# Tests
+# ======
 
 def test_is_creatable():
     assert generator is not None
@@ -91,7 +88,8 @@ def test_constant_literal():
     assert_res("x := 'foo';", {'x' : "foo"})
     
 
-## Assignment
+# Assignment
+# ----------
 
 def test_assignment_simple():
     assert_res('x := 1;', {'x' : 1})
@@ -103,18 +101,17 @@ def test_assignment_augmented():
     assert_res('x := 6; x /= 2;', {'x' : 3})
     assert_res('x := 5; x %= 2;', {'x' : 1})
 
-##
-## Collections
-##
+# Collections
+# -----------
 
 # Syntax sugar for creating
 
 def test_set():
-    assert_res('x := {};', {'x' : set([])})
-    assert_res('x := {1};', {'x' : set([1])})
-    assert_res('x := {1,2};', {'x' : set([1,2])})
-    assert_res('x := {1,2,3};', {'x' : set([1,2,3])})
-    assert_res('x := {1+3,2-4,3**0};', {'x' : set([4,-2,1])})    
+    assert_res('x := {};', {'x' : Set([])})
+    assert_res('x := {1};', {'x' : Set([1])})
+    assert_res('x := {1,2};', {'x' : Set([1,2])})
+    assert_res('x := {1,2,3};', {'x' : Set([1,2,3])})
+    assert_res('x := {1+3,2-4,3**0};', {'x' : Set([4,-2,1])})    
 
 def test_list():
     assert_res('x := [];', {'x' :[]})
@@ -124,12 +121,13 @@ def test_list():
     assert_res('x := [1+3,2-4,3**0];', {'x' : [4,-2,1]})
 
 # Range
+# ~~~~~~
 
 def test_range_set():
-    assert_res('x := {1..16};', {'x' : set(range(1,16+1)) })
-    assert_res('x := {1..-1};', {'x' : set([]) })
-    assert_res('x := {1,3..10};', {'x' : set([1,3,5,7,9]) })
-    assert_res('x := {10,8..1};', {'x' : set([10,8,6,4,2]) })
+    assert_res('x := {1..16};', {'x' : Set(range(1,16+1)) })
+    assert_res('x := {1..-1};', {'x' : Set([]) })
+    assert_res('x := {1,3..10};', {'x' : Set([1,3,5,7,9]) })
+    assert_res('x := {10,8..1};', {'x' : Set([10,8,6,4,2]) })
 
 def test_range_list():
     assert_res('x := [1..16];', {'x' : list(range(1,16+1)) })
@@ -137,7 +135,8 @@ def test_range_list():
     assert_res('x := [1,3..10];', {'x' : [1,3,5,7,9] })
     assert_res('x := [10,8..1];', {'x' : [10,8,6,4,2] })
 
-## Binop
+# Binop
+# -----
 
 def test_binop_simple():
     assert_res('x := 1;', {'x' : 1})
@@ -179,14 +178,66 @@ def test_binop_logic_complex():
     assert_res('x := false <==> false;', {'x' : True})
     assert_res('x := true <!=> false;',  {'x' : True})
 
-def test_binop_comparison_set():
-    assert_res('x := 2 in {1..42};', {'x' : True})
+# Unary
+# ~~~~~ 
 
 def test_unary_simple():
     assert_res('x := 5!;', {'x' : 120})
     assert_res('x := -5;', {'x' : -5})
+    assert_res('x := !true;', {'x' : False})
 
+# Collection operations
+# ~~~~~~~~~~~~~~~~~~~~~
 
+def test_binop_comparison_set():
+    assert_res('x := 2 in {1..42};', {'x' : True})
+
+def test_unop_set():
+    s = Template("""
+    s1 := { 1, 2 };
+    s2 := { 2, 3 };
+    result := s1 $op s2;
+    """)
+    
+    cases = {
+        '+'  : Set((1, 2, 3)), 
+        '-'  : Set((1,)),
+        '*'  : Set((2,)),
+        '><' : Set([(1, 2), (1, 3), (2, 2), (2, 3)]),
+        '%'  : Set((1, 3)),
+    }
+
+    for op, result in cases.items():
+        source = s.substitute(op=op)
+        assert_res(source, {'result' : result})
+
+def test_set_powerset():
+    pass
+
+def test_set_cartesian():
+    pass
+    
+
+# Quantors
+# --------
+
+def test_forall_simple():
+    s = 'result := forall (x in {1..10} | x ** 2 <= 2 ** x);'
+    assert_res(s, {'result' : False})
+
+def test_forall_two_iterators():
+    s = 'result := forall (x in {1..10}, y in [20..30] | x < y);'
+    assert_res(s, {'result' : True})
+
+def test_exists_simple():
+    s = 'result := exists (x in {1..10} | 2 ** x < x ** 2);'
+    assert_res(s, {'result' : True})
+
+@nottest
+def test_exists_two_iterators():
+    s = 'result := exists ([x, y] in {[a,b] : a in {1..10}, b in {1..10}} | 3*x - 4*y == 5);'
+    assert_res(s, {'result' : True}, verbose=True)
+    
 #### 
 ##   Compund statements
 ####

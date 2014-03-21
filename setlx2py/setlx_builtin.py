@@ -8,6 +8,23 @@
 #------------------------------------------------------------------------------
 
 import math
+import collections
+
+from itertools import product, chain, combinations
+
+# Change builtin functions
+# ------------------------
+
+def custom_pow(a,b):
+    if isinstance(a, Set) and b == 2:
+        return cartesian(a,a)
+    elif isinstance(b, Set) and a == 2:
+        return powerset(b)
+    else:
+        return a ** b
+
+# Logic
+# -----
 
 def implies(p,q):
     return not(p) or q
@@ -18,11 +35,43 @@ def equivalent(p,q):
 def antivalent(p,q):
     return not equivalent(p,q)
 
+# Sets
+# ----
+
+def cartesian(a,b):
+    return Set(element for element in product(a, b))
+
+def powerset(s):
+    lst = list(s)
+    return Set(chain.from_iterable(combinations(lst, r) for r in range(len(lst)+1)))
+
+# Custom classes
+# ==============
+
+class Set(frozenset):
+
+    def __init__(self, iterable):
+        super(Set, self).__init__(iterable)
+
+    def __add__(self, other):
+        return self.union(other)
+        
+    def __mul__(self, other):
+        return self.intersection(other)
+
+    def __mod__(self, other):
+        return self.symmetric_difference(other)
+
 builtin = {
+    # Classes
+    'Set'       : Set,
+    # Functions
     'factorial' : math.factorial,
     'implies'   : implies,
     'equivalent': equivalent,
     'antivalent': antivalent,
+    'pow'       : custom_pow,
+    'cartesian' : cartesian,
 }
     
 

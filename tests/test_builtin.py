@@ -1,3 +1,5 @@
+from nose.tools import eq_
+
 from setlx2py.setlx_builtin import *
 
 def test_implies():
@@ -16,4 +18,20 @@ def test_antivalent():
     assert antivalent(True,True)   == False
     assert antivalent(True,False)  == True
     assert antivalent(False,True)  == True
-    assert antivalent(False,False) == False    
+    assert antivalent(False,False) == False
+
+# Custom set
+# ----------
+
+def test_set_operations():
+    s1 = Set([1,2])
+    s2 = Set([2,3])
+    
+    eq_(s1 + s2, Set([1,2,3]))
+    eq_(s1 - s2, Set([1]))
+    eq_(s1 * s2, Set([2]))
+    eq_(s1 % s2, Set([1, 3]) )
+    eq_(custom_pow(s1, 2), Set([(1, 1), (1, 2), (2, 1), (2, 2)]))
+    eq_(custom_pow(2, s2), Set([(), (2,), (2,3), (3,)]))
+    eq_(cartesian(s1, s2), Set([(1, 2), (1, 3), (2, 2), (2, 3)]))
+    

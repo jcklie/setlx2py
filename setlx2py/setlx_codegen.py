@@ -80,16 +80,21 @@ class Codegen(object):
             '||' : 'or',
         }
 
-        bool_op_complex = {
+        op_to_function = {
             '=>'   : 'implies',
             '<==>' : 'equivalent',
             '<!=>' : 'antivalent',
+            '><' : 'cartesian',
         }
+
+        set_op = [
+
+        ]
 
         if n.op in bool_op_simple:
             op = bool_op_simple[n.op]
-        elif n.op in bool_op_complex:
-            op = bool_op_complex[n.op]
+        elif n.op in op_to_function:
+            op = op_to_function[n.op]
             s = '{1}({0},{2})'
         else:
             op = n.op
@@ -98,7 +103,7 @@ class Codegen(object):
 
     def visit_Set(self, n):
         items = ','.join(self.visit(x) for x in n.items)
-        return 'frozenset([{0}])'.format(items)
+        return 'Set([{0}])'.format(items)
 
     def visit_List(self, n):
         items = ','.join(self.visit(x) for x in n.items)
@@ -106,7 +111,7 @@ class Codegen(object):
 
     def visit_Range(self, n):
         if n.klass == 'set':
-            collection = 'frozenset'
+            collection = 'Set'
         elif n.klass == 'list':
             collection = 'list'
         else:
@@ -188,6 +193,12 @@ class Codegen(object):
         targets = ', '.join(self.visit(itr.assignable) for itr in n.iterators)
         iterables = ', '.join(self.visit(itr.expression) for itr in n.iterators)
         return '{0} in zip({1})'.format(targets, iterables)
+
+    def visit_Quantor(self, n):
+        s = '{0}({1} for {2})'        
+        iterator = self.visit(n.iterator)
+        cond = self.visit(n.cond)
+        return s.format(n.name, cond, iterator)
 
     #
     # Helper functions

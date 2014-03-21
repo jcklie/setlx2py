@@ -1,9 +1,0 @@
-// this program can be used to test the performance of the factorial implementation
-
-f := 1;
-i := 2;
-while (i <= 100000) {
-    f *= i;
-    i += 1;
-}
-

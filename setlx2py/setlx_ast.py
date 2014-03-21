@@ -657,15 +657,15 @@ class Procedure(Node):
     attr_names = ()
 
 class Quantor(Node):
-    def __init__(self, name, lhs, cond, coord=None):
+    def __init__(self, name, iterator, cond, coord=None):
         self.name = name
-        self.lhs = lhs
+        self.iterator = iterator
         self.cond = cond
         self.coord = coord
 
     def children(self):
         nodelist = []
-        if self.lhs is not None: nodelist.append(("lhs", self.lhs))
+        if self.iterator is not None: nodelist.append(("iterator", self.iterator))
         if self.cond is not None: nodelist.append(("cond", self.cond))
         return tuple(nodelist)
 

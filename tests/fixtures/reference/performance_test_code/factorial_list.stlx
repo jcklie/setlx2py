@@ -1,4 +1,0 @@
-// this program can be used to test the performance of the factorial implementation
-
-f := */[1 .. 100000];
-
