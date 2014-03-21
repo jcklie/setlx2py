@@ -27,7 +27,7 @@ class Codegen(object):
        else:
            try:
                return ''.join(self.visit(c) for c in node.children())
-           except AttributeError, e:
+           except AttributeError as e:
                msg = 'Cannot visit : \n'
                msg += str(node) + '\n'
                msg += 'Reason: ' + str(e)

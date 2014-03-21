@@ -60,7 +60,7 @@ def run(source, ns={}, verbose=False):
     try:
         code = compile(compiled, '<string>', 'exec')
         exec(code, ns)
-    except Exception, e:
+    except Exception as e:
         msg = error_msg(source, compiled, e=e)
         raise AssertionError(msg)
 
@@ -85,7 +85,7 @@ def test_constant_int():
     run('42;')
 
 def test_constant_str():
-    assert_res('x := "foo";', {'x' : "foo"}, True)
+    assert_res('x := "foo";', {'x' : "foo"})
 
 def test_constant_literal():
     assert_res("x := 'foo';", {'x' : "foo"})
@@ -280,5 +280,6 @@ def test_if_nested_else():
     
     for x, y, relation in permutations:
         source = s.substitute(num1=x, num2=y)
-        assert_res(source, {'relation' : relation}, True)
+        assert_res(source, {'relation' : relation})
+
     
