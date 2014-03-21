@@ -171,6 +171,24 @@ class Codegen(object):
 
         return s
 
+    def visit_For(self, n):
+        s = 'for {0}:'
+        s += '\n'
+        s += '{1}'
+        cond = self.visit(n.cond)
+        body = self._generate_stmt(n.body, add_indent=True)
+        return s.format(cond, body)
+
+    def visit_Iterator(self, n):
+        lhs = self.visit(n.assignable)
+        rhs = self.visit(n.expression)
+        return '{0} in {1}'.format(lhs, rhs)
+
+    def visit_IteratorChain(self, n):
+        targets = ', '.join(self.visit(itr.assignable) for itr in n.iterators)
+        iterables = ', '.join(self.visit(itr.expression) for itr in n.iterators)
+        return '{0} in zip({1})'.format(targets, iterables)
+
     #
     # Helper functions
     #

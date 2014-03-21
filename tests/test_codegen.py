@@ -64,7 +64,7 @@ def run(source, ns={}, verbose=False):
         msg = error_msg(source, compiled, e=e)
         raise AssertionError(msg)
 
-def assert_res(source, variables, verbose=False):
+def assert_res(source, variables={}, verbose=False):
     ns = {}
     run(source, ns, verbose)
     for key, value in variables.items():
@@ -186,8 +186,13 @@ def test_unary_simple():
     assert_res('x := 5!;', {'x' : 120})
     assert_res('x := -5;', {'x' : -5})
 
-##  
-## Compund statements
+
+#### 
+##   Compund statements
+####
+
+##
+## If-Else
 ##
 
 # If-No-Else
@@ -281,5 +286,33 @@ def test_if_nested_else():
     for x, y, relation in permutations:
         source = s.substitute(num1=x, num2=y)
         assert_res(source, {'relation' : relation})
+
+##
+## For-Loop
+##
+
+def test_for_loop_minimal():
+    s = 'for(x in [1..10]) {}'
+    assert_res(s)
+
+def test_for_loop_single():
+    s = """
+    accum := 0;
+    for(x in [1..10]) {
+        accum += x;
+    }
+    """
+    assert_res(s, {'accum' : 55})
+    
+
+def test_for_loop_double():
+    s = """
+    accum := 0;
+    for(x in [1..10], y in {-1,-2..-10}) {
+        accum += x + y;
+    }
+    """
+    assert_res(s, {'accum' : 0})
+    
 
     
