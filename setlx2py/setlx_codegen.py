@@ -125,14 +125,7 @@ class Codegen(object):
         return '[{0}]'.format(items)
 
     def visit_Range(self, n):
-        if n.klass == 'set':
-            collection = 'Set'
-        elif n.klass == 'list':
-            collection = 'list'
-        else:
-            msg = 'Invalid range: {0}'.format(n.klass)
-            raise Exception(msg)
-            
+        collection = self._get_collection_name(n.klass)
         lower = self._parenthesize_unless_simple(n.a)
         middle = self._parenthesize_unless_simple(n.b)
         upper = self._parenthesize_unless_simple(n.c)
@@ -145,6 +138,17 @@ class Codegen(object):
             step = '1'
         
         return s.format(collection, lower, upper, step)
+
+    def visit_Comprehension(self, n):
+        collection = self._get_collection_name(n.klass)
+
+        expr = self.visit(n.expr)
+        iterators = self.visit(n.iterators)
+        cond = self._parenthesize_unless_simple(n.cond)
+        
+        s = '{0}([{1} for {2}])'
+        return s.format(collection, expr, iterators)
+        
         
     def visit_If(self, n):
         s  = 'if {0}:'
@@ -196,7 +200,7 @@ class Codegen(object):
     def visit_IteratorChain(self, n):
         targets = ', '.join(self.visit(itr.assignable) for itr in n.iterators)
         iterables = ', '.join(self.visit(itr.expression) for itr in n.iterators)
-        return '{0} in zip({1})'.format(targets, iterables)
+        return '{0} in {1}({2})'.format(targets, n.mode, iterables)
 
     def visit_Quantor(self, n):
         s = '{0}({1} for {2})'        
@@ -208,6 +212,15 @@ class Codegen(object):
     # Helper functions
     #
 
+    def _get_collection_name(self, clazz):
+        if clazz == 'set':
+            return 'Set'
+        elif clazz == 'list':
+            return 'list'
+        else:
+            msg = 'Invalid collection name: {0}'.format(clazz)
+            raise Exception(msg)
+        
     # Indent
 
     def _indent(self):

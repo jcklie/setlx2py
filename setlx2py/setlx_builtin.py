@@ -13,6 +13,26 @@ import operator
 
 import itertools as it
 
+# Custom classes
+# ==============
+
+class Set(frozenset):
+
+    def __init__(self, iterable):
+        super(Set, self).__init__(iterable)
+
+    def __add__(self, other):
+        return self.union(other)
+        
+    def __mul__(self, other):
+        return self.intersection(other)
+
+    def __mod__(self, other):
+        return self.symmetric_difference(other)
+
+    def _tuple_it(self, l):
+        return tuple(map(self._tuple_it, l)) if isinstance(l, (list, tuple)) else l
+
 # Change builtin functions
 # ------------------------
 
@@ -22,7 +42,7 @@ def custom_pow(a,b):
     elif isinstance(b, Set) and a == 2:
         return powerset(b)
     else:
-        return a ** b
+        return a ** b        
 
 # Logic
 # -----
@@ -48,23 +68,6 @@ def powerset(s):
 
 def product(factors):
     return reduce(operator.mul, factors, 1)
-
-# Custom classes
-# ==============
-
-class Set(frozenset):
-
-    def __init__(self, iterable):
-        super(Set, self).__init__(iterable)
-
-    def __add__(self, other):
-        return self.union(other)
-        
-    def __mul__(self, other):
-        return self.intersection(other)
-
-    def __mod__(self, other):
-        return self.symmetric_difference(other)
 
 builtin = {
     # Classes

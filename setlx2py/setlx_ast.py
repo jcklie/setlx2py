@@ -533,7 +533,8 @@ class Iterator(Node):
     attr_names = ()
 
 class IteratorChain(Node):
-    def __init__(self, iterators, coord=None):
+    def __init__(self, mode, iterators, coord=None):
+        self.mode = mode
         self.iterators = iterators
         self.coord = coord
 
@@ -543,7 +544,7 @@ class IteratorChain(Node):
             nodelist.append(("iterators[%d]" % i, child))
         return tuple(nodelist)
 
-    attr_names = ()
+    attr_names = ('mode',)
 
 class Lambda(Node):
     def __init__(self, params, body, coord=None):

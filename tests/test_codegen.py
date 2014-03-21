@@ -153,6 +153,17 @@ def test_range_list():
     assert_res('x := [1,3..10];', {'x' : [1,3,5,7,9] })
     assert_res('x := [10,8..1];', {'x' : [10,8,6,4,2] })
 
+# Comprehension
+# ~~~~~~~~~~~~~
+
+def test_set_comprehension_minimal():
+    s = "x := {2*n : n in [1..5]};"
+    assert_res(s, {'x' : Set([2,4,6,8,10]) })
+
+def test_set_comprehension_two_iterators():
+    s = "x := {a ** b: a in {1..3}, b in {2..4}};"
+    assert_res(s, {'x' : Set([1, 4, 8, 9, 16, 27, 81]) }, True)
+
 # Binop
 # -----
 
@@ -244,9 +255,9 @@ def test_unary_simple():
     assert_res('x := !true;', {'x' : False})
 
 def test_unary_set():
-    assert_res('x := # {5, 7, 13};', {'x' : 3}, True)
-    assert_res('x := +/ {1..6**2};', {'x' : 666}, True)
-    assert_res('x := */ {1..5};', {'x' : 120}, True)
+    assert_res('x := # {5, 7, 13};', {'x' : 3})
+    assert_res('x := +/ {1..6**2};', {'x' : 666})
+    assert_res('x := */ {1..5};', {'x' : 120})
     
 
 # Quantors
@@ -264,9 +275,8 @@ def test_exists_simple():
     s = 'result := exists (x in {1..10} | 2 ** x < x ** 2);'
     assert_res(s, {'result' : True})
 
-@nottest
 def test_exists_two_iterators():
-    s = 'result := exists ([x, y] in {[a,b] : a in {1..10}, b in {1..10}} | 3*x - 4*y == 5);'
+    s = 'result := exists ([x, y] in [[a,b] : a in {1..10}, b in {1..10}] | 3*x - 4*y == 5);'
     assert_res(s, {'result' : True}, verbose=True)
     
 #### 
@@ -394,7 +404,7 @@ def test_for_loop_double():
         accum += x + y;
     }
     """
-    assert_res(s, {'accum' : 0})
+    assert_res(s, {'accum' : 0}, True)
     
 
     

@@ -410,6 +410,7 @@ class Parser():
         """ set_comprehension : LBRACE expression COLON \
                                 iterator_chain comprehension_condition RBRACE
         """
+        p[4].mode = 'cartesian'
         p[0] = Comprehension('set', p[2], p[4], p[5], p[2].coord)
 
     # List comprehension
@@ -418,6 +419,7 @@ class Parser():
         """ list_comprehension : LBRACKET expression COLON \
                                  iterator_chain comprehension_condition RBRACKET
         """
+        p[4].mode = 'cartesian'
         p[0] = Comprehension('list', p[2], p[4], p[5], p[2].coord)
 
     ##
@@ -640,10 +642,12 @@ class Parser():
     
     def p_quantor_1(self, p):
         """ quantor : FORALL LPAREN iterator_chain PIPE expression RPAREN """
+        p[3].mode = 'cartesian'
         p[0] = Quantor('all', p[3], p[5], p[3].coord)
 
     def p_quantor_2(self, p):
         """ quantor : EXISTS LPAREN iterator_chain PIPE expression RPAREN """
+        p[3].mode = 'cartesian'
         p[0] = Quantor('any', p[3], p[5], p[3].coord)
 
     ##
@@ -663,7 +667,7 @@ class Parser():
     def p_iterator_chain_2(self, p):
         """ iterator_chain : iterator_chain COMMA iterator """
         if not isinstance(p[1], IteratorChain):
-            p[1] = IteratorChain([p[1]], p[1].coord)
+            p[1] = IteratorChain('', [p[1]], p[1].coord)
         p[1].iterators.append(p[3])
         p[0] = p[1]
 
@@ -860,6 +864,7 @@ class Parser():
 
     def p_for_loop(self, p):
         """ for_loop : FOR LPAREN iterator_chain  RPAREN LBRACE block RBRACE """
+        p[3].mode = 'zip'
         p[0] = For(p[3], p[6], p[3].coord)
 
     ##
