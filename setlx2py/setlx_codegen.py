@@ -84,12 +84,9 @@ class Codegen(object):
             '=>'   : 'implies',
             '<==>' : 'equivalent',
             '<!=>' : 'antivalent',
-            '><' : 'cartesian',
+            '><'   : 'cartesian',
+            '**'   : 'pow',
         }
-
-        set_op = [
-
-        ]
 
         if n.op in bool_op_simple:
             op = bool_op_simple[n.op]
@@ -100,6 +97,24 @@ class Codegen(object):
             op = n.op
         
         return s.format(lval_str, op, rval_str)
+
+    def visit_UnaryOp(self, n):
+        op = n.op
+        operand = self._parenthesize_unless_simple(n.expr)
+
+        op_to_function = {
+            'fac' : 'factorial',
+            '#'   : 'len',
+            '+/'  : 'sum',
+            '*/'  : 'product',
+        }
+        if n.op in op_to_function:
+            op = op_to_function[n.op]
+            s = op + '({0})'
+        else:
+            s = op + ' {0}'
+
+        return s.format(operand)
 
     def visit_Set(self, n):
         items = ','.join(self.visit(x) for x in n.items)
@@ -131,17 +146,6 @@ class Codegen(object):
         
         return s.format(collection, lower, upper, step)
         
-    def visit_UnaryOp(self, n):
-        op = n.op
-        operand = self._parenthesize_unless_simple(n.expr)
-        if op == 'fac':
-            s = 'factorial({0})'
-
-        else:
-            s = op + ' {0}'
-
-        return s.format(operand)
-
     def visit_If(self, n):
         s  = 'if {0}:'
         s += '\n'

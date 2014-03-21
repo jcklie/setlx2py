@@ -9,8 +9,9 @@
 
 import math
 import collections
+import operator
 
-from itertools import product, chain, combinations
+import itertools as it
 
 # Change builtin functions
 # ------------------------
@@ -39,11 +40,14 @@ def antivalent(p,q):
 # ----
 
 def cartesian(a,b):
-    return Set(element for element in product(a, b))
+    return Set(element for element in it.product(a, b))
 
 def powerset(s):
     lst = list(s)
-    return Set(chain.from_iterable(combinations(lst, r) for r in range(len(lst)+1)))
+    return Set(it.chain.from_iterable(it.combinations(lst, r) for r in range(len(lst)+1)))
+
+def product(factors):
+    return reduce(operator.mul, factors, 1)
 
 # Custom classes
 # ==============
@@ -67,6 +71,7 @@ builtin = {
     'Set'       : Set,
     # Functions
     'factorial' : math.factorial,
+    'product'   : product,
     'implies'   : implies,
     'equivalent': equivalent,
     'antivalent': antivalent,

@@ -196,6 +196,45 @@ def test_binop_logic_complex():
     assert_res('x := false <==> false;', {'x' : True})
     assert_res('x := true <!=> false;',  {'x' : True})
 
+# Collection operations
+# ~~~~~~~~~~~~~~~~~~~~~
+
+def test_binop_comparison_set():
+    assert_res('x := 2 in {1..42};', {'x' : True})
+
+def test_binop_set():
+    s = Template("""
+    s1 := { 1, 2 };
+    s2 := { 2, 3 };
+    result := s1 $op s2;
+    """)
+    
+    cases = {
+        '+'  : Set([1, 2, 3]), 
+        '-'  : Set([1]),
+        '*'  : Set([2]),
+        '><' : Set([(1, 2), (1, 3), (2, 2), (2, 3)]),
+        '%'  : Set([1, 3]),
+    }
+
+    for op, result in cases.items():
+        source = s.substitute(op=op)
+        assert_res(source, {'result' : result})
+
+def test_set_powerset():
+    s = """
+    s1 := { 1, 2 };
+    result := 2 ** s1;
+    """
+    assert_res(s, {'result' : Set([(), (1,), (1,2), (2,)])})
+
+def test_set_cartesian():
+    s = """
+    s1 := { 1, 2 };
+    result := s1 ** 2;
+    """
+    assert_res(s, {'result' : Set([(1,1), (1,2), (2,1), (2,2)])})        
+
 # Unary
 # ~~~~~ 
 
@@ -204,36 +243,10 @@ def test_unary_simple():
     assert_res('x := -5;', {'x' : -5})
     assert_res('x := !true;', {'x' : False})
 
-# Collection operations
-# ~~~~~~~~~~~~~~~~~~~~~
-
-def test_binop_comparison_set():
-    assert_res('x := 2 in {1..42};', {'x' : True})
-
-def test_unop_set():
-    s = Template("""
-    s1 := { 1, 2 };
-    s2 := { 2, 3 };
-    result := s1 $op s2;
-    """)
-    
-    cases = {
-        '+'  : Set((1, 2, 3)), 
-        '-'  : Set((1,)),
-        '*'  : Set((2,)),
-        '><' : Set([(1, 2), (1, 3), (2, 2), (2, 3)]),
-        '%'  : Set((1, 3)),
-    }
-
-    for op, result in cases.items():
-        source = s.substitute(op=op)
-        assert_res(source, {'result' : result})
-
-def test_set_powerset():
-    pass
-
-def test_set_cartesian():
-    pass
+def test_unary_set():
+    assert_res('x := # {5, 7, 13};', {'x' : 3}, True)
+    assert_res('x := +/ {1..6**2};', {'x' : 666}, True)
+    assert_res('x := */ {1..5};', {'x' : 120}, True)
     
 
 # Quantors

@@ -20,6 +20,10 @@ def test_antivalent():
     assert antivalent(False,True)  == True
     assert antivalent(False,False) == False
 
+def test_product():
+    assert product(range(1,5)) == 24
+    assert product([1,5,34,5,6,8]) == (1 * 5 * 34 * 5 * 6 * 8)
+
 # Custom set
 # ----------
 
