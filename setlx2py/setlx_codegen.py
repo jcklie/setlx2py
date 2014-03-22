@@ -257,6 +257,12 @@ class Codegen(object):
         fref = self._parenthesize_unless_simple(n.name)
         return fref + '(' + self.visit(n.args) + ')'
 
+    def visit_Lambda(self, n):
+        s = 'lambda {0}: {1}'
+        params = self.visit(n.params)
+        body = self.visit(n.body)
+        return s.format(params, body)
+        
     #
     # Helper functions
     #

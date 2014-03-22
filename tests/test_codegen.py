@@ -132,10 +132,13 @@ def test_assignment_list_simultaneous():
     assert_res('[x,y] := [1,2];', {'x' : 1, 'y' : 2})
     assert_res('[x,y] := [1,2]; [y,x] := [x,y];', {'x' : 2, 'y' : 1})
 
+def test_assignment_underscore():
+    assert_res('[x, _, z] := [1, 2, 3];', {'x' : 1, 'z' : 3})    
+
 # Collections
 # -----------
 
-# Syntax sugar for creating
+# Syntax sugar for creating collections
 
 def test_set():
     assert_res('x := {};', {'x' : Set([])})
@@ -389,6 +392,39 @@ def test_procedure_max():
     for a, b, result in cases:
         source = s.substitute(a=a, b=b)
         assert_res(source, {'result' : result})
+
+def test_procedure_two():
+    s = Template("""
+    factors := procedure(p) {
+        return {f : f in { 1 .. p } | p % f == 0 };
+    };
+    primes := procedure(n) {
+        return {p : p in { 2 .. n } | factors(p) == { 1, p } };
+    };
+    result := primes($n);
+    """)
+    
+    cases = {
+        '2'   : [2],
+        '10'  : [2,3,5,7],
+        '50' : [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47],
+    }
+    for n, result in cases.items():
+        source = s.substitute(n=n)
+        assert_res(source, {'result' : Set(result)})
+        break
+
+# Lambda
+# ------
+
+def test_lambda_one_argument():
+    s = """
+    map := procedure(l, f) {
+    return [ f(x) : x in l ];
+    };
+    result := map([1 .. 10], x |-> x * x);
+    """
+    assert_res(s, {'result' : [1, 4, 9, 16, 25, 36, 49, 64, 81, 100]})
 
 # If-Else
 # -------
