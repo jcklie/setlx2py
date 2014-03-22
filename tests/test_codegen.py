@@ -416,13 +416,15 @@ def test_procedure_two():
 # Cached Procedures
 # -----------------
 
-def assert_res_cases(s, cases, name='result'):
-    header = cases.pop(0)[:-1]
+def assert_res_cases(s, cases, verbose=True):
+    header =  cases.pop(0)
+    names, rname = header[:-1], header[-1]
     for case in cases:
         params, result = case[0:-1], case[-1]
         d = { k : v for k, v in zip(header, params) }
         source = s.substitute(d)
-        assert_res(source, {name : result})
+        print(source)
+        assert_res(source, {rname : result}, verbose=True)
 
 def test_cached_procedure_fibonacci():
     s = Template("""
@@ -443,7 +445,7 @@ def test_cached_procedure_fibonacci():
         ('4', 3),
 #        ('50', 12586269025),
     ]
-    assert_res_cases(s, cases, True)  
+    assert_res_cases(s, cases, verbose=True)  
     
 
 # Lambda
