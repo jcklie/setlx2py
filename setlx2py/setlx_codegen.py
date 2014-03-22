@@ -235,6 +235,9 @@ class Codegen(object):
     def visit_Procedure(self, n):
         s = 'def {0}({1}):\n'
         s += '{2}'
+
+        if n.clazz == 'cached':
+            s = '@memoized' + '\n' + s
         params = self.visit(n.params)
         body = self.visit(n.body)
         return s.format(n.name, params, body)

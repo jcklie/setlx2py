@@ -412,7 +412,39 @@ def test_procedure_two():
     for n, result in cases.items():
         source = s.substitute(n=n)
         assert_res(source, {'result' : Set(result)})
-        break
+
+# Cached Procedures
+# -----------------
+
+def assert_res_cases(s, cases, name='result'):
+    header = cases.pop(0)[:-1]
+    for case in cases:
+        params, result = case[0:-1], case[-1]
+        d = { k : v for k, v in zip(header, params) }
+        source = s.substitute(d)
+        assert_res(source, {name : result})
+
+def test_cached_procedure_fibonacci():
+    s = Template("""
+    fibonacci := cachedProcedure(n) {
+        if (n in [0,1]) {
+            return n;
+        }
+        return fibonacci(n-1) + fibonacci(n-2);
+    };
+    result := fibonacci($n);
+    """)
+    cases = [
+        ('n', 'result'),
+        ('0', 0),
+        ('1', 1),
+        ('2', 1),
+        ('3', 2),
+        ('4', 3),
+#        ('50', 12586269025),
+    ]
+    assert_res_cases(s, cases, True)  
+    
 
 # Lambda
 # ------
