@@ -265,20 +265,6 @@ class Break(Node):
 
     attr_names = ()
 
-class CachedProcedure(Node):
-    def __init__(self, params, body, coord=None):
-        self.params = params
-        self.body = body
-        self.coord = coord
-
-    def children(self):
-        nodelist = []
-        if self.params is not None: nodelist.append(("params", self.params))
-        if self.body is not None: nodelist.append(("body", self.body))
-        return tuple(nodelist)
-
-    attr_names = ()
-
 class Call (Node):
     def __init__(self, name, args, coord=None):
         self.name = name
@@ -644,8 +630,9 @@ class Pattern(Node):
     attr_names = ()
 
 class Procedure(Node):
-    def __init__(self, name, params, body, coord=None):
+    def __init__(self, name, clazz, params, body, coord=None):
         self.name = name
+        self.clazz = clazz
         self.params = params
         self.body = body
         self.coord = coord
@@ -656,7 +643,7 @@ class Procedure(Node):
         if self.body is not None: nodelist.append(("body", self.body))
         return tuple(nodelist)
 
-    attr_names = ('name',)
+    attr_names = ('name','clazz',)
 
 class Quantor(Node):
     def __init__(self, name, iterators, cond, coord=None):
@@ -791,19 +778,6 @@ class Switch (Node):
         nodelist = []
         if self.case_list is not None: nodelist.append(("case_list", self.case_list))
         if self.default is not None: nodelist.append(("default", self.default))
-        return tuple(nodelist)
-
-    attr_names = ()
-
-class TargetList (Node):
-    def __init__(self, targets, coord=None):
-        self.targets = targets
-        self.coord = coord
-
-    def children(self):
-        nodelist = []
-        for i, child in enumerate(self.targets or []):
-            nodelist.append(("targets[%d]" % i, child))
         return tuple(nodelist)
 
     attr_names = ()

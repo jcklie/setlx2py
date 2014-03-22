@@ -1,5 +1,5 @@
 parser:
-	python -i -c "from setlx2py.setlx_parser import Parser; parser = Parser()"
+	python -i -c "from setlx2py.setlx_parser import Parser; parser = Parser(yacc_optimize=False)"
 	
 foo:
 	python -i -c "x = 1"

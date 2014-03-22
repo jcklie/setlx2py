@@ -584,13 +584,13 @@ class Parser():
         """ procedure : PROCEDURE LPAREN parameter_list RPAREN \
                         LBRACE block RBRACE
         """
-        p[0] = Procedure('', p[3], p[6], p[6].coord)
+        p[0] = Procedure('', 'vanilla', p[3], p[6], p[6].coord)
 
     def p_procedure_2(self, p):
         """ procedure : CPROCEDURE LPAREN parameter_list RPAREN \
                         LBRACE block RBRACE
         """
-        p[0] = CachedProcedure(p[3], p[6], p[6].coord)
+        p[0] = Procedure('', 'cached', p[3], p[6], p[6].coord)
 
     def p_parameter_list_1(self, p):
         """ parameter_list : params """

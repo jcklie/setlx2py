@@ -1500,12 +1500,12 @@ def test_for_loop_three_iterators():
 
 def test_procedure_minimal():
     node = parse_single_statement('procedure() {};')
-    eq_(node.to_tuples(), ('Procedure', '', ('ParamList',), ('Block',)))
+    eq_(node.to_tuples(), ('Procedure', '', 'vanilla', ('ParamList',), ('Block',)))
 
 def test_procedure_square():
     node = parse_single_statement('procedure(x) { return x ** x; };')
     eq_(node.to_tuples(),
-        ('Procedure', '',
+        ('Procedure', '', 'vanilla',
          ('ParamList', ('Param', 'x')),
          ('Block', ('Return',
            ('BinaryOp', '**',
@@ -1526,7 +1526,7 @@ def test_procedure_max():
     eq_(node.to_tuples(),
         ('Assignment', ':=',
          ('Identifier', 'max'),
-         ('Procedure', '',
+         ('Procedure', '', 'vanilla',
           ('ParamList', ('Param', 'a'), ('Param', 'b')),
           ('Block',
            ('If',
@@ -1549,7 +1549,7 @@ def test_procedure_fac():
     eq_(node.to_tuples(),
         ('Assignment', ':=',
          ('Identifier', 'fac'),
-         ('Procedure', '',
+         ('Procedure', '', 'vanilla',
           ('ParamList', ('Param', 'n')),
           ('Block',
            ('Assignment', ':=', ('Identifier', 'i'), ('Constant', 'int', 1)),
@@ -1566,12 +1566,12 @@ def test_procedure_fac():
 
 def test_cached_procedure_minimal():
     node = parse_single_statement('cachedProcedure() {};')
-    eq_(node.to_tuples(), ('CachedProcedure', ('ParamList',), ('Block',)))
+    eq_(node.to_tuples(), ('Procedure', '', 'cached', ('ParamList',), ('Block',)))
 
 def test_cached_procedure_square():
     node = parse_single_statement('cachedProcedure(x) { return x ** x; };')
     eq_(node.to_tuples(),
-        ('CachedProcedure',
+        ('Procedure', '', 'cached',
          ('ParamList', ('Param', 'x')),
          ('Block', ('Return',
            ('BinaryOp', '**',
@@ -1592,7 +1592,7 @@ def test_cached_procedure_max():
     eq_(node.to_tuples(),
         ('Assignment', ':=',
          ('Identifier', 'max'),
-         ('CachedProcedure',
+         ('Procedure', '', 'cached',
           ('ParamList', ('Param', 'a'), ('Param', 'b')),
           ('Block',
            ('If',
@@ -1615,7 +1615,7 @@ def test_cached_procedure_fac():
     eq_(node.to_tuples(),
         ('Assignment', ':=',
          ('Identifier', 'fac'),
-         ('CachedProcedure',
+         ('Procedure', '', 'cached',
           ('ParamList', ('Param', 'n')),
           ('Block',
            ('Assignment', ':=', ('Identifier', 'i'), ('Constant', 'int', 1)),
