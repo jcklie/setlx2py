@@ -73,3 +73,19 @@ def test_procedure_name():
     """
     node = parse_single_statement(s)
     eq_(node.name, 'primes')
+
+# Pattern
+# -------
+
+def test_match_pattern():
+    s = """
+    match (s) {
+        case [] : return s;
+        case [c]: return c;
+        case [a,b|r]: return b + a + reversePairs(r);
+    }
+    """
+    node = parse_single_statement(s)
+    cases = node.case_list
+    pattern = cases.cases[1]
+    assert True

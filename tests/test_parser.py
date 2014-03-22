@@ -145,6 +145,15 @@ def test_list_head_tail():
          ('Identifier', 'h'),
          ('Identifier', 't')))
 
+def test_list_two_head_tail():
+    node = parse_single_statement('[x,y|z];')
+    eq_(node.to_tuples(),
+        ('Pattern',
+         ('ExprList',
+          ('Identifier', 'x'),
+          ('Identifier', 'y')),
+         ('Identifier', 'z')))    
+
 # Set
 
 def test_set_minimal():
@@ -177,6 +186,15 @@ def test_set_head_tail():
         ('Pattern',
          ('Identifier', 'h'),
          ('Identifier', 't')))
+
+def test_set_two_head_tail():
+    node = parse_single_statement('{x,y|z};')
+    eq_(node.to_tuples(),
+        ('Pattern',
+         ('ExprList',
+          ('Identifier', 'x'),
+          ('Identifier', 'y')),
+         ('Identifier', 'z')))    
     
 ##
 ## Ranges

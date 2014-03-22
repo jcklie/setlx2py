@@ -643,7 +643,30 @@ def test_switch_sort3():
     ]
     cases += [(a,b,c, sorted((a,b,c))) for a,b,c in itertools.permutations(range(1,4), 3)]
     assert_res_cases(s, cases)
-    
+
+# Match-Statement
+# ---------------
+
+@nottest
+def test_match_reverse():
+    s = Template("""
+    reverse := procedure(s) {
+        match (s) {
+            case []   : return s;
+            case [c|r]: return reverse(r) + c;
+            default   : abort("type error in reverse(s)");
+        }
+    };
+    result := reverse('$s');
+    """)
+    cases = [
+        ('s', 'result'),
+        ('A', 'A'),
+#        ('maoam', 'maoam'),
+#        ('foo', 'oof'),
+#        ('', ''),
+    ]
+    assert_res_cases(s, cases, True)
 
     
 # For-Loop

@@ -296,6 +296,42 @@ class Codegen(object):
 
         body = self._generate_stmt(n.body, add_indent=True)
         return s.format(body)
+
+    def visit_Match(self, n):
+        s = '_matchee = {0}\n'
+        s += self._make_indent() + '{1}'
+        matchee = self.visit(n.matchee)
+        matches = self.visit(n.case_list)
+        if n.default:
+            default = self.visit(n.default)
+            matches += default
+        return s.format(matchee, matches)
+
+    def visit_Pattern(self, n):
+        s = '[{0}], "{1}"'
+        left = self.visit(n.left)
+        right = self.visit(n.right)
+        return s.format(left, right)
+
+    def visit_MatchCase(self, n):
+        s = self._make_indent()
+        s += 'elif matches(Pattern({0}), _matchee):\n'
+        
+        if isinstance(n.expr, Pattern):
+            self._indent()
+            binding = self._make_indent() + '{0} = bind(Pattern())\n'
+            self._unindent()
+            s += binding
+        s += '{1}'        
+
+        expr = self.visit(n.expr)
+        cond = self.visit(n.cond)
+        body = self._generate_stmt(n.body, add_indent=True)
+
+        
+
+        
+        return s.format(expr, body)
         
     #
     # Helper functions
@@ -360,7 +396,9 @@ class Codegen(object):
         """
         simple_nodes = (
             Constant,
-            Identifier
+            Identifier,
+            List,
+            Set
         )
         return isinstance(n, simple_nodes) or n is None
 

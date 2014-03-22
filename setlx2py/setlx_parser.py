@@ -474,6 +474,14 @@ class Parser():
         """ set_display : LBRACE expression PIPE expression RBRACE  """
         p[0] = Pattern(p[2], p[4], p[2].coord)
 
+    def p_set_display_5(self, p):
+        """ set_display : LBRACE expression COMMA argument_list PIPE expression RBRACE """
+        lst = p[4].arguments
+        expr = p[2]
+        lst.insert(0, expr)
+        p[2] = ExprList(lst)
+        p[0] = Pattern(p[2], p[6], p[2].coord)
+
     # List Display
 
     def p_list_display_1(self, p):
@@ -494,6 +502,14 @@ class Parser():
     def p_list_display_4(self, p):
         """ list_display : LBRACKET expression PIPE expression RBRACKET """
         p[0] = Pattern(p[2], p[4], p[2].coord)
+
+    def p_list_display_5(self, p):
+        """ list_display : LBRACKET expression COMMA argument_list PIPE expression RBRACKET """
+        lst = p[4].arguments
+        expr = p[2]
+        lst.insert(0, expr)
+        p[2] = ExprList(lst)
+        p[0] = Pattern(p[2], p[6], p[2].coord)
         
     ##
     ## Lambda Definitions

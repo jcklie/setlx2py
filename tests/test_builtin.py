@@ -1,4 +1,4 @@
-from nose.tools import eq_
+from nose.tools import eq_, nottest
 
 from setlx2py.setlx_builtin import *
 
@@ -24,7 +24,7 @@ def test_product():
     assert product(range(1,5)) == 24
     assert product([1,5,34,5,6,8]) == (1 * 5 * 34 * 5 * 6 * 8)
 
-# Custom set
+# Custom/Overloaded set Operations
 # ----------
 
 def test_set_operations():
@@ -38,4 +38,34 @@ def test_set_operations():
     eq_(custom_pow(s1, 2), Set([(1, 1), (1, 2), (2, 1), (2, 2)]))
     eq_(custom_pow(2, s2), Set([(), (2,), (2,3), (3,)]))
     eq_(cartesian(s1, s2), Set([(1, 2), (1, 3), (2, 2), (2, 3)]))
-    
+
+# Matching
+# ========
+
+def test_matches():
+    # case []
+    assert matches(Pattern([]), [])
+    assert not matches(Pattern([]), [1])                
+
+    # case [a,b]
+    assert matches(Pattern(['a', 'b']), [1, 2])           
+
+    # case [a,b|c]
+    assert matches(Pattern(['a', 'b'], 'c'), [1, 2])      
+
+    # case [a,b,c]
+    assert not matches(Pattern(['a', 'b', 'c']), [1, 2])  
+
+    # case [a,b,c|d]
+    assert matches(Pattern(['a', 'b', 'c'], 'd'), [1, 2, 3]) 
+    assert not matches(Pattern(['a', 'b', 'c'], 'd'), [1, 2])
+
+@nottest    
+def test_bind():
+    # match ([1,2,3]) { case [a,b,c] : .. }
+    s = bind(Pattern(['a', 'b', 'c']))
+    print(s)
+
+    # match ([1..42]) { case [a,b|c] : .. }
+    s = bind(Pattern(['a', 'b'], 'r' ))
+    print(s)

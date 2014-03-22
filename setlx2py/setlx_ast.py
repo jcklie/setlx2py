@@ -576,17 +576,17 @@ class Match(Node):
     attr_names = ()
 
 class MatchCase(Node):
-    def __init__(self, expr, cond, block, coord=None):
+    def __init__(self, expr, cond, body, coord=None):
         self.expr = expr
         self.cond = cond
-        self.block = block
+        self.body = body
         self.coord = coord
 
     def children(self):
         nodelist = []
         if self.expr is not None: nodelist.append(("expr", self.expr))
         if self.cond is not None: nodelist.append(("cond", self.cond))
-        if self.block is not None: nodelist.append(("block", self.block))
+        if self.body is not None: nodelist.append(("body", self.body))
         return tuple(nodelist)
 
     attr_names = ()

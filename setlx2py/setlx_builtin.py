@@ -62,6 +62,9 @@ class memoized(object):
         '''Support instance methods.'''
         return functools.partial(self.__call__, obj)
 
+# Builtin Functions
+# =================
+
 # Change builtin functions
 # ------------------------
 
@@ -98,9 +101,38 @@ def powerset(s):
 def product(factors):
     return functools.reduce(operator.mul, factors, 1)
 
+# Matching
+# --------
+
+class Pattern(collections.namedtuple('Pattern', ['head', 'tail'])):
+    def __new__(cls, head, tail=None):
+        return super(Pattern, cls).__new__(cls, head, tail)
+
+def _empty(x):
+    return len(x) == 0
+
+def matches(pattern, variables):
+    """ A pattern matches when there are at least
+    len(var) bindable elements in it.
+    """
+    if _empty(pattern.head) and not _empty(variables): return False
+    return len(variables) >= len(pattern.head)
+
+def bind(pattern, matchee='_matchee'):
+    front = ', '.join(pattern.head)
+    back = ''
+    for i in range(len(pattern.head)):
+        back += '{0}[{1}], '.format(matchee, i) # e.g. _matchee[0]
+
+    if pattern.tail:
+        front += ', ' + pattern.tail
+        back += '{0}[{1}:]'.format(matchee, i+1)
+    return front + ' = ' + back
+    
 builtin = {
     # Classes
     'Set'       : Set,
+    'Pattern'   : Pattern,
     'memoized'  : memoized,
     # Functions
     'factorial' : math.factorial,
@@ -110,6 +142,7 @@ builtin = {
     'antivalent': antivalent,
     'pow'       : custom_pow,
     'cartesian' : cartesian,
+    'matches'   : matches
 }
     
 
