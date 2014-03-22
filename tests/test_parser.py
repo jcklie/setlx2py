@@ -19,7 +19,7 @@ from setlx2py.setlx_ast import *
 ## Test housekeeping
 ##
 
-parser = Parser()
+parser = Parser(yacc_optimize=False)
 
 ##
 ## Parse helper
@@ -238,7 +238,7 @@ def test_set_comprehension_two_iterators():
          ('BinaryOp', '*',
           ('Identifier', 'a'),
           ('Identifier', 'b')),
-         ('IteratorChain', 'cartesian',
+         ('IteratorChain', '',
           ('Iterator',
            ('Identifier', 'a'),
            ('Range', 'set',
@@ -296,7 +296,7 @@ def test_list_comprehension_two_iterators():
          ('BinaryOp', '*',
           ('Identifier', 'a'),
           ('Identifier', 'b')),
-         ('IteratorChain', 'cartesian',
+         ('IteratorChain', '',
           ('Iterator',
            ('Identifier', 'a'),
            ('Range', 'set',
@@ -1483,7 +1483,7 @@ def test_for_loop_three_iterators():
     node = parse_single_statement(s)
     eq_(node.to_tuples(),
         ('For',
-         ('IteratorChain', 'zip',
+         ('IteratorChain', '',
           ('Iterator', ('Identifier', 'i'), ('Identifier', 'uids')),
           ('Iterator', ('Identifier', 's'), ('Identifier', 'street')),
           ('Iterator', ('Identifier', 'n'), ('Identifier', 'street_number'))),
@@ -1500,12 +1500,12 @@ def test_for_loop_three_iterators():
 
 def test_procedure_minimal():
     node = parse_single_statement('procedure() {};')
-    eq_(node.to_tuples(), ('Procedure', ('ParamList',), ('Block',)))
+    eq_(node.to_tuples(), ('Procedure', '', ('ParamList',), ('Block',)))
 
 def test_procedure_square():
     node = parse_single_statement('procedure(x) { return x ** x; };')
     eq_(node.to_tuples(),
-        ('Procedure',
+        ('Procedure', '',
          ('ParamList', ('Param', 'x')),
          ('Block', ('Return',
            ('BinaryOp', '**',
@@ -1526,7 +1526,7 @@ def test_procedure_max():
     eq_(node.to_tuples(),
         ('Assignment', ':=',
          ('Identifier', 'max'),
-         ('Procedure',
+         ('Procedure', '',
           ('ParamList', ('Param', 'a'), ('Param', 'b')),
           ('Block',
            ('If',
@@ -1549,7 +1549,7 @@ def test_procedure_fac():
     eq_(node.to_tuples(),
         ('Assignment', ':=',
          ('Identifier', 'fac'),
-         ('Procedure',
+         ('Procedure', '',
           ('ParamList', ('Param', 'n')),
           ('Block',
            ('Assignment', ':=', ('Identifier', 'i'), ('Constant', 'int', 1)),

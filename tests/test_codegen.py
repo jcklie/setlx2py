@@ -15,10 +15,12 @@ from nose.tools import nottest, eq_
 
 from setlx2py.setlx_builtin import builtin, Set
 from setlx2py.setlx_parser import Parser
+from setlx2py.setlx_ast_transformer import AstTransformer
 from setlx2py.setlx_codegen import Codegen
 
-generator = Codegen()
 parser = Parser()
+transformer = AstTransformer()
+generator = Codegen()
 
 ##
 ## Hack redefines
@@ -50,6 +52,7 @@ def error_msg(source, compiled=None, e=None):
 def run(source, ns={}, verbose=False, print_ast=False):
     ns.update(builtin)
     ast = parser.parse(source)
+    transformer.visit(ast)
     
     if verbose:
         print('Source: \n' + source)
@@ -386,8 +389,6 @@ def test_procedure_max():
     for a, b, result in cases:
         source = s.substitute(a=a, b=b)
         assert_res(source, {'result' : result})
-
-
 
 # If-Else
 # -------

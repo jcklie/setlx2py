@@ -7,6 +7,8 @@
 # License: Apache v2
 #------------------------------------------------------------------------------
 
+import re
+
 from setlx2py.setlx_ast import *
 
 class Codegen(object):
@@ -50,14 +52,8 @@ class Codegen(object):
         lhs = self.visit(n.target)
         rhs = self.visit(n.right)
 
-        if isinstance(n.right, Procedure):
-            assert op == '=', 'Cannot use other operator for procedures than ":="'
-            s = '{0}\n'
-            s += '{1} = {2}'
-            return s.format(rhs, lhs, self._get_function_name())
-        else:
-            s = '{0} {1} {2}'
-            return s.format(lhs, op, rhs)
+        s = '{0} {1} {2}'
+        return s.format(lhs, op, rhs)
 
     def visit_Constant(self, n):
         # Types which do not need special treatment;
@@ -70,7 +66,7 @@ class Codegen(object):
         if n.klass == 'string': 
             return "'" + str(n.value) + "'"
         elif n.klass == 'literal':
-            return "'" + str(n.value) + "'"
+            return "r'" + str(n.value) + "'"
         elif n.klass in simple_constants:
             return str(n.value)
         else:
@@ -215,9 +211,9 @@ class Codegen(object):
         s = 'for {0}:'
         s += '\n'
         s += '{1}'
-        cond = self.visit(n.cond)
+        iterators = self.visit(n.iterators)
         body = self._generate_stmt(n.body, add_indent=True)
-        return s.format(cond, body)
+        return s.format(iterators, body)
 
     def visit_Iterator(self, n):
         lhs = self.visit(n.assignable)
@@ -225,23 +221,23 @@ class Codegen(object):
         return '{0} in {1}'.format(lhs, rhs)
 
     def visit_IteratorChain(self, n):
+        assert n.mode in ['zip', 'cartesian'], 'Invalid mode for iterator chain : ' + n.mode
         targets = ', '.join(self.visit(itr.assignable) for itr in n.iterators)
         iterables = ', '.join(self.visit(itr.expression) for itr in n.iterators)
         return '{0} in {1}({2})'.format(targets, n.mode, iterables)
 
     def visit_Quantor(self, n):
         s = '{0}({1} for {2})'        
-        iterator = self.visit(n.iterator)
+        iterators = self.visit(n.iterators)
         cond = self.visit(n.cond)
-        return s.format(n.name, cond, iterator)
+        return s.format(n.name, cond, iterators)
 
     def visit_Procedure(self, n):
         s = 'def {0}({1}):\n'
         s += '{2}'
-        name = self._generate_function_name()
         params = self.visit(n.params)
         body = self.visit(n.body)
-        return s.format(name, params, body)
+        return s.format(n.name, params, body)
 
     def visit_ParamList(self, n):
         return ', '.join(self.visit(param) for param in n.params)
@@ -265,13 +261,6 @@ class Codegen(object):
     # Helper functions
     #
 
-    def _get_function_name(self):
-        return '_fun' + str(self.func_count)
-        
-    def _generate_function_name(self):
-        self.func_count += 1
-        return self._get_function_name()
-
     def _get_collection_name(self, clazz):
         if clazz == 'set':
             return 'Set'
@@ -280,6 +269,10 @@ class Codegen(object):
         else:
             msg = 'Invalid collection name: {0}'.format(clazz)
             raise Exception(msg)
+
+    def _string_interpolate(self, s):
+        pattern = re.compile('\$.*?\$')
+        
         
     # Indent
 

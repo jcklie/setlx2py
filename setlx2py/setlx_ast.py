@@ -478,14 +478,14 @@ class FileAST(Node):
     attr_names = ()
 
 class For(Node):
-    def __init__(self, cond, body, coord=None):
-        self.cond = cond
+    def __init__(self, iterators, body, coord=None):
+        self.iterators = iterators
         self.body = body
         self.coord = coord
 
     def children(self):
         nodelist = []
-        if self.cond is not None: nodelist.append(("cond", self.cond))
+        if self.iterators is not None: nodelist.append(("iterators", self.iterators))
         if self.body is not None: nodelist.append(("body", self.body))
         return tuple(nodelist)
 
@@ -644,7 +644,8 @@ class Pattern(Node):
     attr_names = ()
 
 class Procedure(Node):
-    def __init__(self, params, body, coord=None):
+    def __init__(self, name, params, body, coord=None):
+        self.name = name
         self.params = params
         self.body = body
         self.coord = coord
@@ -655,18 +656,18 @@ class Procedure(Node):
         if self.body is not None: nodelist.append(("body", self.body))
         return tuple(nodelist)
 
-    attr_names = ()
+    attr_names = ('name',)
 
 class Quantor(Node):
-    def __init__(self, name, iterator, cond, coord=None):
+    def __init__(self, name, iterators, cond, coord=None):
         self.name = name
-        self.iterator = iterator
+        self.iterators = iterators
         self.cond = cond
         self.coord = coord
 
     def children(self):
         nodelist = []
-        if self.iterator is not None: nodelist.append(("iterator", self.iterator))
+        if self.iterators is not None: nodelist.append(("iterators", self.iterators))
         if self.cond is not None: nodelist.append(("cond", self.cond))
         return tuple(nodelist)
 
