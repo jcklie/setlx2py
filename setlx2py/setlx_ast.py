@@ -280,15 +280,15 @@ class Call (Node):
     attr_names = ()
 
 class Case(Node):
-    def __init__(self, cond, block, coord=None):
+    def __init__(self, cond, body, coord=None):
         self.cond = cond
-        self.block = block
+        self.body = body
         self.coord = coord
 
     def children(self):
         nodelist = []
         if self.cond is not None: nodelist.append(("cond", self.cond))
-        if self.block is not None: nodelist.append(("block", self.block))
+        if self.body is not None: nodelist.append(("body", self.body))
         return tuple(nodelist)
 
     attr_names = ()
@@ -403,13 +403,13 @@ class Constant(Node):
     attr_names = ('klass','value',)
 
 class Default(Node):
-    def __init__(self, block, coord=None):
-        self.block = block
+    def __init__(self, body, coord=None):
+        self.body = body
         self.coord = coord
 
     def children(self):
         nodelist = []
-        if self.block is not None: nodelist.append(("block", self.block))
+        if self.body is not None: nodelist.append(("body", self.body))
         return tuple(nodelist)
 
     attr_names = ()

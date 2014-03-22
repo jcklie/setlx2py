@@ -79,13 +79,14 @@ def assert_res(source, variables={}, verbose=False, print_ast=False):
     for key, value in variables.items():
         eq_(ns.get(key, None), value)
 
-def assert_res_cases(s, cases, verbose=False):
+def assert_res_cases(s, cases, verbose=False, print_source=False):
     header =  cases.pop(0)
     names, rname = header[:-1], header[-1]
     for case in cases:
         params, result = case[0:-1], case[-1]
         d = { k : v for k, v in zip(header, params) }
         source = s.substitute(d)
+        if print_source: print(source)
         assert_res(source, {rname : result}, verbose=verbose)        
                 
 # Tests
@@ -576,11 +577,77 @@ def test_if_else_cray():
     ]
     cases += [(a,b,c, sorted((a,b,c))) for a,b,c in itertools.permutations(range(1,4), 3)]
     assert_res_cases(s, cases)
+                     
+# Switch-Statement
+
+def test_switch_even_odd():
+    s = Template("""
+    parity := procedure(n) {
+        switch {
+            case n % 2 == 0 : return 'Even';
+            case n % 2 == 1 : return 'Odd';
+        }
+    };
+    result := parity($n);
+    """)
+    cases = [
+        ('n', 'result'),
+        (42, 'Even'),
+        (1337, 'Odd'),
+    ]
+    assert_res_cases(s, cases)
+
+def test_switch_grades():
+    s = Template("""
+    gradez := procedure(grade) {
+        switch {
+            case grade == 'A' : return 'Excellent';
+            case grade == 'B' : return 'Good';
+            case grade == 'C' : return 'Satisfactory';
+            case grade == 'D' : return 'Pass';
+            case grade == 'F' : return 'Fail';
+            default           : return 'Invalid input';
+        }
+    };
+    descr := gradez('$grade');
+    """)
+    cases = [
+        ('grade', 'descr'),
+        ('A', 'Excellent'),
+        ('B', 'Good'),
+        ('C', 'Satisfactory'),
+        ('D', 'Pass'),
+        ('F', 'Fail'),
+        ('J', 'Invalid input'),
+    ]
+    assert_res_cases(s, cases)
+
+def test_switch_sort3():
+    s = Template("""
+    sort3 := procedure(l) {
+        [ x, y, z ] := l;
+        switch {
+        case x <= y && y <= z: return [ x, y, z ];
+        case x <= z && z <= y: return [ x, z, y ];
+        case y <= x && x <= z: return [ y, x, z ];
+        case y <= z && z <= x: return [ y, z, x ];
+        case z <= x && x <= y: return [ z, x, y ];
+        case z <= y && y <= x: return [ z, y, x ];
+        default: print("Impossible error occurred!");
+        }
+    };
+    result := sort3([$a, $b, $c]);
+    """)
+    cases = [
+        ('a', 'b', 'c', 'result'),
+    ]
+    cases += [(a,b,c, sorted((a,b,c))) for a,b,c in itertools.permutations(range(1,4), 3)]
+    assert_res_cases(s, cases)
     
-                 
-##
-## For-Loop
-##
+
+    
+# For-Loop
+# --------
 
 def test_for_loop_minimal():
     s = 'for(x in [1..10]) {}'

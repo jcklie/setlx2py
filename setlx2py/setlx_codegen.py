@@ -266,6 +266,36 @@ class Codegen(object):
         params = self.visit(n.params)
         body = self.visit(n.body)
         return s.format(params, body)
+
+    def visit_Switch(self, n):
+        cases = self.visit(n.case_list)
+        if n.default:
+            default = self.visit(n.default)
+            cases += default
+        return cases
+
+    def visit_CaseList(self, n):
+        s = ''.join(self.visit(case) for case in n.cases)
+        return s.replace(self._make_indent() + 'el', '', 1)
+
+    def visit_Case(self, n):
+        s = self._make_indent()
+        s += 'elif {0}:'
+        s += '\n'
+        s += '{1}'        
+
+        cond = self.visit(n.cond)
+        body = self._generate_stmt(n.body, add_indent=True)
+
+        return s.format(cond, body)
+
+    def visit_Default(self, n):
+        s = self._make_indent()
+        s += 'else:\n'
+        s += '{0}'        
+
+        body = self._generate_stmt(n.body, add_indent=True)
+        return s.format(body)
         
     #
     # Helper functions
