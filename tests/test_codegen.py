@@ -18,6 +18,8 @@ from setlx2py.setlx_parser import Parser
 from setlx2py.setlx_ast_transformer import AstTransformer
 from setlx2py.setlx_codegen import Codegen
 
+import itertools
+
 parser = Parser()
 transformer = AstTransformer()
 generator = Codegen()
@@ -567,7 +569,13 @@ def test_if_else_cray():
              return [ y, z, x ];
         }
     };
+    result := sort3([$a, $b, $c]);
     """)
+    cases = [
+        ('a', 'b', 'c', 'result'),
+    ]
+    cases += [(a,b,c, sorted((a,b,c))) for a,b,c in itertools.permutations(range(1,4), 3)]
+    assert_res_cases(s, cases)
     
                  
 ##

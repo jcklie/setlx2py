@@ -183,9 +183,10 @@ class Codegen(object):
 
         if n.iffalse:
             if isinstance(n.iffalse, If):
-                else_body = self._generate_stmt(n.iffalse, add_indent=False)
-                s += 'el'
+                else_body = self._generate_stmt(n.iffalse, add_indent=False).lstrip(self.indent)
+                s += self._make_indent() + 'el'
                 s += '{2}'
+                
             else:
                 else_body = self._generate_stmt(n.iffalse, add_indent=True)
                 s += self._make_indent() + 'else:\n{2}'
