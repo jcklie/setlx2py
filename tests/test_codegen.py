@@ -76,6 +76,15 @@ def assert_res(source, variables={}, verbose=False, print_ast=False):
     run(source, ns, verbose, print_ast)
     for key, value in variables.items():
         eq_(ns.get(key, None), value)
+
+def assert_res_cases(s, cases, verbose=False):
+    header =  cases.pop(0)
+    names, rname = header[:-1], header[-1]
+    for case in cases:
+        params, result = case[0:-1], case[-1]
+        d = { k : v for k, v in zip(header, params) }
+        source = s.substitute(d)
+        assert_res(source, {rname : result}, verbose=verbose)        
                 
 # Tests
 # ======
@@ -257,17 +266,15 @@ def test_binop_set():
     result := s1 $op s2;
     """)
     
-    cases = {
-        '+'  : Set([1, 2, 3]), 
-        '-'  : Set([1]),
-        '*'  : Set([2]),
-        '><' : Set([(1, 2), (1, 3), (2, 2), (2, 3)]),
-        '%'  : Set([1, 3]),
-    }
-
-    for op, result in cases.items():
-        source = s.substitute(op=op)
-        assert_res(source, {'result' : result})
+    cases = [
+        ('op', 'result'),
+        ('+' , Set([1, 2, 3])), 
+        ('-' , Set([1])),
+        ('*' , Set([2])),
+        ('><', Set([(1, 2), (1, 3), (2, 2), (2, 3)])),
+        ('%' , Set([1, 3])),
+    ]
+    assert_res_cases(s, cases)
 
 def test_set_powerset():
     s = """
@@ -385,13 +392,12 @@ def test_procedure_max():
     result := max($a,$b);
     """)
     cases = [
+        ('a', 'b', 'result'),
         (42, 3, 42),
         (23, 1337, 1337),
         (7, 7, 7),
     ]
-    for a, b, result in cases:
-        source = s.substitute(a=a, b=b)
-        assert_res(source, {'result' : result})
+    assert_res_cases(s, cases)
 
 def test_procedure_two():
     s = Template("""
@@ -404,27 +410,16 @@ def test_procedure_two():
     result := primes($n);
     """)
     
-    cases = {
-        '2'   : [2],
-        '10'  : [2,3,5,7],
-        '50' : [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47],
-    }
-    for n, result in cases.items():
-        source = s.substitute(n=n)
-        assert_res(source, {'result' : Set(result)})
+    cases = [
+        ('n', 'result'),
+        ('2' , Set([2])),
+        ('10', Set([2,3,5,7])),
+        ('50', Set([2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47])),
+    ]
+    assert_res_cases(s, cases)
 
 # Cached Procedures
 # -----------------
-
-def assert_res_cases(s, cases, verbose=True):
-    header =  cases.pop(0)
-    names, rname = header[:-1], header[-1]
-    for case in cases:
-        params, result = case[0:-1], case[-1]
-        d = { k : v for k, v in zip(header, params) }
-        source = s.substitute(d)
-        print(source)
-        assert_res(source, {rname : result}, verbose=True)
 
 def test_cached_procedure_fibonacci():
     s = Template("""
@@ -443,9 +438,9 @@ def test_cached_procedure_fibonacci():
         ('2', 1),
         ('3', 2),
         ('4', 3),
-#        ('50', 12586269025),
+        ('50', 12586269025),
     ]
-    assert_res_cases(s, cases, verbose=True)  
+    assert_res_cases(s, cases)  
     
 
 # Lambda
@@ -520,18 +515,16 @@ def test_if_four_else_if_else():
     }
     """)
     
-    permutations = {
-        'A' : 'Excellent',
-        'B' : 'Good',
-        'C' : 'Satisfactory',
-        'D' : 'Pass',
-        'F' : 'Fail',
-        'J' : 'Invalid input',
-    }
-    
-    for grade, descr in permutations.items():
-        source = s.substitute(grade=grade)
-        assert_res(source, {'grade' : grade, 'descr' : descr})
+    cases = [
+        ('grade', 'descr'),
+        ('A', 'Excellent'),
+        ('B', 'Good'),
+        ('C', 'Satisfactory'),
+        ('D', 'Pass'),
+        ('F', 'Fail'),
+        ('J', 'Invalid input'),
+    ]
+    assert_res_cases(s, cases)
 
 def test_if_nested_else_simple():
     s = Template("""
@@ -546,16 +539,37 @@ def test_if_nested_else_simple():
     }
     """)
     
-    permutations = [
+    cases = [
+        ('num1', 'num2', 'relation'),
         (1,1, "Equal"),
         (2,1, "Num1 greater"),
         (1,2, "Num2 greater"),
     ]
+    assert_res_cases(s, cases)
+        
+def test_if_else_cray():
+    s = Template("""
+    sort3 := procedure(l) {
+        [ x, y, z ] := l;
+        if (x <= y) {
+            if (y <= z) {
+                 return [ x, y, z ];
+            } else if (x <= z) {
+                 return [ x, z, y ];
+             } else {
+                 return [ z, x, y ];
+             }
+         } else if (z <= y) {
+             return [z, y, x];
+         } else if (x <= z) {
+             return [ y, x, z ];
+         } else {
+             return [ y, z, x ];
+        }
+    };
+    """)
     
-    for x, y, relation in permutations:
-        source = s.substitute(num1=x, num2=y)
-        assert_res(source, {'relation' : relation})
-
+                 
 ##
 ## For-Loop
 ##
