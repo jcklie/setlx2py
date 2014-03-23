@@ -87,5 +87,9 @@ def test_match_pattern():
     """
     node = parse_single_statement(s)
     cases = node.case_list
-    pattern = cases.cases[1]
-    assert True
+    short_pattern = cases.cases[1].expr
+    long_pattern = cases.cases[2].expr
+    
+
+#    print(short_pattern.to_tuples())
+#    print(long_pattern.to_tuples())

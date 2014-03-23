@@ -616,15 +616,15 @@ class ParamList (Node):
     attr_names = ()
 
 class Pattern(Node):
-    def __init__(self, left, right, coord=None):
-        self.left = left
-        self.right = right
+    def __init__(self, head, tail, coord=None):
+        self.head = head
+        self.tail = tail
         self.coord = coord
 
     def children(self):
         nodelist = []
-        if self.left is not None: nodelist.append(("left", self.left))
-        if self.right is not None: nodelist.append(("right", self.right))
+        if self.head is not None: nodelist.append(("head", self.head))
+        if self.tail is not None: nodelist.append(("tail", self.tail))
         return tuple(nodelist)
 
     attr_names = ()

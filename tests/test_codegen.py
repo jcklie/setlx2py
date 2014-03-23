@@ -647,7 +647,7 @@ def test_switch_sort3():
 # Match-Statement
 # ---------------
 
-@nottest
+
 def test_match_reverse():
     s = Template("""
     reverse := procedure(s) {
@@ -662,11 +662,11 @@ def test_match_reverse():
     cases = [
         ('s', 'result'),
         ('A', 'A'),
-#        ('maoam', 'maoam'),
-#        ('foo', 'oof'),
-#        ('', ''),
+        ('maoam', 'maoam'),
+        ('foo', 'oof'),
+        ('', ''),
     ]
-    assert_res_cases(s, cases, True)
+    assert_res_cases(s, cases)
 
     
 # For-Loop

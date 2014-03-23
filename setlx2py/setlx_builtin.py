@@ -7,6 +7,8 @@
 # License: Apache v2
 #------------------------------------------------------------------------------
 
+from __future__ import print_function
+
 import math
 import collections
 import operator
@@ -118,16 +120,32 @@ def matches(pattern, variables):
     if _empty(pattern.head) and not _empty(variables): return False
     return len(variables) >= len(pattern.head)
 
-def bind(pattern, matchee='_matchee'):
-    front = ', '.join(pattern.head)
-    back = ''
-    for i in range(len(pattern.head)):
-        back += '{0}[{1}], '.format(matchee, i) # e.g. _matchee[0]
+class Bumper(object):
+
+    def __add__(self, other):
+        return other
+
+    def __len__(self):
+        return 0
+
+    def __repr__(self):
+        return 'epsilon'
+
+def bind(pattern, matchee):
+    binding = []
+    length = len(pattern.head)
+    
+    for i in range(length):
+        binding.append(matchee[i])
 
     if pattern.tail:
-        front += ', ' + pattern.tail
-        back += '{0}[{1}:]'.format(matchee, i+1)
-    return front + ' = ' + back
+        last = matchee[length:]
+        if last:
+            binding.append(last)
+        else:
+            binding.append(Bumper())
+
+    return binding
     
 builtin = {
     # Classes
@@ -142,7 +160,11 @@ builtin = {
     'antivalent': antivalent,
     'pow'       : custom_pow,
     'cartesian' : cartesian,
-    'matches'   : matches
+    'matches'   : matches,
+    'bind'      : bind,
+
+    # SetlX#
+    'print:'    : print,
 }
     
 

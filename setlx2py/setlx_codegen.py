@@ -308,30 +308,36 @@ class Codegen(object):
         return s.format(matchee, matches)
 
     def visit_Pattern(self, n):
-        s = '[{0}], "{1}"'
-        left = self.visit(n.left)
-        right = self.visit(n.right)
-        return s.format(left, right)
+        s = '{0}, {1}'
+        head = self.visit(n.head)
+        tail = self.visit(n.tail)
+        return s.format(head, tail)
 
     def visit_MatchCase(self, n):
         s = self._make_indent()
-        s += 'elif matches(Pattern({0}), _matchee):\n'
-        
-        if isinstance(n.expr, Pattern):
-            self._indent()
-            binding = self._make_indent() + '{0} = bind(Pattern())\n'
-            self._unindent()
-            s += binding
-        s += '{1}'        
+        s += 'elif matches(Pattern({0}, {1}), _matchee):\n'
 
         expr = self.visit(n.expr)
         cond = self.visit(n.cond)
         body = self._generate_stmt(n.body, add_indent=True)
-
         
+        if isinstance(n.expr, Pattern):
+            head = ''.join("'" + self.visit(expr) + "'" for expr in [n.expr.head])
+            head = '['+ head + ']'
 
-        
-        return s.format(expr, body)
+            tail = self.visit(n.expr.tail)
+            tail = "'" + tail + "'"
+            
+            self._indent()
+            binding = self._make_indent() + '{2} = bind(Pattern({0}, {1}), _matchee)\n'
+            self._unindent()
+            s += binding
+        else:
+            head = expr
+            tail = None
+        s += '{3}'        
+
+        return s.format(head, tail, expr, body)
         
     #
     # Helper functions
@@ -373,6 +379,7 @@ class Codegen(object):
 
         # These can also appear in an expression context so no semicolon
         # is added to them automatically
+        
         simple_stmts = [
             Assignment, UnaryOp, BinaryOp, Call, Subscription,
             AttributeRef, Constant, Identifier
