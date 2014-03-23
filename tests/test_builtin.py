@@ -44,21 +44,26 @@ def test_set_operations():
 
 def test_matches():
     # case []
-    assert matches(Pattern([]), [])
-    assert not matches(Pattern([]), [1])                
+    p = Pattern(0, False)
+    assert matches(p , [])
+    assert not matches(p, [1])                
 
     # case [a,b]
-    assert matches(Pattern(['a', 'b']), [1, 2])           
+    assert matches(Pattern(2, False), [1, 2])           
 
     # case [a,b|c]
-    assert matches(Pattern(['a', 'b'], 'c'), [1, 2])      
+    assert matches(Pattern(2, True), [1, 2])      
 
     # case [a,b,c]
-    assert not matches(Pattern(['a', 'b', 'c']), [1, 2])  
+    p = Pattern(3, False)
+    assert not matches(p, [1, 2])
+    assert matches(p, [1,2,3])
+    assert not matches(p, [1, 2, 3, 4])  
 
     # case [a,b,c|d]
-    assert matches(Pattern(['a', 'b', 'c'], 'd'), [1, 2, 3]) 
-    assert not matches(Pattern(['a', 'b', 'c'], 'd'), [1, 2])
+    p = Pattern(3, True)
+    assert matches(p, [1, 2, 3]) 
+    assert not matches(p, [1, 2])
 
 @nottest    
 def test_bind():

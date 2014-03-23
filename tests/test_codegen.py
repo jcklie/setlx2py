@@ -79,15 +79,14 @@ def assert_res(source, variables={}, verbose=False, print_ast=False):
     for key, value in variables.items():
         eq_(ns.get(key, None), value)
 
-def assert_res_cases(s, cases, verbose=False, print_source=False):
+def assert_res_cases(s, cases, verbose=False, print_ast=False):
     header =  cases.pop(0)
     names, rname = header[:-1], header[-1]
     for case in cases:
         params, result = case[0:-1], case[-1]
         d = { k : v for k, v in zip(header, params) }
         source = s.substitute(d)
-        if print_source: print(source)
-        assert_res(source, {rname : result}, verbose=verbose)        
+        assert_res(source, {rname : result}, verbose=verbose, print_ast=print_ast)        
                 
 # Tests
 # ======
@@ -666,7 +665,30 @@ def test_match_reverse():
         ('foo', 'oof'),
         ('', ''),
     ]
+    assert_res_cases(s, cases, True, True)
+
+def test_match_reverse_pairs():
+    s = Template("""
+    reversePairs := procedure(s) {
+         match (s) {
+             case []: return s;
+             case [c]: return c;
+             case [a, b | r]:
+             return b + a + reversePairs(r);
+         }
+    };
+    result := reversePairs('$s');
+    """)
+    
+    cases = [
+        ('s', 'result'),
+        ('', ''),
+        ('j', 'j'),
+        ('xy', 'yx'),
+        ('rentiere sind toll', 'ertneiers ni dotll'),
+    ]
     assert_res_cases(s, cases)
+    
 
     
 # For-Loop

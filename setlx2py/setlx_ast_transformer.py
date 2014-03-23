@@ -24,6 +24,17 @@ class AstTransformer(NodeVisitor):
                 
             self.generic_visit(n)
 
-    
-    
-    
+    def visit_MatchCase(self, n):
+        pattern = n.pattern
+        if isinstance(pattern, List):
+            lst = ExprList(list(pattern.items))
+            n.pattern = Pattern(lst, None)
+        self.generic_visit(n)
+
+    def visit_Pattern(self, n):
+        head = n.head
+        if not isinstance(head, ExprList):
+            n.head = ExprList([head])
+        self.generic_visit(n)
+            
+            

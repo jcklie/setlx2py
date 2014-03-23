@@ -21,7 +21,7 @@ from setlx2py.setlx_parser import Parser
 ## Test housekeeping
 ##
 
-parser = Parser()
+parser = Parser(yacc_optimize=False)
 
 def is_parsable(path):
     with open(path, 'r') as f:

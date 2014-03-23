@@ -805,7 +805,7 @@ class Parser():
         p[0] = p[1]
 
     def p_match_case(self, p):
-        """ match_case : CASE expression_list case_condition COLON block """
+        """ match_case : CASE expression case_condition COLON block """
         p[0] = MatchCase(p[2], p[3], p[5], p[2].coord)
 
     # Regex case

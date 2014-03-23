@@ -17,10 +17,12 @@ class Codegen(object):
         self.cur_indent = 0
         self.func_count = 0
         self.indent = ' ' * 4
+        self.last_visited = ''
 
     def visit(self, node):
         method = 'visit_' + node.__class__.__name__
         fun = getattr(self, method, self.generic_visit)(node)
+        self.last_visited = method
         return fun
 
     def generic_visit(self, node):
@@ -32,7 +34,8 @@ class Codegen(object):
            except AttributeError as e:
                msg = 'Cannot visit : \n'
                msg += str(node) + '\n'
-               msg += 'Reason: ' + str(e)
+               msg += 'Reason: ' + str(e) + '\n'
+               msg += 'Last: ' + self.last_visited + '\n'
                raise Exception(msg)
 
     ## Visit functions
@@ -278,6 +281,10 @@ class Codegen(object):
         s = ''.join(self.visit(case) for case in n.cases)
         return s.replace(self._make_indent() + 'el', '', 1)
 
+    def visit_ExprList(self, n):
+        s = ', '.join(self.visit(expr) for expr in n.exprs)
+        return s
+
     def visit_Case(self, n):
         s = self._make_indent()
         s += 'elif {0}:'
@@ -317,27 +324,26 @@ class Codegen(object):
         s = self._make_indent()
         s += 'elif matches(Pattern({0}, {1}), _matchee):\n'
 
-        expr = self.visit(n.expr)
+        pattern = self.visit(n.pattern)
         cond = self.visit(n.cond)
         body = self._generate_stmt(n.body, add_indent=True)
         
-        if isinstance(n.expr, Pattern):
-            head = ''.join("'" + self.visit(expr) + "'" for expr in [n.expr.head])
-            head = '['+ head + ']'
+        if isinstance(n.pattern, Pattern):
+            headcount = len(n.pattern.head.exprs)
+            has_tail = n.pattern.tail is not None
 
-            tail = self.visit(n.expr.tail)
-            tail = "'" + tail + "'"
-            
-            self._indent()
-            binding = self._make_indent() + '{2} = bind(Pattern({0}, {1}), _matchee)\n'
-            self._unindent()
-            s += binding
+            if headcount > 0:
+                self._indent()
+                binding = self._make_indent() + '{2} = bind(Pattern({0}, {1}), _matchee)\n'
+                s += binding
+                self._unindent()
+
         else:
-            head = expr
+            head = pattern
             tail = None
         s += '{3}'        
 
-        return s.format(head, tail, expr, body)
+        return s.format(headcount, has_tail, pattern, body)
         
     #
     # Helper functions

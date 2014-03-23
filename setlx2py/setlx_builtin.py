@@ -106,9 +106,7 @@ def product(factors):
 # Matching
 # --------
 
-class Pattern(collections.namedtuple('Pattern', ['head', 'tail'])):
-    def __new__(cls, head, tail=None):
-        return super(Pattern, cls).__new__(cls, head, tail)
+Pattern = collections.namedtuple('Pattern', ['headcount', 'has_tail'])
 
 def _empty(x):
     return len(x) == 0
@@ -117,12 +115,19 @@ def matches(pattern, variables):
     """ A pattern matches when there are at least
     len(var) bindable elements in it.
     """
-    if _empty(pattern.head) and not _empty(variables): return False
-    return len(variables) >= len(pattern.head)
+    if pattern.headcount == 0 and not _empty(variables):
+        return False
+    elif pattern.has_tail:
+        return len(variables) >= pattern.headcount
+    else:
+        return len(variables) == pattern.headcount
 
 class Bumper(object):
 
     def __add__(self, other):
+        return other
+
+    def __radd__(self, other):
         return other
 
     def __len__(self):
@@ -133,12 +138,12 @@ class Bumper(object):
 
 def bind(pattern, matchee):
     binding = []
-    length = len(pattern.head)
+    length = pattern.headcount
     
     for i in range(length):
         binding.append(matchee[i])
 
-    if pattern.tail:
+    if pattern.has_tail:
         last = matchee[length:]
         if last:
             binding.append(last)
