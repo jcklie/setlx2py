@@ -1,5 +1,10 @@
 from nose.tools import eq_, nottest
 
+import sys
+import random
+
+from cStringIO import StringIO
+
 from setlx2py.setlx_builtin import *
 
 def test_implies():
@@ -23,6 +28,21 @@ def test_antivalent():
 def test_product():
     assert product(range(1,5)) == 24
     assert product([1,5,34,5,6,8]) == (1 * 5 * 34 * 5 * 6 * 8)
+
+def test_arb():
+    random.seed(42)
+    s = Set([42])
+
+    result = arb(s)
+    eq_(result, 42)
+    eq_(s, Set([42]))
+    
+def test_from():
+    s = Set([42])
+    s, result = pop_random(s)
+
+    eq_(result, 42)
+    eq_(s, Set([]))    
 
 # Custom/Overloaded set Operations
 # ----------
@@ -74,3 +94,11 @@ def test_bind():
     # match ([1..42]) { case [a,b|c] : .. }
     s = bind(Pattern(['a', 'b'], 'r' ))
     print(s)
+
+def test_print():
+    old_stdout = sys.stdout
+    sys.stdout = mystdout = StringIO()
+    syso('Foo ', 'Bar ', 'baz')
+    result =  mystdout.getvalue()
+    sys.stdout = old_stdout
+    eq_(result, 'Foo Bar baz\n')

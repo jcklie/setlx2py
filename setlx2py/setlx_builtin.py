@@ -7,13 +7,12 @@
 # License: Apache v2
 #------------------------------------------------------------------------------
 
-from __future__ import print_function
-
 import math
 import collections
 import operator
 import functools
-
+import sys
+import random
 import itertools as it
 
 # Custom classes
@@ -22,7 +21,7 @@ import itertools as it
 class Set(frozenset):
 
     def __init__(self, iterable):
-        super(Set, self).__init__()
+        super(Set, self).__init__(iterable)
 
     def __add__(self, other):
         return self.union(other)
@@ -33,8 +32,34 @@ class Set(frozenset):
     def __mod__(self, other):
         return self.symmetric_difference(other)
 
-    def _tuple_it(self, l):
-        return tuple(map(self._tuple_it, l)) if isinstance(l, (list, tuple)) else l
+    def __lt__(self, other):
+        l1 = len(self)
+        l2 = len(other)
+
+        it1 = iter(self)
+        it2 = iter(other)
+
+        for i in range(max(l1,l2)):
+            try:
+                x = it1.next()
+                y = it2.next()
+                if x != y:
+                    return x < y
+            except StopIteration:
+                return l1 < l2
+                    
+        return False
+
+    def __repr__(self):
+        data = sorted(self)
+
+        s = ', '.join(repr(i) for i in data)
+        
+        s = s.replace('(', '{')
+        s = s.replace(')', '}')
+        s = s.replace(',}', '}')
+        return '{' + s + '}'
+
 
 class memoized(object):
     '''Decorator. Caches a function's return value each time it is called.
@@ -76,7 +101,11 @@ def custom_pow(a,b):
     elif isinstance(b, Set) and a == 2:
         return powerset(b)
     else:
-        return a ** b        
+        return a ** b
+
+def syso(*args):
+    s = ''.join(str(arg) for arg in args) + '\n'
+    sys.stdout.write(s)
 
 # Logic
 # -----
@@ -98,10 +127,19 @@ def cartesian(a,b):
 
 def powerset(s):
     lst = list(s)
-    return Set(it.chain.from_iterable(it.combinations(lst, r) for r in range(len(lst)+1)))
+    return Set(it.chain.from_iterable(it.combinations(lst, r)
+                                      for r in range(len(lst)+1)))
 
 def product(factors):
     return functools.reduce(operator.mul, factors, 1)
+
+def arb(m):
+    return random.sample(m, 1)[0]
+
+def pop_random(m):
+    n = arb(m)
+    altered_m = m - Set([n])
+    return altered_m, n
 
 # Matching
 # --------
@@ -158,18 +196,24 @@ builtin = {
     'Pattern'   : Pattern,
     'memoized'  : memoized,
     # Functions
-    'factorial' : math.factorial,
-    'product'   : product,
-    'implies'   : implies,
-    'equivalent': equivalent,
-    'antivalent': antivalent,
-    'pow'       : custom_pow,
-    'cartesian' : cartesian,
-    'matches'   : matches,
-    'bind'      : bind,
+    'factorial'   : math.factorial,
+    'product'     : product,
+    
+    '_implies'    : implies,
+    '_equivalent' : equivalent,
+    '_antivalent' : antivalent,
+    '_arb'        : arb,
+    '_pop_random' : pop_random,
+    '_powerset'   : powerset,
+    '_pow'        : custom_pow,
+    '_cartesian'  : cartesian,
+    
+    'matches'     : matches,
+    'bind'        : bind,
 
-    # SetlX#
-    'print:'    : print,
+    '_print'      : syso,
+
+    '_zip'        : zip,
 }
     
 

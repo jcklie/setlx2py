@@ -13,65 +13,22 @@ from string import Template
 
 from nose.tools import nottest, eq_
 
-from setlx2py.setlx_builtin import builtin, Set
-from setlx2py.setlx_parser import Parser
-from setlx2py.setlx_ast_transformer import AstTransformer
-from setlx2py.setlx_codegen import Codegen
+from setlx2py.setlx_builtin import Set
+from setlx2py.setlx_util import run
 
 import itertools
 
-parser = Parser()
-transformer = AstTransformer()
-generator = Codegen()
-
-##
-## Hack redefines
-## 
+# Hack redefines
+# ==============
 
 try:
     xrange(0,2)
     range = xrange
 except:
     pass
-
-
-##
-## Helper methods
-##
-
-def error_msg(source, compiled=None, e=None):
-    msg = 'Could not run stuff:\n'
     
-    msg += 'Source:\n' + source + '\n'
-    if compiled:
-        msg += 'Compiled:\n' + compiled
-    if e:
-        msg += 'Reason:\n'
-        msg += e.__class__.__name__ + '\n'
-        msg += str(e) + '\n'
-    return msg
-
-def run(source, ns={}, verbose=False, print_ast=False):
-    ns.update(builtin)
-    ast = parser.parse(source)
-    transformer.visit(ast)
-    
-    if verbose:
-        print('Source: \n' + source)
-
-    if print_ast:
-        print(ast)
-
-    compiled = generator.visit(ast)
-    if verbose:
-        print('Compliled: \n' + compiled)
-
-    try:
-        code = compile(compiled, '<string>', 'exec')
-        exec(code, ns)
-    except Exception as e:
-        msg = error_msg(source, compiled, e=e)
-        raise AssertionError(msg)
+# Custom Asserts
+# ==============    
 
 def assert_res(source, variables={}, verbose=False, print_ast=False):
     ns = {}
@@ -90,9 +47,6 @@ def assert_res_cases(s, cases, verbose=False, print_ast=False):
                 
 # Tests
 # ======
-
-def test_is_creatable():
-    assert generator is not None
 
 def test_identifier():
     ns = {'a' : 42}
@@ -665,7 +619,7 @@ def test_match_reverse():
         ('foo', 'oof'),
         ('', ''),
     ]
-    assert_res_cases(s, cases, True, True)
+    assert_res_cases(s, cases)
 
 def test_match_reverse_pairs():
     s = Template("""

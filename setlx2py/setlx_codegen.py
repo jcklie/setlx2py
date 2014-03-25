@@ -7,6 +7,8 @@
 # License: Apache v2
 #------------------------------------------------------------------------------
 
+from __future__ import print_function
+
 import re
 
 from setlx2py.setlx_ast import *
@@ -88,11 +90,11 @@ class Codegen(object):
         }
 
         op_to_function = {
-            '=>'   : 'implies',
-            '<==>' : 'equivalent',
-            '<!=>' : 'antivalent',
-            '><'   : 'cartesian',
-            '**'   : 'pow',
+            '=>'   : '_implies',
+            '<==>' : '_equivalent',
+            '<!=>' : '_antivalent',
+            '><'   : '_cartesian',
+            '**'   : '_pow',
         }
 
         if n.op in bool_op_simple:
@@ -225,7 +227,7 @@ class Codegen(object):
         return '{0} in {1}'.format(lhs, rhs)
 
     def visit_IteratorChain(self, n):
-        assert n.mode in ['zip', 'cartesian'], 'Invalid mode for iterator chain : ' + n.mode
+        assert n.mode in ['_zip', '_cartesian'], 'Invalid mode for iterator chain : ' + n.mode
         targets = ', '.join(self.visit(itr.assignable) for itr in n.iterators)
         iterables = ', '.join(self.visit(itr.expression) for itr in n.iterators)
         return '{0} in {1}({2})'.format(targets, n.mode, iterables)
@@ -261,7 +263,16 @@ class Codegen(object):
         return ', '.join(self.visit(arg) for arg in n.arguments)
 
     def visit_Call(self, n):
+        mapped_function_names = {
+            'print' : '_print',
+            'from'  : '_pop_random',
+            'arb'   : '_arb',
+            'pow'   : '_powerset',
+        }
+
         fref = self._parenthesize_unless_simple(n.name)
+        fref = mapped_function_names.get(fref, fref)
+
         return fref + '(' + self.visit(n.args) + ')'
 
     def visit_Lambda(self, n):

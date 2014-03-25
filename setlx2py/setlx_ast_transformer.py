@@ -3,15 +3,15 @@ from setlx2py.setlx_ast import *
 class AstTransformer(NodeVisitor):
 
     def visit_Quantor(self, n):
-        n.iterators.mode = 'cartesian'
+        n.iterators.mode = '_cartesian'
         self.generic_visit(n)
 
     def visit_Comprehension(self, n):
-        n.iterators.mode = 'cartesian'
+        n.iterators.mode = '_cartesian'
         self.generic_visit(n)
 
     def visit_For(self, n):
-        n.iterators.mode = 'zip'
+        n.iterators.mode = '_zip'
         self.generic_visit(n)
 
     def visit_FileAST(self, n):

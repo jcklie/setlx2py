@@ -44,22 +44,22 @@ def test_iterchain_mode_for():
     }
     """
     node = parse_single_statement(s)
-    eq_(node.iterators.mode, 'zip')
+    eq_(node.iterators.mode, '_zip')
     
 def test_iterchain_mode_comprehension():
     s = '{a * b: a in {1..3}, b in {1..3}};'
     node = parse_single_statement(s)
-    eq_(node.iterators.mode, 'cartesian')
+    eq_(node.iterators.mode, '_cartesian')
 
 def test_iterchain_mode_quantor():
     s = 'forall (x in {1..10}, y in [20..30] | x < y);'
     node = parse_single_statement(s)
-    eq_(node.iterators.mode, 'cartesian')
+    eq_(node.iterators.mode, '_cartesian')
     
 def test_iterchain_mode_quantor_deep():
     s = 'exists ([x, y] in [[a,b] : a in {1..10}, b in {1..10}] | 3*x - 4*y == 5);'
     node = parse_single_statement(s)
-    eq_(node.iterators.expression.iterators.mode, 'cartesian')
+    eq_(node.iterators.expression.iterators.mode, '_cartesian')
 
 # Procedure
 # ---------
