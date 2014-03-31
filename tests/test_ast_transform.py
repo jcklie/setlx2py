@@ -93,3 +93,16 @@ def test_match_pattern():
 
 #    print(short_pattern.to_tuples())
 #    print(long_pattern.to_tuples())
+
+def test_assignment_list_bracketed():
+    node = parse_single_statement('[x,y,z] := [1..3];')
+    assert "bracketed" in node.target.tags
+
+def test_iterator_bracketed():
+    s = """
+    for([x,y] in [[1..5], [1,2,3,4,5]]) {
+        print(x+y);
+    }
+    """
+    node = parse_single_statement(s)
+    assert "bracketed" in node.iterators.assignable.tags

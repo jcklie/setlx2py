@@ -7,11 +7,8 @@
 # License: Apache v2
 #------------------------------------------------------------------------------
 
-from __future__ import print_function
-
-import re
-
 from setlx2py.setlx_ast import *
+from setlx2py.setlx_util import *
 
 class Codegen(object):
 
@@ -43,6 +40,8 @@ class Codegen(object):
     ## Visit functions
 
     def visit_Identifier(self, n):
+        if n.name == 'om':
+            return None
         return n.name
 
     def visit_FileAST(self, n):
@@ -69,9 +68,9 @@ class Codegen(object):
         ]
         
         if n.klass == 'string': 
-            return "'" + str(n.value) + "'"
+            return "SetlxString('{0}')".format(n.value)
         elif n.klass == 'literal':
-            return "r'" + str(n.value) + "'"
+            return "SetlxString('{0}')".format(n.value)
         elif n.klass in simple_constants:
             return str(n.value)
         else:
@@ -87,14 +86,15 @@ class Codegen(object):
         bool_op_simple = {
             '&&' : 'and',
             '||' : 'or',
+            'notin' : 'not in',
         }
 
         op_to_function = {
-            '=>'   : '_implies',
-            '<==>' : '_equivalent',
-            '<!=>' : '_antivalent',
-            '><'   : '_cartesian',
-            '**'   : '_pow',
+            '=>'   : 'stlx_implies',
+            '<==>' : 'stlx_equivalent',
+            '<!=>' : 'stlx_antivalent',
+            '><'   : 'stlx_cartesian',
+            '**'   : 'stlx_pow',
         }
 
         if n.op in bool_op_simple:
@@ -112,10 +112,10 @@ class Codegen(object):
         operand = self._parenthesize_unless_simple(n.expr)
 
         op_to_function = {
-            'fac' : 'factorial',
-            '#'   : 'len',
-            '+/'  : 'sum',
-            '*/'  : 'product',
+            'fac' : 'stlx_factorial',
+            '#'   : 'stlx_len',
+            '+/'  : 'stlx_sum',
+            '*/'  : 'stlx_product',
         }
         if n.op in op_to_function:
             op = op_to_function[n.op]
@@ -130,11 +130,15 @@ class Codegen(object):
         return 'Set([{0}])'.format(items)
 
     def visit_List(self, n):
+        if "bracketed" in n.tags:
+            s = '[{0}]'
+        else:
+            s = 'SetlxList([{0}])'
         items = ','.join(self.visit(x) for x in n.items)
-        return '[{0}]'.format(items)
+        return s.format(items)
 
     def visit_Subscription(self, n):
-        s = '{0}[{1} - 1]'
+        s = '{0}[{1}]'
         obj = self._parenthesize_unless_simple(n.obj)
         subscript =  self.visit(n.subscript)
         return s.format(obj, subscript)
@@ -144,10 +148,7 @@ class Codegen(object):
         lower = self._parenthesize_unless_simple(n.lower)
         upper = self._parenthesize_unless_simple(n.upper)
 
-        if lower:
-            lower = '(' + lower + ' - 1)'
-
-        s = '{0}[{1}: {2}]'
+        s = '{0}[{1}:{2}]'
         return s.format(obj, lower, upper) 
 
     def visit_Range(self, n):
@@ -221,16 +222,25 @@ class Codegen(object):
         body = self._generate_stmt(n.body, add_indent=True)
         return s.format(iterators, body)
 
+    def visit_While(self, n):
+        s = 'while {0}:\n'
+        s += '{1}'
+        cond = self._parenthesize_unless_simple(n.cond)
+        body = self._generate_stmt(n.body, add_indent=True)
+        return s.format(cond, body)
+
     def visit_Iterator(self, n):
         lhs = self.visit(n.assignable)
         rhs = self.visit(n.expression)
         return '{0} in {1}'.format(lhs, rhs)
 
     def visit_IteratorChain(self, n):
-        assert n.mode in ['_zip', '_cartesian'], 'Invalid mode for iterator chain : ' + n.mode
+        assert n.mode in ['_zip', '_cartesian'], \
+        'Invalid mode for iterator chain : ' + n.mode
+        mode = 'stlx' + n.mode
         targets = ', '.join(self.visit(itr.assignable) for itr in n.iterators)
         iterables = ', '.join(self.visit(itr.expression) for itr in n.iterators)
-        return '{0} in {1}({2})'.format(targets, n.mode, iterables)
+        return '{0} in {1}({2})'.format(targets, mode, iterables)
 
     def visit_Quantor(self, n):
         s = '{0}({1} for {2})'        
@@ -263,17 +273,30 @@ class Codegen(object):
         return ', '.join(self.visit(arg) for arg in n.arguments)
 
     def visit_Call(self, n):
-        mapped_function_names = {
-            'print' : '_print',
-            'from'  : '_pop_random',
-            'arb'   : '_arb',
-            'pow'   : '_powerset',
+        renamed_functions = {
+            'pow' : 'powerset',
         }
 
-        fref = self._parenthesize_unless_simple(n.name)
-        fref = mapped_function_names.get(fref, fref)
+        builtin_functions = [
+            'print', 
+            'from',  
+            'arb',  
+            'pow',  
+            'char',  
+            'isString',
+            'abort',
+        ]
 
-        return fref + '(' + self.visit(n.args) + ')'
+        builtin_functions += renamed_functions.values()
+
+        name = self._parenthesize_unless_simple(n.name)
+        if name in renamed_functions:
+            name = renamed_functions[name]
+
+        if name in builtin_functions:
+            name = 'stlx_' + self.camel_to_snake(name)
+            
+        return name + '(' + self.visit(n.args) + ')'
 
     def visit_Lambda(self, n):
         s = 'lambda {0}: {1}'
@@ -333,7 +356,7 @@ class Codegen(object):
 
     def visit_MatchCase(self, n):
         s = self._make_indent()
-        s += 'elif matches(Pattern({0}, {1}), _matchee):\n'
+        s += 'elif stlx_matches(Pattern({0}, {1}), _matchee):\n'
 
         pattern = self.visit(n.pattern)
         cond = self.visit(n.cond)
@@ -345,7 +368,8 @@ class Codegen(object):
 
             if headcount > 0:
                 self._indent()
-                binding = self._make_indent() + '{2} = bind(Pattern({0}, {1}), _matchee)\n'
+                binding = self._make_indent()
+                binding += '{2} = stlx_bind(Pattern({0}, {1}), _matchee)\n'
                 s += binding
                 self._unindent()
 
@@ -364,7 +388,7 @@ class Codegen(object):
         if clazz == 'set':
             return 'Set'
         elif clazz == 'list':
-            return 'list'
+            return 'SetlxList'
         else:
             msg = 'Invalid collection name: {0}'.format(clazz)
             raise Exception(msg)
@@ -438,4 +462,13 @@ class Codegen(object):
         """ Common use case for _parenthesize_if """
         return self._parenthesize_if(n, self._is_simple_node)
 
-    
+    def camel_to_snake(self, s):
+        """
+        https://gist.github.com/jaytaylor/3660565
+        Converts string in CamelCase to snake_case
+        """
+        _underscorer1 = re.compile(r'(.)([A-Z][a-z]+)')
+        _underscorer2 = re.compile('([a-z0-9])([A-Z])')
+
+        subbed = _underscorer1.sub(r'\1_\2', s)
+        return _underscorer2.sub(r'\1_\2', subbed).lower()

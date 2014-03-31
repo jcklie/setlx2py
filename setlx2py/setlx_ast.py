@@ -153,6 +153,7 @@ class NodeVisitor(object):
 
 class As (Node):
     def __init__(self, expr, coord=None):
+        self.tags = []
         self.expr = expr
         self.coord = coord
 
@@ -165,6 +166,7 @@ class As (Node):
 
 class Assert(Node):
     def __init__(self, cond, expr, coord=None):
+        self.tags = []
         self.cond = cond
         self.expr = expr
         self.coord = coord
@@ -179,6 +181,7 @@ class Assert(Node):
 
 class ArgumentList (Node):
     def __init__(self, arguments, coord=None):
+        self.tags = []
         self.arguments = arguments
         self.coord = coord
 
@@ -192,6 +195,7 @@ class ArgumentList (Node):
 
 class Assignment(Node):
     def __init__(self, op, target, right, coord=None):
+        self.tags = []
         self.op = op
         self.target = target
         self.right = right
@@ -207,6 +211,7 @@ class Assignment(Node):
 
 class AttributeRef (Node):
     def __init__(self, obj, field, coord=None):
+        self.tags = []
         self.obj = obj
         self.field = field
         self.coord = coord
@@ -221,6 +226,7 @@ class AttributeRef (Node):
 
 class BinaryOp(Node):
     def __init__(self, op, left, right, coord=None):
+        self.tags = []
         self.op = op
         self.left = left
         self.right = right
@@ -236,6 +242,7 @@ class BinaryOp(Node):
 
 class Backtrack(Node):
     def __init__(self, coord=None):
+        self.tags = []
         self.coord = coord
 
     def children(self):
@@ -245,6 +252,7 @@ class Backtrack(Node):
 
 class Block(Node):
     def __init__(self, stmts, coord=None):
+        self.tags = []
         self.stmts = stmts
         self.coord = coord
 
@@ -258,6 +266,7 @@ class Block(Node):
 
 class Break(Node):
     def __init__(self, coord=None):
+        self.tags = []
         self.coord = coord
 
     def children(self):
@@ -267,6 +276,7 @@ class Break(Node):
 
 class Call (Node):
     def __init__(self, name, args, coord=None):
+        self.tags = []
         self.name = name
         self.args = args
         self.coord = coord
@@ -281,6 +291,7 @@ class Call (Node):
 
 class Case(Node):
     def __init__(self, cond, body, coord=None):
+        self.tags = []
         self.cond = cond
         self.body = body
         self.coord = coord
@@ -295,6 +306,7 @@ class Case(Node):
 
 class CaseList (Node):
     def __init__(self, cases, coord=None):
+        self.tags = []
         self.cases = cases
         self.coord = coord
 
@@ -308,6 +320,7 @@ class CaseList (Node):
 
 class CatchClause(Node):
     def __init__(self, type, name, block, coord=None):
+        self.tags = []
         self.type = type
         self.name = name
         self.block = block
@@ -323,6 +336,7 @@ class CatchClause(Node):
 
 class Catches (Node):
     def __init__(self, clauses, coord=None):
+        self.tags = []
         self.clauses = clauses
         self.coord = coord
 
@@ -336,6 +350,7 @@ class Catches (Node):
 
 class Check(Node):
     def __init__(self, block, coord=None):
+        self.tags = []
         self.block = block
         self.coord = coord
 
@@ -348,6 +363,7 @@ class Check(Node):
 
 class Class(Node):
     def __init__(self, name, params, block, static, coord=None):
+        self.tags = []
         self.name = name
         self.params = params
         self.block = block
@@ -366,6 +382,7 @@ class Class(Node):
 
 class Comprehension (Node):
     def __init__(self, klass, expr, iterators, cond, coord=None):
+        self.tags = []
         self.klass = klass
         self.expr = expr
         self.iterators = iterators
@@ -383,6 +400,7 @@ class Comprehension (Node):
 
 class Continue(Node):
     def __init__(self, coord=None):
+        self.tags = []
         self.coord = coord
 
     def children(self):
@@ -392,6 +410,7 @@ class Continue(Node):
 
 class Constant(Node):
     def __init__(self, klass, value, coord=None):
+        self.tags = []
         self.klass = klass
         self.value = value
         self.coord = coord
@@ -404,6 +423,7 @@ class Constant(Node):
 
 class Default(Node):
     def __init__(self, body, coord=None):
+        self.tags = []
         self.body = body
         self.coord = coord
 
@@ -416,6 +436,7 @@ class Default(Node):
 
 class DoWhile(Node):
     def __init__(self, cond, body, coord=None):
+        self.tags = []
         self.cond = cond
         self.body = body
         self.coord = coord
@@ -430,6 +451,7 @@ class DoWhile(Node):
 
 class Exit(Node):
     def __init__(self, coord=None):
+        self.tags = []
         self.coord = coord
 
     def children(self):
@@ -439,6 +461,7 @@ class Exit(Node):
 
 class ExprList(Node):
     def __init__(self, exprs, coord=None):
+        self.tags = []
         self.exprs = exprs
         self.coord = coord
 
@@ -452,6 +475,7 @@ class ExprList(Node):
 
 class FileAST(Node):
     def __init__(self, stmts, coord=None):
+        self.tags = []
         self.stmts = stmts
         self.coord = coord
 
@@ -465,6 +489,7 @@ class FileAST(Node):
 
 class For(Node):
     def __init__(self, iterators, body, coord=None):
+        self.tags = []
         self.iterators = iterators
         self.body = body
         self.coord = coord
@@ -479,6 +504,7 @@ class For(Node):
 
 class Identifier(Node):
     def __init__(self, name, coord=None):
+        self.tags = []
         self.name = name
         self.coord = coord
 
@@ -490,6 +516,7 @@ class Identifier(Node):
 
 class If(Node):
     def __init__(self, cond, iftrue, iffalse, coord=None):
+        self.tags = []
         self.cond = cond
         self.iftrue = iftrue
         self.iffalse = iffalse
@@ -506,6 +533,7 @@ class If(Node):
 
 class Iterator(Node):
     def __init__(self, assignable, expression, coord=None):
+        self.tags = []
         self.assignable = assignable
         self.expression = expression
         self.coord = coord
@@ -520,6 +548,7 @@ class Iterator(Node):
 
 class IteratorChain(Node):
     def __init__(self, mode, iterators, coord=None):
+        self.tags = []
         self.mode = mode
         self.iterators = iterators
         self.coord = coord
@@ -534,6 +563,7 @@ class IteratorChain(Node):
 
 class Lambda(Node):
     def __init__(self, params, body, coord=None):
+        self.tags = []
         self.params = params
         self.body = body
         self.coord = coord
@@ -548,6 +578,7 @@ class Lambda(Node):
 
 class List(Node):
     def __init__(self, items, coord=None):
+        self.tags = []
         self.items = items
         self.coord = coord
 
@@ -561,6 +592,7 @@ class List(Node):
 
 class Match(Node):
     def __init__(self, matchee, case_list, default, coord=None):
+        self.tags = []
         self.matchee = matchee
         self.case_list = case_list
         self.default = default
@@ -577,6 +609,7 @@ class Match(Node):
 
 class MatchCase(Node):
     def __init__(self, pattern, cond, body, coord=None):
+        self.tags = []
         self.pattern = pattern
         self.cond = cond
         self.body = body
@@ -593,6 +626,7 @@ class MatchCase(Node):
 
 class Param (Node):
     def __init__(self, name, coord=None):
+        self.tags = []
         self.name = name
         self.coord = coord
 
@@ -604,6 +638,7 @@ class Param (Node):
 
 class ParamList (Node):
     def __init__(self, params, coord=None):
+        self.tags = []
         self.params = params
         self.coord = coord
 
@@ -617,6 +652,7 @@ class ParamList (Node):
 
 class Pattern(Node):
     def __init__(self, head, tail, coord=None):
+        self.tags = []
         self.head = head
         self.tail = tail
         self.coord = coord
@@ -631,6 +667,7 @@ class Pattern(Node):
 
 class Procedure(Node):
     def __init__(self, name, clazz, params, body, coord=None):
+        self.tags = []
         self.name = name
         self.clazz = clazz
         self.params = params
@@ -647,6 +684,7 @@ class Procedure(Node):
 
 class Quantor(Node):
     def __init__(self, name, iterators, cond, coord=None):
+        self.tags = []
         self.name = name
         self.iterators = iterators
         self.cond = cond
@@ -662,6 +700,7 @@ class Quantor(Node):
 
 class Range (Node):
     def __init__(self, klass, a, b, c, coord=None):
+        self.tags = []
         self.klass = klass
         self.a = a
         self.b = b
@@ -679,6 +718,7 @@ class Range (Node):
 
 class Regex (Node):
     def __init__(self, expr, as_expr, cond, block, coord=None):
+        self.tags = []
         self.expr = expr
         self.as_expr = as_expr
         self.cond = cond
@@ -697,6 +737,7 @@ class Regex (Node):
 
 class Return (Node):
     def __init__(self, expr, coord=None):
+        self.tags = []
         self.expr = expr
         self.coord = coord
 
@@ -709,6 +750,7 @@ class Return (Node):
 
 class Scan(Node):
     def __init__(self, expr, using, regex_list, default, coord=None):
+        self.tags = []
         self.expr = expr
         self.using = using
         self.regex_list = regex_list
@@ -727,6 +769,7 @@ class Scan(Node):
 
 class Set(Node):
     def __init__(self, items, coord=None):
+        self.tags = []
         self.items = items
         self.coord = coord
 
@@ -740,6 +783,7 @@ class Set(Node):
 
 class Slice (Node):
     def __init__(self, obj, lower, upper, coord=None):
+        self.tags = []
         self.obj = obj
         self.lower = lower
         self.upper = upper
@@ -756,6 +800,7 @@ class Slice (Node):
 
 class Subscription(Node):
     def __init__(self, obj, subscript, coord=None):
+        self.tags = []
         self.obj = obj
         self.subscript = subscript
         self.coord = coord
@@ -770,6 +815,7 @@ class Subscription(Node):
 
 class Switch (Node):
     def __init__(self, case_list, default, coord=None):
+        self.tags = []
         self.case_list = case_list
         self.default = default
         self.coord = coord
@@ -784,6 +830,7 @@ class Switch (Node):
 
 class Term(Node):
     def __init__(self, name, args, coord=None):
+        self.tags = []
         self.name = name
         self.args = args
         self.coord = coord
@@ -797,6 +844,7 @@ class Term(Node):
 
 class Try(Node):
     def __init__(self, block, catches, coord=None):
+        self.tags = []
         self.block = block
         self.catches = catches
         self.coord = coord
@@ -811,6 +859,7 @@ class Try(Node):
 
 class UnaryOp(Node):
     def __init__(self, op, expr, coord=None):
+        self.tags = []
         self.op = op
         self.expr = expr
         self.coord = coord
@@ -824,6 +873,7 @@ class UnaryOp(Node):
 
 class While(Node):
     def __init__(self, cond, body, coord=None):
+        self.tags = []
         self.cond = cond
         self.body = body
         self.coord = coord

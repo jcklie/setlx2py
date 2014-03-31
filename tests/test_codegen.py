@@ -307,10 +307,15 @@ def test_subscription_chained():
 # Slice
 # -----
 
-def test_slice():
+def test_slice_list():
     assert_res('l := [1..100]; x := l[5..10];', {'x' : [5,6,7,8,9,10]})
     assert_res('l := [1..10]; x := l[..4];', {'x' : [1,2,3,4]})
     assert_res('l := [1..10]; x := l[4..];', {'x' : [4,5,6,7,8,9,10]})
+
+def test_slice_string():
+    assert_res('s := "abcdef"; x := s[2..5];', {'x' : "bcde"})
+    assert_res('s := "abcdef"; x := s[2..];', {'x' : "bcdef"})
+    assert_res('s := "abcdef"; x := s[..5];', {'x' : "abcde"})
     
 # Compund statements
 # ==================
@@ -614,10 +619,10 @@ def test_match_reverse():
     """)
     cases = [
         ('s', 'result'),
-        ('A', 'A'),
-        ('maoam', 'maoam'),
-        ('foo', 'oof'),
         ('', ''),
+        ('A', 'A'),
+        ('ab', 'ba'),
+        ('maoam', 'maoam'),
     ]
     assert_res_cases(s, cases)
 
@@ -627,8 +632,7 @@ def test_match_reverse_pairs():
          match (s) {
              case []: return s;
              case [c]: return c;
-             case [a, b | r]:
-             return b + a + reversePairs(r);
+             case [a, b | r]: return b + a + reversePairs(r);
          }
     };
     result := reversePairs('$s');
@@ -671,5 +675,31 @@ def test_for_loop_double():
     """
     assert_res(s, {'accum' : 0})
     
+# While-Loop
+# ----------
 
-    
+def test_while_collatz():
+    s = Template(
+    """
+    f := procedure(n) {
+        if (n == 0) {
+            return 1;
+        }
+        while (n != 1) {
+            if (n % 2 == 0) {
+                n /= 2;
+            } else {
+                n := 3 * n + 1;
+            }
+        }
+            return n;
+    };
+    result := f($n);     
+    """)
+    cases = [
+        ('n', 'result'),
+        (42, 1),
+        (0, 1),
+        (1, 1),
+    ]
+    assert_res_cases(s, cases)

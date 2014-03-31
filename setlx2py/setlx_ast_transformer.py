@@ -36,5 +36,17 @@ class AstTransformer(NodeVisitor):
         if not isinstance(head, ExprList):
             n.head = ExprList([head])
         self.generic_visit(n)
+
+    def visit_Assignment(self, n):
+        target = n.target
+        if isinstance(target, List):
+            target.tags.append('bracketed')
+        self.generic_visit(n)
+
+    def visit_Iterator(self, n):
+        assignable = n.assignable
+        if isinstance(assignable, List):
+            assignable.tags.append('bracketed')
+        self.generic_visit(n)
             
             
