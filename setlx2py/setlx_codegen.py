@@ -127,7 +127,7 @@ class Codegen(object):
 
     def visit_Set(self, n):
         items = ','.join(self.visit(x) for x in n.items)
-        return 'Set([{0}])'.format(items)
+        return 'SetlxSet([{0}])'.format(items)
 
     def visit_List(self, n):
         if "bracketed" in n.tags:
@@ -153,18 +153,16 @@ class Codegen(object):
 
     def visit_Range(self, n):
         collection = self._get_collection_name(n.klass)
-        lower = self._parenthesize_unless_simple(n.a)
-        middle = self._parenthesize_unless_simple(n.b)
-        upper = self._parenthesize_unless_simple(n.c)
+        a = self._parenthesize_unless_simple(n.a)
+        b = self._parenthesize_unless_simple(n.b)
+        z = self._parenthesize_unless_simple(n.c)
 
-        if middle:
-            s = '{0}(range({1},{2}, {3}))'
-            step = '{0} - {1}'.format(middle, lower)
+        if b:
+            s = '{0}(stlx_range({1}, {2}, {3}))'
+            return s.format(collection, a, b, z)
         else:
-            s = '{0}(range({1},{2} + 1, {3}))'
-            step = '1'
-        
-        return s.format(collection, lower, upper, step)
+            s = '{0}(stlx_range({1},{2}))'
+            return s.format(collection, a, z)
 
     def visit_Comprehension(self, n):
         collection = self._get_collection_name(n.klass)
@@ -235,9 +233,7 @@ class Codegen(object):
         return '{0} in {1}'.format(lhs, rhs)
 
     def visit_IteratorChain(self, n):
-        assert n.mode in ['_zip', '_cartesian'], \
-        'Invalid mode for iterator chain : ' + n.mode
-        mode = 'stlx' + n.mode
+        mode = 'stlx_cartesian'
         targets = ', '.join(self.visit(itr.assignable) for itr in n.iterators)
         iterables = ', '.join(self.visit(itr.expression) for itr in n.iterators)
         return '{0} in {1}({2})'.format(targets, mode, iterables)
@@ -386,7 +382,7 @@ class Codegen(object):
 
     def _get_collection_name(self, clazz):
         if clazz == 'set':
-            return 'Set'
+            return 'SetlxSet'
         elif clazz == 'list':
             return 'SetlxList'
         else:

@@ -5,7 +5,7 @@ import random
 
 from StringIO import StringIO
 
-from setlx2py.setlx_builtin import *
+from setlx2py.builtin.setlx_functions import *
 
 def test_implies():
     assert stlx_implies(True,True)   == True
@@ -31,33 +31,33 @@ def test_product():
 
 def test_arb():
     random.seed(42)
-    s = Set([42])
+    s = SetlxSet([42])
 
     result = stlx_arb(s)
     eq_(result, 42)
-    eq_(s, Set([42]))
+    eq_(s, SetlxSet([42]))
     
 def test_from():
-    s = Set([42])
+    s = SetlxSet([42])
     s, result = stlx_from(s)
 
     eq_(result, 42)
-    eq_(s, Set([]))    
+    eq_(s, SetlxSet([]))    
 
 # Custom/Overloaded set Operations
 # ----------
 
 def test_set_operations():
-    s1 = Set([1,2])
-    s2 = Set([2,3])
+    s1 = SetlxSet([1,2])
+    s2 = SetlxSet([2,3])
     
-    eq_(s1 + s2, Set([1,2,3]))
-    eq_(s1 - s2, Set([1]))
-    eq_(s1 * s2, Set([2]))
-    eq_(s1 % s2, Set([1, 3]) )
-    eq_(stlx_pow(s1, 2), Set([(1, 1), (1, 2), (2, 1), (2, 2)]))
-    eq_(stlx_pow(2, s2), Set([(), (2,), (2,3), (3,)]))
-    eq_(stlx_cartesian(s1, s2), Set([(1, 2), (1, 3), (2, 2), (2, 3)]))
+    eq_(s1 + s2, SetlxSet([1,2,3]))
+    eq_(s1 - s2, SetlxSet([1]))
+    eq_(s1 * s2, SetlxSet([2]))
+    eq_(s1 % s2, SetlxSet([1, 3]) )
+    eq_(stlx_pow(s1, 2), SetlxSet([(1, 1), (1, 2), (2, 1), (2, 2)]))
+    eq_(stlx_pow(2, s2), SetlxSet([(), (2,), (2,3), (3,)]))
+    eq_(stlx_cartesian(s1, s2), SetlxSet([(1, 2), (1, 3), (2, 2), (2, 3)]))
 
 # Matching
 # ========
@@ -127,7 +127,7 @@ def test_bind_string_tail_minimal():
     matchee = SetlxString("ab")
     a, b = stlx_bind(Pattern(1, True), matchee)
     eq_(a, SetlxString("a"))
-    eq_(b, SetlxString("b"))    
+    eq_(b, SetlxString("b"))
 
 def test_bind_string_tail_longer_string():
     # match ("abcdef") { case [a|b] : .. }
@@ -143,3 +143,10 @@ def test_print():
     result =  mystdout.getvalue()
     sys.stdout = old_stdout
     eq_(result, 'Foo Bar baz\n')
+
+def test_range():
+    eq_( SetlxList(stlx_range(0,5)), SetlxList([0, 1, 2, 3, 4, 5]))
+    eq_( SetlxList(stlx_range(0,2,5)), SetlxList([0,2,4]))
+    eq_( SetlxList(stlx_range(-3,-1)), SetlxList([-3, -2, -1]))
+    eq_( SetlxList(stlx_range(10,8,1)), SetlxList([10, 8, 6, 4, 2]))
+    

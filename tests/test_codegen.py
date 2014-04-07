@@ -13,19 +13,11 @@ from string import Template
 
 from nose.tools import nottest, eq_
 
-from setlx2py.setlx_builtin import Set
+from setlx2py.builtin.setlx_set import SetlxSet
+
 from setlx2py.setlx_util import run
 
 import itertools
-
-# Hack redefines
-# ==============
-
-try:
-    xrange(0,2)
-    range = xrange
-except:
-    pass
     
 # Custom Asserts
 # ==============    
@@ -83,10 +75,10 @@ def test_assignment_augmented_set():
     """)
     
     cases = {
-        '+='  : Set((1, 2, 3)), 
-        '-='  : Set((1,)),
-        '*='  : Set((2,)),
-        '%='  : Set((1, 3)),
+        '+='  : SetlxSet((1, 2, 3)), 
+        '-='  : SetlxSet((1,)),
+        '*='  : SetlxSet((2,)),
+        '%='  : SetlxSet((1, 3)),
     }
 
     for op, result in cases.items():
@@ -106,11 +98,11 @@ def test_assignment_underscore():
 # Syntax sugar for creating collections
 
 def test_set():
-    assert_res('x := {};', {'x' : Set([])})
-    assert_res('x := {1};', {'x' : Set([1])})
-    assert_res('x := {1,2};', {'x' : Set([1,2])})
-    assert_res('x := {1,2,3};', {'x' : Set([1,2,3])})
-    assert_res('x := {1+3,2-4,3**0};', {'x' : Set([4,-2,1])})    
+    assert_res('x := {};', {'x' : SetlxSet([])})
+    assert_res('x := {1};', {'x' : SetlxSet([1])})
+    assert_res('x := {1,2};', {'x' : SetlxSet([1,2])})
+    assert_res('x := {1,2,3};', {'x' : SetlxSet([1,2,3])})
+    assert_res('x := {1+3,2-4,3**0};', {'x' : SetlxSet([4,-2,1])})    
 
 def test_list():
     assert_res('x := [];', {'x' :[]})
@@ -123,10 +115,11 @@ def test_list():
 # ~~~~~~
 
 def test_range_set():
-    assert_res('x := {1..16};', {'x' : Set(range(1,16+1)) })
-    assert_res('x := {1..-1};', {'x' : Set([]) })
-    assert_res('x := {1,3..10};', {'x' : Set([1,3,5,7,9]) })
-    assert_res('x := {10,8..1};', {'x' : Set([10,8,6,4,2]) })
+    assert_res('x := {1..5};', {'x' : SetlxSet([1,2,3,4,5]) })
+    assert_res('x := {1..-1};', {'x' : SetlxSet([]) })
+    assert_res('x := {1,3..10};', {'x' : SetlxSet([1,3,5,7,9]) })
+    assert_res('x := {10,8..1};', {'x' : SetlxSet([10,8,6,4,2]) })
+    assert_res('x := {-1,-2..-2};', {'x' : SetlxSet([-2, -1])})
 
 def test_range_list():
     assert_res('x := [1..16];', {'x' : list(range(1,16+1)) })
@@ -139,25 +132,25 @@ def test_range_list():
 
 def test_set_comprehension_minimal():
     s = 'x := {2*n : n in [1..5]};'
-    assert_res(s, {'x' : Set([2,4,6,8,10]) })
+    assert_res(s, {'x' : SetlxSet([2,4,6,8,10]) })
 
 def test_set_comprehension_two_iterators():
     s = 'x := {a ** b: a in {1..3}, b in {2..4}};'
-    assert_res(s, {'x' : Set([1, 4, 8, 9, 16, 27, 81]) })
+    assert_res(s, {'x' : SetlxSet([1, 4, 8, 9, 16, 27, 81]) })
 
 def test_set_comprehension_cond():
     s = """
     p := 42;
     divisors := { t:t in {2..p-1} | p % t == 0 };
     """
-    assert_res(s, {'divisors' : Set([2, 3, 6, 7, 14, 21])})    
+    assert_res(s, {'divisors' : SetlxSet([2, 3, 6, 7, 14, 21])})    
 
 def test_set_comprehension_cray():
     s = 'primes := { p:p in {2..100} | { t:t in {2..p-1} | p % t == 0 } == {} };'
     primes = [2, 3, 5, 7, 11, 13, 17, 19, 23,
               29, 31, 37, 41, 43, 47, 53, 59,
               61, 67, 71, 73, 79, 83, 89, 97]
-    assert_res(s, {'primes' : Set(primes)})
+    assert_res(s, {'primes' : SetlxSet(primes)})
 
 def test_list_comprehension_cray():
     s = 'primes := [ p:p in [2..100] | [ t:t in [2..p-1] | p % t == 0 ] == [] ];'
@@ -224,11 +217,11 @@ def test_binop_set():
     
     cases = [
         ('op', 'result'),
-        ('+' , Set([1, 2, 3])), 
-        ('-' , Set([1])),
-        ('*' , Set([2])),
-        ('><', Set([(1, 2), (1, 3), (2, 2), (2, 3)])),
-        ('%' , Set([1, 3])),
+        ('+' , SetlxSet([1, 2, 3])), 
+        ('-' , SetlxSet([1])),
+        ('*' , SetlxSet([2])),
+        ('><', SetlxSet([(1, 2), (1, 3), (2, 2), (2, 3)])),
+        ('%' , SetlxSet([1, 3])),
     ]
     assert_res_cases(s, cases)
 
@@ -237,14 +230,14 @@ def test_set_powerset():
     s1 := { 1, 2 };
     result := 2 ** s1;
     """
-    assert_res(s, {'result' : Set([(), (1,), (1,2), (2,)])})
+    assert_res(s, {'result' : SetlxSet([(), (1,), (1,2), (2,)])})
 
 def test_set_cartesian():
     s = """
     s1 := { 1, 2 };
     result := s1 ** 2;
     """
-    assert_res(s, {'result' : Set([(1,1), (1,2), (2,1), (2,2)])})
+    assert_res(s, {'result' : SetlxSet([(1,1), (1,2), (2,1), (2,2)])})
 
 def binop_list():
     assert_res('x := [1..3] + [5..10];', {'x' : [1, 2, 3, 5, 6, 7, 8, 9, 10]})
@@ -339,7 +332,7 @@ def test_procedure_primes():
     }
     for n, result in cases.items():
         source = s.substitute(n=n)
-        assert_res(source, {'result' : Set(result)})
+        assert_res(source, {'result' : SetlxSet(result)})
 
 def test_procedure_max():
     s = Template("""
@@ -373,9 +366,9 @@ def test_procedure_two():
     
     cases = [
         ('n', 'result'),
-        ('2' , Set([2])),
-        ('10', Set([2,3,5,7])),
-        ('50', Set([2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47])),
+        ('2' , SetlxSet([2])),
+        ('10', SetlxSet([2,3,5,7])),
+        ('50', SetlxSet([2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47])),
     ]
     assert_res_cases(s, cases)
 
@@ -668,12 +661,12 @@ def test_for_loop_single():
 
 def test_for_loop_double():
     s = """
-    accum := 0;
-    for(x in [1..10], y in {-1,-2..-10}) {
-        accum += x + y;
+    accum := {};
+    for(x in {1..2}, y in {-1,-2..-2}) {
+        accum += {[x, y]};
     }
     """
-    assert_res(s, {'accum' : 0})
+    assert_res(s, {'accum' : SetlxSet([[1, -2], [1, -1], [2, -2], [2, -1]])})
     
 # While-Loop
 # ----------

@@ -1,4 +1,7 @@
 import os
+import sys
+
+from StringIO import StringIO
 
 from nose.tools import eq_, nottest
 
@@ -13,7 +16,18 @@ def has_same_result(source_path, ref_path, verbose=False, print_ast=False):
         source = f_source.read()
         reference = f_ref.read()
 
-    result = run(source, verbose=verbose, print_ast=print_ast)
+    # Pipe stdout to a variable
+        
+    old_stdout = sys.stdout
+    sys.stdout = mystdout = StringIO()
+    try:
+        run(source, verbose=verbose, print_ast=print_ast)
+        result =  mystdout.getvalue()
+    except Exception as e:
+        raise e
+    finally:
+        sys.stdout = old_stdout
+
     if verbose or result != reference:
         print('')
         print(source_path)

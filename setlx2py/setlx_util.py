@@ -19,6 +19,14 @@ from setlx2py.setlx_codegen import Codegen
 
 from setlx2py.setlx_builtin import *
 
+HEADER = """
+from setlx2py.builtin.setlx_functions import *
+from setlx2py.builtin.setlx_set import SetlxSet
+from setlx2py.builtin.setlx_list import SetlxList
+from setlx2py.builtin.setlx_string import SetlxString
+
+"""
+
 parser = Parser()
 transformer = AstTransformer()
 generator = Codegen()
@@ -40,10 +48,7 @@ def get_exception_line(e):
     exc_type, exc_obj, exc_tb = sys.exc_info()
     return exc_tb.tb_lineno
 
-def run(source, ns={}, verbose=False, print_ast=False):
-    copy_globals = dict(globals())
-    copy_locals = dict(locals())
-#    ns.update(copy_globals)
+def compile_setlx(source, verbose=False, print_ast=False):
     ast = parser.parse(source)
     transformer.visit(ast)
     
@@ -54,13 +59,16 @@ def run(source, ns={}, verbose=False, print_ast=False):
         print(ast)
 
     compiled = generator.visit(ast)
-
-    header =  'from setlx2py.setlx_builtin import *\n'
     
-    compiled = header + compiled
+    compiled = HEADER + compiled
     if verbose:
         print('Compliled: \n' + compiled)
+    return compiled
 
+
+def run(source, ns={}, verbose=False, print_ast=False):
+    compiled = compile_setlx(source, verbose, print_ast)
+    
     try:
         code = compile(compiled, '<string>', 'exec')    
         exec(code, ns)
