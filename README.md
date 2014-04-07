@@ -8,9 +8,14 @@ The homepage for setlX can be found on <http://randoom.org/Software/SetlX>.
 Dependencies
 ============
 
-* Python 2.7.3
+* Python  >= 2.7.3
 * PLY (Python Lex-Yacc)
+* blist
 * ast-gen (only for development)
+
+Install them with
+
+	pip install -r REQUIREMENTS.txt
 
 Play with it
 ============
