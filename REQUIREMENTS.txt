@@ -1,7 +1,4 @@
 argparse==1.2.1
--e git+https://github.com/Rentier/ast-gen.git@83da134dcd532ce94d53ad51e77d48f153ff7fb3#egg=ast_gen-dev
-distribute==0.6.49
-grako==2.3.0
-nose==1.3.0
-nose-ignore-docstring==0.2
+-e git+https://github.com/Rentier/ast-gen.git@391dc28cbbf753c312af6feb0d5fc09db41aa8e4#egg=ast_gen-dev
+blist==1.3.6
 ply==3.4
