@@ -531,6 +531,21 @@ class If(Node):
 
     attr_names = ()
 
+class Interpolation(Node):
+    def __init__(self, format_string, expressions, coord=None):
+        self.tags = []
+        self.format_string = format_string
+        self.expressions = expressions
+        self.coord = coord
+
+    def children(self):
+        nodelist = []
+        if self.format_string is not None: nodelist.append(("format_string", self.format_string))
+        if self.expressions is not None: nodelist.append(("expressions", self.expressions))
+        return tuple(nodelist)
+
+    attr_names = ()
+
 class Iterator(Node):
     def __init__(self, assignable, expression, coord=None):
         self.tags = []

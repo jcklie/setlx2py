@@ -75,3 +75,14 @@ def run(source, ns={}, verbose=False, print_ast=False):
     except Exception as e:
         msg = error_msg(source, compiled, e=e)
         raise AssertionError(msg)
+
+def parse_statements(text, verbose=False):
+    ast = parser.parse(text) # FileAST
+    if verbose: print(ast)
+    transformer.visit(ast)
+    if verbose: print(ast)
+    return ast # List of statements
+
+def parse_single_statement(text):
+    return parse_statements(text).stmts[0] # first statement after FileAST
+        

@@ -1771,3 +1771,10 @@ def test_check_minimal():
     eq_(node.to_tuples(),
         ('Check',
          ('Block',)))
+
+##
+## Single expression
+##
+
+def test_check_single_expr():
+    node = parser.parse('x!')

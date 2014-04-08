@@ -309,6 +309,17 @@ def test_slice_string():
     assert_res('s := "abcdef"; x := s[2..5];', {'x' : "bcde"})
     assert_res('s := "abcdef"; x := s[2..];', {'x' : "bcdef"})
     assert_res('s := "abcdef"; x := s[..5];', {'x' : "abcde"})
+
+# String Interpolation
+# --------------------
+
+def test_string_interpolation():
+    assert_res('x := 42; s := "x = $x$";', {'s' : "x = 42"})
+    assert_res('n :=  6; s := "$n$! = $n!$";', {'s' : "6! = 720"})
+
+@nottest
+def test_escapes():
+    assert_res('s := "a single \$-symbol";', {'s' : "a single $-symbol"}, True)    
     
 # Compund statements
 # ==================
@@ -696,3 +707,4 @@ def test_while_collatz():
         (1, 1),
     ]
     assert_res_cases(s, cases)
+

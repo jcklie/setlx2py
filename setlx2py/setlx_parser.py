@@ -52,9 +52,13 @@ class Parser():
     ## Implementation of the BNF defined in Pure.g of setlx interpreter 
     ##
 
-    def p_file_input(self, p):
+    def p_file_input_1(self, p):
         """ file_input : statement_list """
         p[0] = FileAST([]) if p[1] is None else FileAST(p[1])
+
+    def p_file_input_2(self, p):
+        """ file_input : expression """
+        p[0] = p[1]
 
     def p_epsilon(self, p):
         """ epsilon : """

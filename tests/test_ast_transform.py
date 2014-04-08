@@ -11,6 +11,7 @@ from nose.tools import nottest, eq_
 
 from setlx2py.setlx_ast_transformer import AstTransformer
 from setlx2py.setlx_parser import Parser
+from setlx2py.setlx_ast import *
 
 parser = Parser()
 transformer = AstTransformer()
@@ -79,3 +80,16 @@ def test_iterator_bracketed():
     """
     node = parse_single_statement(s)
     assert "bracketed" in node.iterators.assignable.tags
+
+def test_string_interpolation():
+    s = 's := "x = $n$";'
+    node = parse_single_statement(s)
+    eq_(node.to_tuples(),
+        ('Assignment', ':=',
+         ('Identifier', 's'),
+         ('Interpolation',
+          ('Constant',  'literal', 'x = {0}'),
+          ('ExprList',
+           ('Identifier', 'n')))))
+           
+    

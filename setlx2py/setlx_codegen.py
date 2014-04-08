@@ -77,6 +77,11 @@ class Codegen(object):
             msg = 'Invalid constant: {0}'.format(n)
             raise Exception(msg)
 
+    def visit_Interpolation(self, n):
+        s = self.visit(n.format_string)
+        exprs = self.visit(n.expressions)
+        return '{0}.format({1})'.format(s, exprs)
+
     def visit_BinaryOp(self, n):
         lval_str = self._parenthesize_unless_simple(n.left)
         rval_str = self._parenthesize_unless_simple(n.right)
