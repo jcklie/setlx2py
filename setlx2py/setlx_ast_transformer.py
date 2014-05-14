@@ -3,6 +3,8 @@ import re
 from setlx2py.setlx_ast import *
 from setlx2py.setlx_parser import Parser
 
+TAG_INTERPOLATION = "KLIENTERPOLATION"
+
 class AstTransformer(NodeVisitor):
 
     def visit(self, node, parent=None):
@@ -50,23 +52,32 @@ class AstTransformer(NodeVisitor):
 
     def visit_Iterator(self, n, p):
         assignable = n.assignable
-        if isinstance(assignable, List):
-            assignable.tags.append('bracketed')
+        n.tags.append('bracketed')
         self.generic_visit(n, p)
 
-    def visit_Constant(self, n, p):
-        if n.klass == 'string' and '$' in n.value:
-            interpolation = self._build_interpolation(n.value)
-            p.right = interpolation
+    def visit_List(self, n, p):
+        if isinstance(p, Iterator):
+            n.tags.append('outer_list')
+        elif "bracketed" in p.tags or  "outer_list" in p.tags :
+            n.tags.append('bracketed')
+        self.generic_visit(n, p)
+
+    def visit_Range(self, n, p):
+        if "bracketed" in p.tags:
+            n.tags.append('bracketed')
+        self.generic_visit(n, p)
+
+    def visit_Interpolation(self, n, p):
+        self._fill_interpolation(n)
         self.generic_visit(n, p)
             
-    def _build_interpolation(self, text):
+    def _fill_interpolation(self, n):
+        text = n.format_string.value
         parser = Parser()
         format_string, expressions = self._extract_interpolations(text)
         exprs = [parser.parse(expr) for expr in expressions]
-        expr_list = ExprList(exprs)
-        const = Constant('literal', format_string)
-        return Interpolation(const, expr_list)
+        n.format_string.value = format_string
+        n.expressions.exprs.extend(exprs)
 
     def _extract_interpolations(self, s):
         pattern = re.compile('\$([^\$]+?)\$')

@@ -1,0 +1,51 @@
+
+createBelegung := procedure(m, a) {
+	return {[x, x in m]: x in a};
+};
+
+evalSet := procedure(fS, i) {
+	return {eval(f, i): f in fS} == {true};
+};
+
+eval := procedure(f, i) {
+	switch {
+		case f == 1 :
+			return true;
+		case f == 0 :
+			return false;
+		case isString(f) :
+			return i[f];
+		case f[1] == "-" :
+			return ( ! (eval(f[2], i)) );
+		case f[2] == "*" :
+			return eval(f[1], i) && eval(f[3], i);
+		case f[2] == "+" :
+			return eval(f[1], i) || eval(f[3], i);
+		case f[2] == "->" :
+			return ( ! (eval(f[1], i)) ) || eval(f[3], i);
+		case f[2] == "<->" :
+			return eval(f[1], i) == eval(f[3], i);
+		default :
+			print("eval: Syntax-Fehler: ", f);
+	}
+};
+
+f1 := [["a", "+", "b"], "+", "c"];
+f2 := ["a", "->", ["b", "+", "c"]];
+f3 := ["a", "->", ["-", ["b", "*", "c"]]];
+f4 := [["-", "b"], "->", ["-", "c"]];
+f5 := ["-", [["a", "*", "b"], "*", ["-", "c"]]];
+f6 := [["-", "c"], "->", "a"];
+fS := {f1, f2, f3, f4, f5, f6};
+a := {"a", "b", "c"};
+p := pow(a);
+print("P = ", p);
+b := {createBelegung(m, a): m in p};
+s := {i : i in b | (evalSet(fS, i) <==> true)};
+print("\nMenge der Belegungen, die FS erfuellen:");
+if (#s == 1) {
+	i := arb(s);
+	taeter := {x : x in a | i[x]};
+	print("\nMenge der Taeter: ", taeter);
+}
+

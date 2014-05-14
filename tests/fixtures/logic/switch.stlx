@@ -1,5 +1,6 @@
 print("Zahl eingeben:");
-n := read();
+n := 2147483647;
+print(n);
 m := n % 10;
 switch {
     case m == 0 : print("letzte Ziffer ist 0"); 

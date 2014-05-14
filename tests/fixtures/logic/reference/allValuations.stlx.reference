@@ -1,0 +1,72 @@
+n = 1:
+testing {'x1'}
+{['x1', False]}
+{['x1', True]}
+n = 2:
+testing {'x1', 'x2'}
+{['x1', False], ['x2', False]}
+{['x1', False], ['x2', True]}
+{['x1', True], ['x2', False]}
+{['x1', True], ['x2', True]}
+n = 3:
+testing {'x1', 'x2', 'x3'}
+{['x1', False], ['x2', False], ['x3', False]}
+{['x1', False], ['x2', False], ['x3', True]}
+{['x1', False], ['x2', True], ['x3', False]}
+{['x1', False], ['x2', True], ['x3', True]}
+{['x1', True], ['x2', False], ['x3', False]}
+{['x1', True], ['x2', False], ['x3', True]}
+{['x1', True], ['x2', True], ['x3', False]}
+{['x1', True], ['x2', True], ['x3', True]}
+n = 4:
+testing {'x1', 'x2', 'x3', 'x4'}
+{['x1', False], ['x2', False], ['x3', False], ['x4', False]}
+{['x1', False], ['x2', False], ['x3', False], ['x4', True]}
+{['x1', False], ['x2', False], ['x3', True], ['x4', False]}
+{['x1', False], ['x2', False], ['x3', True], ['x4', True]}
+{['x1', False], ['x2', True], ['x3', False], ['x4', False]}
+{['x1', False], ['x2', True], ['x3', False], ['x4', True]}
+{['x1', False], ['x2', True], ['x3', True], ['x4', False]}
+{['x1', False], ['x2', True], ['x3', True], ['x4', True]}
+{['x1', True], ['x2', False], ['x3', False], ['x4', False]}
+{['x1', True], ['x2', False], ['x3', False], ['x4', True]}
+{['x1', True], ['x2', False], ['x3', True], ['x4', False]}
+{['x1', True], ['x2', False], ['x3', True], ['x4', True]}
+{['x1', True], ['x2', True], ['x3', False], ['x4', False]}
+{['x1', True], ['x2', True], ['x3', False], ['x4', True]}
+{['x1', True], ['x2', True], ['x3', True], ['x4', False]}
+{['x1', True], ['x2', True], ['x3', True], ['x4', True]}
+n = 5:
+testing {'x1', 'x2', 'x3', 'x4', 'x5'}
+{['x1', False], ['x2', False], ['x3', False], ['x4', False], ['x5', False]}
+{['x1', False], ['x2', False], ['x3', False], ['x4', False], ['x5', True]}
+{['x1', False], ['x2', False], ['x3', False], ['x4', True], ['x5', False]}
+{['x1', False], ['x2', False], ['x3', False], ['x4', True], ['x5', True]}
+{['x1', False], ['x2', False], ['x3', True], ['x4', False], ['x5', False]}
+{['x1', False], ['x2', False], ['x3', True], ['x4', False], ['x5', True]}
+{['x1', False], ['x2', False], ['x3', True], ['x4', True], ['x5', False]}
+{['x1', False], ['x2', False], ['x3', True], ['x4', True], ['x5', True]}
+{['x1', False], ['x2', True], ['x3', False], ['x4', False], ['x5', False]}
+{['x1', False], ['x2', True], ['x3', False], ['x4', False], ['x5', True]}
+{['x1', False], ['x2', True], ['x3', False], ['x4', True], ['x5', False]}
+{['x1', False], ['x2', True], ['x3', False], ['x4', True], ['x5', True]}
+{['x1', False], ['x2', True], ['x3', True], ['x4', False], ['x5', False]}
+{['x1', False], ['x2', True], ['x3', True], ['x4', False], ['x5', True]}
+{['x1', False], ['x2', True], ['x3', True], ['x4', True], ['x5', False]}
+{['x1', False], ['x2', True], ['x3', True], ['x4', True], ['x5', True]}
+{['x1', True], ['x2', False], ['x3', False], ['x4', False], ['x5', False]}
+{['x1', True], ['x2', False], ['x3', False], ['x4', False], ['x5', True]}
+{['x1', True], ['x2', False], ['x3', False], ['x4', True], ['x5', False]}
+{['x1', True], ['x2', False], ['x3', False], ['x4', True], ['x5', True]}
+{['x1', True], ['x2', False], ['x3', True], ['x4', False], ['x5', False]}
+{['x1', True], ['x2', False], ['x3', True], ['x4', False], ['x5', True]}
+{['x1', True], ['x2', False], ['x3', True], ['x4', True], ['x5', False]}
+{['x1', True], ['x2', False], ['x3', True], ['x4', True], ['x5', True]}
+{['x1', True], ['x2', True], ['x3', False], ['x4', False], ['x5', False]}
+{['x1', True], ['x2', True], ['x3', False], ['x4', False], ['x5', True]}
+{['x1', True], ['x2', True], ['x3', False], ['x4', True], ['x5', False]}
+{['x1', True], ['x2', True], ['x3', False], ['x4', True], ['x5', True]}
+{['x1', True], ['x2', True], ['x3', True], ['x4', False], ['x5', False]}
+{['x1', True], ['x2', True], ['x3', True], ['x4', False], ['x5', True]}
+{['x1', True], ['x2', True], ['x3', True], ['x4', True], ['x5', False]}
+{['x1', True], ['x2', True], ['x3', True], ['x4', True], ['x5', True]}

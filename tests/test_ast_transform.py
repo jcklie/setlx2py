@@ -26,8 +26,8 @@ def parse_statements(text, verbose=False):
     if verbose: print(ast)
     return ast # List of statements
 
-def parse_single_statement(text):
-    return parse_statements(text).stmts[0] # first statement after FileAST
+def parse_single_statement(text, verbose=False):
+    return parse_statements(text, verbose).stmts[0] # first statement after FileAST
 
 # Tests
 # =====
@@ -72,6 +72,7 @@ def test_assignment_list_bracketed():
     node = parse_single_statement('[x,y,z] := [1..3];')
     assert "bracketed" in node.target.tags
 
+@nottest
 def test_iterator_bracketed():
     s = """
     for([x,y] in [[1..5], [1,2,3,4,5]]) {
@@ -79,7 +80,10 @@ def test_iterator_bracketed():
     }
     """
     node = parse_single_statement(s)
-    assert "bracketed" in node.iterators.assignable.tags
+    assert "outer_list" in node.iterators.assignable.tags
+    assert "bracketed" not in node.iterators.expression.tags
+    assert "bracketed" in node.iterators.expression.items[0].tags
+    assert "bracketed" in node.iterators.expression.items[1].tags
 
 def test_string_interpolation():
     s = 's := "x = $n$";'
@@ -92,4 +96,14 @@ def test_string_interpolation():
           ('ExprList',
            ('Identifier', 'n')))))
            
-    
+def test_string_interpolation_function():
+    s = 'print("n = $k$:");'
+    node = parse_single_statement(s)
+    eq_(node.to_tuples(),
+        ('Call',
+         ('Identifier', 'print'),
+         ('ArgumentList',
+          ('Interpolation',
+           ('Constant', 'literal', 'n = {0}:'),
+           ('ExprList',
+            ('Identifier', 'k'))))))

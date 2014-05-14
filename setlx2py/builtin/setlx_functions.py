@@ -80,8 +80,8 @@ def stlx_antivalent(p,q):
 # Sets
 # ----
 
-def stlx_cartesian(a,b):
-    return SetlxSet(element for element in it.product(a, b))
+def stlx_cartesian(*args):
+    return SetlxSet(it.product(*args))
 
 def stlx_powerset(s):
     lst = list(s)
@@ -96,8 +96,8 @@ def stlx_arb(m):
 
 def stlx_from(m):
     n = stlx_arb(m)
-    altered_m = m - SetlxSet([n])
-    return altered_m, n
+    m.remove(n)
+    return n
 
 # Misc
 # ----

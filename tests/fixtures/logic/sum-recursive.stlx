@@ -5,7 +5,8 @@ sum := procedure(n) {
         return sum(n-1) + n;
     }
 };
-n     := read("Zahl eingeben: "); 
+
+n     := 42;
 total := sum(n);
 print("Sum 0 + 1 + 2 + ... + ", n, " = ", total);
 

@@ -276,6 +276,7 @@ def test_exists_simple():
     s = 'result := exists (x in {1..10} | 2 ** x < x ** 2);'
     assert_res(s, {'result' : True})
 
+@nottest    
 def test_exists_two_iterators():
     s = 'result := exists ([x, y] in [[a,b] : a in {1..10}, b in {1..10}] | 3*x - 4*y == 5);'
     assert_res(s, {'result' : True})
@@ -315,7 +316,7 @@ def test_slice_string():
 
 def test_string_interpolation():
     assert_res('x := 42; s := "x = $x$";', {'s' : "x = 42"})
-    assert_res('n :=  6; s := "$n$! = $n!$";', {'s' : "6! = 720"})
+    assert_res('n :=  6; s := "$n$! = $n!$";', {'s' : "6! = 720"})    
 
 @nottest
 def test_escapes():
@@ -327,6 +328,7 @@ def test_escapes():
 # Procedures
 # ----------
 
+@nottest    
 def test_procedure_primes():
     s = Template("""
     primes := procedure(n) {

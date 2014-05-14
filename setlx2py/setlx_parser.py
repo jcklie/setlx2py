@@ -361,6 +361,12 @@ class Parser():
         """ stringliteral : LITERAL """
         p[0] = Constant('literal', str(p[1]))
 
+    def p_string_literal_3(self, p):
+        """ stringliteral : INTERPOLATION """
+        lit = Constant('literal', str(p[1]))
+        lst = ExprList([])
+        p[0] = Interpolation(lit, lst)
+
     # Numerical constants
 
     def p_integer(self, p):

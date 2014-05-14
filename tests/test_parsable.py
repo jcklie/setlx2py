@@ -52,8 +52,11 @@ def assert_parsable(folder):
             all_parsable = False
             not_parsable_files.append(f)
 
-    msg =  'Parsed [{0}/{1}]\n'.format(len(files) - len(not_parsable_files), len(files))
-    msg += 'Cannot parse the following files: \n{0}'.format('\n'.join(not_parsable_files))
+    msg =  'Parsed [{0}/{1}]\n'.format(len(files) - len(not_parsable_files),
+                                       len(files))
+
+    s = '\n'.join(not_parsable_files)
+    msg += 'Cannot parse the following files: \n{0}'.format(s)
     
     assert all_parsable, msg
 
@@ -61,4 +64,4 @@ def test_parsable_logic():
     assert_parsable('tests/fixtures/logic') 
 
 def test_parsable_logic_solutions():
-    assert_parsable('tests/fixtures/logic/solutions')     
+    assert_parsable('tests/fixtures/logic/')     

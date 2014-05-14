@@ -1,10 +1,10 @@
 ////////////////////////////////////////////////////////////////////////
 //                                                                    //
-// ÃœberfÃ¼hrung in konjunktive Normal-Form                             //
+// Überführung in konjunktive Normal-Form                             //
 //                                                                    //
 ////////////////////////////////////////////////////////////////////////
 
-// Diese Prozedur Ã¼berfÃ¼hrt die Formel f in konjunktive Normalform.
+// Diese Prozedur überführt die Formel f in konjunktive Normalform.
 normalize := procedure(f) {
     n1 := elimGdw(f);
     n2 := elimFolgt(n1);
@@ -43,7 +43,7 @@ nnf := procedure(f) {
     }
 };
 // Diese Funktion berechnet die Negations-Normalform von (-f) und schiebt dabei
-// das Negationszeichen soweit wie mÃ¶glich nach innen.
+// das Negationszeichen soweit wie möglich nach innen.
 neg := procedure(f) {
     match (f) {
         case !g     : return nnf(g);

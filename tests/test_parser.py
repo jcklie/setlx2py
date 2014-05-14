@@ -108,6 +108,13 @@ def test_atomic_value_false():
     node = parse_single_statement('false;')
     eq_(node.to_tuples(), ('Constant', 'bool', False))
 
+def test_atomic_value_interpolation():
+    node = parse_single_statement('"n := $n$";')
+    eq_(node.to_tuples(),
+        ('Interpolation',
+         ('Constant', 'literal', 'n := $n$'),
+         ('ExprList', )))
+    
 ##
 ## Collections
 ##
@@ -1510,7 +1517,9 @@ def test_for_loop_three_iterators():
            ('Subscription',
             ('Identifier', 'address'),
             ('Identifier', 'i')),
-           ('Constant', 'string', "$street$ $street_number$")))))
+           ('Interpolation',
+            ('Constant', 'literal', '$street$ $street_number$'), ('ExprList',))))))
+        
 
 ##
 ## Procedures

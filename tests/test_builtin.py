@@ -39,7 +39,7 @@ def test_arb():
     
 def test_from():
     s = SetlxSet([42])
-    s, result = stlx_from(s)
+    result = stlx_from(s)
 
     eq_(result, 42)
     eq_(s, SetlxSet([]))    
@@ -57,9 +57,19 @@ def test_set_operations():
     eq_(s1 % s2, SetlxSet([1, 3]) )
     eq_(stlx_pow(s1, 2), SetlxSet([(1, 1), (1, 2), (2, 1), (2, 2)]))
     eq_(stlx_pow(2, s2), SetlxSet([(), (2,), (2,3), (3,)]))
-    eq_(stlx_cartesian(s1, s2), SetlxSet([(1, 2), (1, 3), (2, 2), (2, 3)]))
 
-# Matching
+def test_cartesian_two():
+    s1 = SetlxSet([1,2])
+    s2 = SetlxSet([2,3])
+    result = SetlxSet(stlx_cartesian(s1, s2))
+    eq_(result, SetlxSet([(1, 2), (1, 3), (2, 2), (2, 3)]))
+
+def test_cartesian_three():
+    expected = [(1, 'a', 4), (1, 'a', 5), (1, 'b', 4), (1, 'b', 5),
+                (2, 'a', 4), (2, 'a', 5), (2, 'b', 4), (2, 'b', 5),
+                (3, 'a', 4), (3, 'a', 5), (3, 'b', 4), (3, 'b', 5)]
+    eq_(stlx_cartesian([1,2,3],['a','b'],[4,5]), SetlxSet(expected))
+        
 # ========
 
 def test_matches():

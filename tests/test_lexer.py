@@ -136,15 +136,19 @@ def test_constants_double_exponential():
 #    assert_token_types('.1', ['DOUBLE'])
 
 def test_constants_bool():
-    assert_token_types('true', ['TRUE'])
-    assert_token_types('false', ['FALSE'])
+    assert_token_type('true', 'TRUE')
+    assert_token_type('false', 'FALSE')
+
+def test_interpolations():
+    assert_token_type('"x = $x$"', 'INTERPOLATION')
+    assert_token_type('"$n$! = $n!$"', 'INTERPOLATION')
 
 def test_identifier():
-    assert_token_types('q0', ['IDENTIFIER'])
-    assert_token_types('a', ['IDENTIFIER'])
-    assert_token_types('a_', ['IDENTIFIER'])
-    assert_token_types('a13234', ['IDENTIFIER'])
-    assert_token_types('z42a_____', ['IDENTIFIER'])
+    assert_token_type('q0', 'IDENTIFIER')
+    assert_token_type('a', 'IDENTIFIER')
+    assert_token_type('a_', 'IDENTIFIER')
+    assert_token_type('a13234', 'IDENTIFIER')
+    assert_token_type('z42a_____', 'IDENTIFIER')
 
 def test_term():
     assert_token_type('F', 'TERM')

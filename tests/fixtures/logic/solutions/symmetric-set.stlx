@@ -1,8 +1,0 @@
-// Compute the set of all permutations on the set { 1, ..., n }
-allPermutations := procedure(n) {
-    a := { 1 .. n };
-	return { r : r in 2**(a><a) | #r == n && {p[1] : p in r} == a && {p[2] : p in r} == a };
-};
-
-for (p in allPermutations(3)) { print(p); }
-

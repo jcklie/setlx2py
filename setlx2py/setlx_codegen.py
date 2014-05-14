@@ -65,6 +65,7 @@ class Codegen(object):
         simple_constants = [
             'int',
             'bool',
+            'double'
         ]
         
         if n.klass == 'string': 
@@ -362,6 +363,9 @@ class Codegen(object):
         pattern = self.visit(n.pattern)
         cond = self.visit(n.cond)
         body = self._generate_stmt(n.body, add_indent=True)
+
+        headcount = 0
+        has_tail = False
         
         if isinstance(n.pattern, Pattern):
             headcount = len(n.pattern.head.exprs)

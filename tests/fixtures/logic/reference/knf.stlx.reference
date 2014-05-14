@@ -1,0 +1,6 @@
+The knf of p => p is {}
+The knf of (p && q => r) || !r => !p is {{q, !p}, {r, !p}, {!p, !r}}
+The knf of (p => q) => (!p => q) => q is {}
+The knf of (p => q) && (q => r) => p => r is {}
+The knf of (p => q) => !p => !q is {{p, !q}}
+The knf of (p => q) && (!p => !q) => q => p is {}

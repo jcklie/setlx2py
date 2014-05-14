@@ -10,6 +10,8 @@
 from ply import lex
 from ply.lex import TOKEN
 
+import re
+
 class SyntaxError (Exception):
     def __init__(self, msg, LEXER, src, lineno=None, lexpos=None):
         if lineno is None:
@@ -79,6 +81,7 @@ class Lexer():
 
     string = r'"([^\\"]|(\\.))*"'
     literal = r"'([^\\']|(\\.))*'"    
+    interpolation = re.compile('"[^"]*(\$[^\$\"]+?\$)[^"]*?"')
     
     # integer constants    
     integer_constant = '0|([1-9][0-9]*)'
@@ -143,7 +146,7 @@ class Lexer():
         'INTEGER', 'DOUBLE',
 
         # Character Sequences
-        'STRING', 'LITERAL',
+        'STRING', 'LITERAL', 'INTERPOLATION',
             
         # Operators
         'PLUS', 'MINUS',
@@ -250,10 +253,13 @@ class Lexer():
 
     @TOKEN(integer_constant)
     def t_INTEGER(self, t):
-        return t
+        return t        
 
     @TOKEN(string)
     def t_STRING(self, t):
+        if re.match(self.interpolation, t.value):
+            t.type = 'INTERPOLATION'
+        
         t.value = self.escape(t.value)
         return t
 

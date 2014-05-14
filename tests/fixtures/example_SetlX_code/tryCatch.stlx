@@ -1,0 +1,51 @@
+// this program demonstrates the try catch block and its functionality
+
+something      := 42;
+someOtherThing := 23;
+try {
+    something => someOtherThing; // this will fail and the program would be terminated
+    print("... and this will never be executed.");
+} catch (error) {
+    printErr("Some error occurred!:");
+    printErr(error);
+}
+print("However, using the try catch block we can still get here in spite of the error!");
+
+print();
+
+// throw(value)            : stops execution and throws value to be catched by try-catch block
+try {
+    x := [{"why use return, when we can throw things around"}, "??"];
+    throw(x);
+    print("this will also never be executed.");
+} catch (error) {
+    if (isError(error)) { // this identifies real errors, e.g. NOT created using throw() function
+        printErr("Some error occurred!:");
+        printErr(error);
+    } else {
+        print("Something else happened:");
+        print(error);
+    }
+}
+
+print();
+
+// selective catching ins also possible
+try {
+    if (rnd({1, 2}) == 1) {
+        throw("user error");
+    } else {
+        om + om; // language error
+    }
+} catchUsr (error) { // this will only catch `errors' thrown by the user using throw() function
+    print("User error: " + error );
+} catchLng (error) { // this will catch real errors, e.g. NOT created using throw() function
+    print("Language error: " + error );
+} catch (foo) { // this will catch everything
+    print("unreachable"); // but is unreachable, because catchUsr and catchLng cover all errors
+}
+
+print();
+
+throw("the end is near");
+

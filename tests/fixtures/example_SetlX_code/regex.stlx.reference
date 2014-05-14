@@ -1,0 +1,13 @@
+match (a)
+match (b) foo o
+match (c) regexTest
+match (d) foobar
+no match
+foobar
+fbarbar
+foobar
+fbaro
+true
+false
+["fobarabof", "bar"]
+[]

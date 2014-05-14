@@ -50,31 +50,32 @@ def get_exception_line(e):
 
 def compile_setlx(source, verbose=False, print_ast=False):
     ast = parser.parse(source)
+
+    if print_ast: log_ast(ast)
+    
     transformer.visit(ast)
     
-    if verbose:
-        print('Source: \n' + source)
-
-    if print_ast:
-        print(ast)
-
-    compiled = generator.visit(ast)
+    if print_ast: log_transformed(ast)
+    if verbose: log_source(source)
     
+    compiled = generator.visit(ast)
     compiled = HEADER + compiled
-    if verbose:
-        print('Compliled: \n' + compiled)
-    return compiled
 
+    if verbose: log_compiled(compiled)
+    
+    return compiled
 
 def run(source, ns={}, verbose=False, print_ast=False):
     compiled = compile_setlx(source, verbose, print_ast)
-    
+
     try:
-        code = compile(compiled, '<string>', 'exec')    
+        code = compile(compiled, '<string>', 'exec')
         exec(code, ns)
     except Exception as e:
         msg = error_msg(source, compiled, e=e)
         raise AssertionError(msg)
+
+# Parse
 
 def parse_statements(text, verbose=False):
     ast = parser.parse(text) # FileAST
@@ -85,4 +86,25 @@ def parse_statements(text, verbose=False):
 
 def parse_single_statement(text):
     return parse_statements(text).stmts[0] # first statement after FileAST
+
+# Log
+
+def log(tag, txt):
+    sys.stderr.write('\n')
+    sys.stderr.write(tag)
+    sys.stderr.write('\n')
+    sys.stderr.write(str(txt))
+
+def log_ast(ast):
+    log("AST", ast)
+
+def log_transformed(ast):
+    log("Transformed", ast)
+
+def log_source(source):
+    log("Source", source)
+
+def log_compiled(compiled):
+    log("Compiled", compiled)
+
         
