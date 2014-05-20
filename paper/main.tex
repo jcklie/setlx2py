@@ -1,0 +1,98 @@
+% TEX-option: shell-escape
+
+\documentclass[a4paper,11pt]{article}
+
+\usepackage[left=3.0cm, right=3.0cm, top=2.5cm, bottom=2.5cm]{geometry}
+\usepackage{url}
+\usepackage{menukeys}
+\usepackage{cleveref}
+\usepackage{graphicx}
+\usepackage{todonotes}
+\usepackage{upgreek}
+\usepackage{dirtree}
+
+\usepackage[parfill]{parskip}
+
+\usepackage{listings} % Syntax highlighting
+\lstset{
+  breaklines=true,                
+  basicstyle=\ttfamily,
+  showstringspaces=false,
+  commentstyle=\color{red},
+  keywordstyle=\color{blue},
+  columns=fullflexible
+}
+
+\usepackage{syntax}
+\setlength{\grammarparsep}{20pt plus 1pt minus 1pt} % increase separation between rules
+\setlength{\grammarindent}{12em} % increase separation between LHS/RHS 
+
+\usepackage{hyperref}
+\hypersetup{colorlinks=false}
+
+\newcommand{\token}[1]{\lstinline$#1$}
+\newcommand{\myparagraph}[1]{\paragraph{#1}\mbox{}}
+
+% BEGIN DOCUMENT
+
+\begin{document}
+
+\pagenumbering{roman}
+
+\include{Chapters/titelpage}
+
+\tableofcontents
+\listoftables
+\listoffigures
+
+\pagenumbering{arabic}
+
+% ************************
+% USER GUIDE
+% ************************
+\clearpage
+\part{User Guide}
+
+\include{Chapters/preface}
+\include{Chapters/windows}
+
+\section{Linux}
+
+\section{Mac OS}
+
+% ************************
+% LANGUAGE REFERENCE
+% ************************
+\clearpage
+\part{The SetlX language}
+\clearpage
+
+\include{Chapters/lexanal}
+\section{Execution model}
+\subsection{Scoping}
+\include{Chapters/grammar}
+
+% ************************
+% SETLX2PY REFERENCE
+% ************************
+\clearpage
+\part{Setlx2py internals}
+\clearpage
+
+\include{Chapters/structure}
+
+\section{Testing}
+
+\section{Running the tests}
+
+\section{AST}
+
+\section{Transformations}
+
+\section{Code generation}
+
+\section{Execution}
+
+\section{Known issues}
+
+\end{document}

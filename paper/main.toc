@@ -1,0 +1,92 @@
+\contentsline {part}{I\hspace {1em}User Guide}{2}{part.1}
+\contentsline {section}{\numberline {1}Preface}{3}{section.1}
+\contentsline {subsection}{\numberline {1.1}Overview}{3}{subsection.1.1}
+\contentsline {subsection}{\numberline {1.2}Dependencies}{3}{subsection.1.2}
+\contentsline {paragraph}{Runtime}{3}{section*.4}
+\contentsline {paragraph}{Packages}{3}{section*.5}
+\contentsline {section}{\numberline {2}Windows}{4}{section.2}
+\contentsline {subsection}{\numberline {2.1}Install Python}{4}{subsection.2.1}
+\contentsline {subsubsection}{\numberline {2.1.1}Obtain the Python binary}{4}{subsubsection.2.1.1}
+\contentsline {subsubsection}{\numberline {2.1.2}Setting the \$PATH}{4}{subsubsection.2.1.2}
+\contentsline {subsection}{\numberline {2.2}Install package manager}{4}{subsection.2.2}
+\contentsline {subsection}{\numberline {2.3}Install binary dependencies}{5}{subsection.2.3}
+\contentsline {subsection}{\numberline {2.4}Install dependencies}{6}{subsection.2.4}
+\contentsline {subsection}{\numberline {2.5}Use setlx2py}{6}{subsection.2.5}
+\contentsline {section}{\numberline {3}Linux}{7}{section.3}
+\contentsline {section}{\numberline {4}Mac OS}{7}{section.4}
+\contentsline {part}{II\hspace {1em}The SetlX language}{8}{part.2}
+\contentsline {section}{\numberline {5}Lexical analysis}{9}{section.5}
+\contentsline {subsection}{\numberline {5.1}Line structure}{9}{subsection.5.1}
+\contentsline {subsubsection}{\numberline {5.1.1}Logical lines}{9}{subsubsection.5.1.1}
+\contentsline {subsubsection}{\numberline {5.1.2}Physical lines}{9}{subsubsection.5.1.2}
+\contentsline {subsubsection}{\numberline {5.1.3}Comments}{9}{subsubsection.5.1.3}
+\contentsline {paragraph}{Singe-line comments}{9}{section*.6}
+\contentsline {paragraph}{Multi-line comments}{9}{section*.7}
+\contentsline {subsubsection}{\numberline {5.1.4}Blank lines}{9}{subsubsection.5.1.4}
+\contentsline {subsubsection}{\numberline {5.1.5}Whitespace}{9}{subsubsection.5.1.5}
+\contentsline {subsection}{\numberline {5.2}Identifiers and keywords}{9}{subsection.5.2}
+\contentsline {subsubsection}{\numberline {5.2.1}Identifier}{10}{subsubsection.5.2.1}
+\contentsline {subsubsection}{\numberline {5.2.2}Functor}{10}{subsubsection.5.2.2}
+\contentsline {subsection}{\numberline {5.3}Keywords}{10}{subsection.5.3}
+\contentsline {subsection}{\numberline {5.4}Literals}{10}{subsection.5.4}
+\contentsline {subsubsection}{\numberline {5.4.1}Character sequences}{10}{subsubsection.5.4.1}
+\contentsline {paragraph}{Strings}{10}{section*.9}
+\contentsline {paragraph}{Literal strings}{10}{section*.10}
+\contentsline {paragraph}{String interpolations}{11}{section*.11}
+\contentsline {paragraph}{Escaping}{11}{section*.12}
+\contentsline {subsubsection}{\numberline {5.4.2}Numeric literals}{11}{subsubsection.5.4.2}
+\contentsline {paragraph}{Integer literals}{11}{section*.13}
+\contentsline {paragraph}{Floating point literals}{11}{section*.14}
+\contentsline {subsection}{\numberline {5.5}Operators}{12}{subsection.5.5}
+\contentsline {subsection}{\numberline {5.6}Delimiters}{12}{subsection.5.6}
+\contentsline {section}{\numberline {6}Execution model}{13}{section.6}
+\contentsline {subsection}{\numberline {6.1}Scoping}{13}{subsection.6.1}
+\contentsline {section}{\numberline {7}Grammar}{14}{section.7}
+\contentsline {subsection}{\numberline {7.1}Top-level components}{15}{subsection.7.1}
+\contentsline {subsection}{\numberline {7.2}Expressions}{16}{subsection.7.2}
+\contentsline {paragraph}{lambda}{17}{section*.16}
+\contentsline {paragraph}{quantor}{17}{section*.17}
+\contentsline {paragraph}{term}{17}{section*.18}
+\contentsline {subsubsection}{\numberline {7.2.1}Atom}{17}{subsubsection.7.2.1}
+\contentsline {paragraph}{Literals}{17}{section*.19}
+\contentsline {subsubsection}{\numberline {7.2.2}Primaries}{18}{subsubsection.7.2.2}
+\contentsline {paragraph}{Attributeref}{18}{section*.20}
+\contentsline {paragraph}{Subscription}{18}{section*.21}
+\contentsline {paragraph}{Slicing}{18}{section*.22}
+\contentsline {paragraph}{Procedure}{18}{section*.23}
+\contentsline {paragraph}{Call}{19}{section*.24}
+\contentsline {subsubsection}{\numberline {7.2.3}Enclosures}{19}{subsubsection.7.2.3}
+\contentsline {paragraph}{Parenthesized forms}{19}{section*.25}
+\contentsline {paragraph}{Comprehensions}{19}{section*.26}
+\contentsline {paragraph}{Ranges}{20}{section*.27}
+\contentsline {paragraph}{Displays}{20}{section*.28}
+\contentsline {subsection}{\numberline {7.3}Simple statements}{21}{subsection.7.3}
+\contentsline {subsubsection}{\numberline {7.3.1}Assert statement}{21}{subsubsection.7.3.1}
+\contentsline {subsubsection}{\numberline {7.3.2}Assignment statement}{21}{subsubsection.7.3.2}
+\contentsline {subsubsection}{\numberline {7.3.3}Augmented assignment statement}{21}{subsubsection.7.3.3}
+\contentsline {subsubsection}{\numberline {7.3.4}Backtrack statement}{21}{subsubsection.7.3.4}
+\contentsline {subsubsection}{\numberline {7.3.5}Break statement}{22}{subsubsection.7.3.5}
+\contentsline {subsubsection}{\numberline {7.3.6}Continue statement}{22}{subsubsection.7.3.6}
+\contentsline {subsubsection}{\numberline {7.3.7}Exit statement}{22}{subsubsection.7.3.7}
+\contentsline {subsubsection}{\numberline {7.3.8}Expression statement}{22}{subsubsection.7.3.8}
+\contentsline {subsubsection}{\numberline {7.3.9}Return statement}{22}{subsubsection.7.3.9}
+\contentsline {subsection}{\numberline {7.4}Compound statements}{23}{subsection.7.4}
+\contentsline {subsubsection}{\numberline {7.4.1}Check statement}{23}{subsubsection.7.4.1}
+\contentsline {subsubsection}{\numberline {7.4.2}Class statement}{23}{subsubsection.7.4.2}
+\contentsline {subsubsection}{\numberline {7.4.3}Do-While statement}{23}{subsubsection.7.4.3}
+\contentsline {subsubsection}{\numberline {7.4.4}For-Loop statement}{23}{subsubsection.7.4.4}
+\contentsline {subsubsection}{\numberline {7.4.5}If statement}{24}{subsubsection.7.4.5}
+\contentsline {subsubsection}{\numberline {7.4.6}Match statement}{24}{subsubsection.7.4.6}
+\contentsline {subsubsection}{\numberline {7.4.7}Scan statement}{24}{subsubsection.7.4.7}
+\contentsline {subsubsection}{\numberline {7.4.8}Switch statement}{24}{subsubsection.7.4.8}
+\contentsline {subsubsection}{\numberline {7.4.9}Try statement}{25}{subsubsection.7.4.9}
+\contentsline {subsubsection}{\numberline {7.4.10}While-Loop statement}{25}{subsubsection.7.4.10}
+\contentsline {part}{III\hspace {1em}Setlx2py internals}{27}{part.3}
+\contentsline {section}{\numberline {8}Project structure}{28}{section.8}
+\contentsline {section}{\numberline {9}Testing}{29}{section.9}
+\contentsline {section}{\numberline {10}Running the tests}{29}{section.10}
+\contentsline {section}{\numberline {11}AST}{29}{section.11}
+\contentsline {section}{\numberline {12}Transformations}{29}{section.12}
+\contentsline {section}{\numberline {13}Code generation}{29}{section.13}
+\contentsline {section}{\numberline {14}Execution}{29}{section.14}
+\contentsline {section}{\numberline {15}Known issues}{29}{section.15}

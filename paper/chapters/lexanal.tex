@@ -1,0 +1,219 @@
+%!TEX root = ../main.tex
+\section{Lexical analysis}
+
+%
+% SUBSECTION
+%
+\subsection{Line structure}
+
+A SetlX program is built of logical lines.
+
+%#####################
+%
+\subsubsection{Logical lines}
+
+The end of a logical line is represented by a semicolon `;'.
+
+%#####################
+%
+\subsubsection{Physical lines}
+
+A physical line consists of a number of characters ending with a end-of-line character. One physical line can have any fraction of a logical line, i.e. one can split code arbitrarily at whitespace.
+
+%#####################
+%
+\subsubsection{Comments}
+
+Setlx has two types of comments. Comments are ignored by the lexer, they are stripped and do not generate any tokens.
+
+\myparagraph{Singe-line comments}
+
+A single line comment starts with a double slash (\token{//}) that is not part of a string literal, and ends at the end of the physical line. 
+
+\myparagraph{Multi-line comments}
+
+Multi-line comments, start with \token{/*} and end with \token{*/}.
+
+%#####################
+%
+\subsubsection{Blank lines}
+
+Lines that only contain whitespace are ignored.
+
+%#####################
+%
+\subsubsection{Whitespace}
+Except in string literals, the whitespace characters used to separate tokens are tab, carriage return, form feed, vertical tab.
+
+%
+% SUBSECTION
+%
+\subsection{Identifiers and keywords}
+
+Identifier and functors are unlimited in length. Case is significant.
+
+%#####################
+%
+\subsubsection{Identifier}
+
+Identifiers are described by the following lexical definitions:
+
+\begin{grammar}
+<identifier> ::= <lowercase> <seq> | `_'
+
+<seq> ::= <seq> <char>
+\alt $\upepsilon$
+
+<char> ::= <lowercase> | <uppercase> | <digit> | `_'
+
+<lowercase>  ::=  `a'...`z'
+
+<uppercase>  ::=  `A'...`Z'
+
+<digit>      ::=  `0'...`9'
+\end{grammar}
+
+%#####################
+%
+\subsubsection{Functor}
+
+Functors are described by the following lexical definitions:
+
+\begin{grammar}
+<functor> ::= <uppercase> <seq>
+\end{grammar}
+
+%
+% SUBSECTION
+%
+\subsection{Keywords}
+\todo{Update keywords}
+The following identifier are treated as keywords in SetlX and cannot used for other purposes:
+
+\begin{table}[h]
+\begin{tabular*}{\columnwidth}{@{\extracolsep{\stretch{1}}}*{6}{l}@{}}
+\token{true} 		& \token{false} 			& \token{in} 		& \token{notin} 	& \token{forall} 	& \token{exists} 	\\
+\token{backtrack} 	& \token{check} 			& \token{match} 	& \token{regex} 	& \token{as} 		& \token{break} 	\\
+\token{continue} 	& \token{exit} 				& \token{return} 	& \token{assert} 	& \token{if} 		& \token{else} 		\\
+\token{switch} 		& \token{case} 				& \token{default} 	& \token{for} 		& \token{do} 		& \token{while} 	\\
+\token{procedure} 	& \token{cachedProcedure} 	& \token{class} 	& \token{static} 	& \token{scan} 		&  \token{using} 	\\
+\token{try} 		&  \token{catch} 			& \token{catchUsr} 	& \token{catchLng} 	&  \\
+\end{tabular*}
+\end{table}
+
+%
+% SUBSECTION
+%
+\subsection{Literals}
+
+Literals are notations for constant values of some built-in types.
+
+%#####################
+%
+\subsubsection{Character sequences}
+
+\myparagraph{Strings}
+
+Any sequence of characters enclosed in double quotes which does not contain a interpolation is considered a string.
+
+\myparagraph{Literal strings}
+
+Any sequence of characters enclosed in single quotes is considered a literal string.
+
+\myparagraph{String interpolations}
+
+A string interpolation is a string which contains at least one interpolation.
+
+\begin{grammar}
+<interpolation> ::= `\$' <expression> `\$'
+\end{grammar}
+
+\myparagraph{Escaping}
+
+SetlX supports the same escape sequences as the language C.
+
+%#####################
+%
+\subsubsection{Numeric literals}
+
+There are two types of numeric literals: integer and floating point numbers. Note that the following definitions do not include signs, that is handled by expressions with unary operators.
+
+\myparagraph{Integer literals}
+
+\begin{grammar}
+<integer> ::=  <nonzerodigit> <digits-or-empty> | `0'
+
+<nonzerodigit>   ::=  `1'...`9'
+
+<digits> ::= <digits> <digit>
+\alt <digit>
+
+<digits-or-empty> ::= <digits> | $\upepsilon$
+\end{grammar}
+
+\myparagraph{Floating point literals}
+
+Floating point literals are described by the following lexical definitions:
+
+\begin{grammar}
+<floatnumber>   ::=  <pointfloat> | <exponentfloat>
+
+<pointfloat>    ::=  <fraction>
+\alt <intpart> <fraction>
+\alt <intpart> `.'
+
+<exponentfloat> ::=  <significand> <exponent>
+
+<significand> ::= <intpart> | <pointfloat>
+
+<intpart>       ::=  <digits>
+
+<fraction>      ::=  `.' <digits>
+
+<exponent>      ::= <e> <sign> <digits>
+
+<e> ::= `e' | `E'
+
+<sign> ::= `+' | `-' | $\upepsilon$
+
+\end{grammar}
+
+%
+% SUBSECTION
+%
+\subsection{Operators}
+
+The following tokens are operators:
+
+\begin{table}[h]
+\begin{tabular*}{\columnwidth}{@{\extracolsep{\stretch{1}}}*{6}{l}@{}}
+\token{+} 		& \token{-} 	& \token{/} 	& \token{*} 	& \token{\\\\} 	& \token{\%} \\
+\token{><} 		& \token{**} 	& \token{\#} 	& \token{@}	& 						 					& \\
+\token{<==>} 	& \token{<!=>}	& \token{=>}	& \token{||}	& \token{\&\&} 								& \token{!} \\
+\token{==} 		& \token{!=} 	& \token{<} 	& \token{<=} 	& \token{>} 								& \token{>=} \\
+\token{\\+} & \token{\\*} & & & &	\\
+\end{tabular*}
+\end{table}
+
+%
+% SUBSECTION
+%
+\subsection{Delimiters}
+
+The following tokens serve as delimiters in the grammar:
+
+\begin{table}[h]
+\begin{tabular*}{\columnwidth}{@{\extracolsep{\stretch{1}}}*{6}{l}@{}}
+\token{(} 	& \token{)} 	& \token{[} 	& \token{]} 	& \token{\{}	& \token{\}} 	\\
+\token{;} 	& \token{,} 	& \token{:} 	& \token{..}	& \token{.} 	& \token{|} 	\\
+\token{:=}	& \token{+=}	& \token{-=} 	& \token{*=}	& 				&				\\
+\token{/=}	& \token{\\=} & \token{\%=} &\token{|->}				\\
+\end{tabular*}
+\end{table}
+
+
+
+
+
+
+

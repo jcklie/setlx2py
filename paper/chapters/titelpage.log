@@ -1,0 +1,299 @@
+This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013/W32TeX) (format=pdflatex 2014.2.23)  19 MAY 2014 04:29
+entering extended mode
+ restricted \write18 enabled.
+ %&-line parsing enabled.
+**titelpage.tex -recorder
+(./titelpage.tex
+LaTeX2e <2011/06/27>
+Babel <3.9h> and hyphenation patterns for 78 languages loaded.
+
+! LaTeX Error: Environment titlepage undefined.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.34 \begin{titlepage}
+                      
+Your command was ignored.
+Type  I <command> <return>  to replace it with another command,
+or  <return>  to continue without it.
+
+
+! LaTeX Error: Missing \begin{document}.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.38 \center
+             % Center everything on the page
+You're in trouble here.  Try typing  <return>  to proceed.
+If that doesn't work, type  X <return>  to quit.
+
+
+Overfull \hbox (20.0pt too wide) in paragraph at lines 38--38
+[] 
+ []
+
+! Undefined control sequence.
+<recently read> \LARGE 
+                       
+l.44 \textsc{\LARGE DHBW Mannheim}
+                                  \\[1.5cm] % Name of your university/college
+The control sequence at the end of the top line
+of your error message was never \def'ed. If you have
+misspelled it (e.g., `\hobx'), type `I' and the correct
+spelling (e.g., `I\hbox'). Otherwise just continue,
+and I'll forget about whatever was undefined.
+
+
+Overfull \hbox (35.1941pt too wide) in paragraph at lines 44--44
+ \OT1/cmr/m/sc/10 DHBW 
+ []
+
+
+Overfull \hbox (50.48862pt too wide) in paragraph at lines 44--44
+ \OT1/cmr/m/sc/10 Mannheim 
+ []
+
+! Undefined control sequence.
+<recently read> \Large 
+                       
+l.45 \textsc{\Large Student research project}
+                                             \\[0.5cm] % Major heading such ...
+The control sequence at the end of the top line
+of your error message was never \def'ed. If you have
+misspelled it (e.g., `\hobx'), type `I' and the correct
+spelling (e.g., `I\hbox'). Otherwise just continue,
+and I'll forget about whatever was undefined.
+
+
+Overfull \hbox (42.02199pt too wide) in paragraph at lines 45--45
+ []\OT1/cmr/m/sc/10 Student 
+ []
+
+
+Overfull \hbox (15.37769pt too wide) in paragraph at lines 45--45
+ \OT1/cmr/m/sc/10 re- 
+ []
+
+
+Overfull \hbox (34.13318pt too wide) in paragraph at lines 45--45
+ \OT1/cmr/m/sc/10 search 
+ []
+
+
+Overfull \hbox (39.37756pt too wide) in paragraph at lines 45--45
+ \OT1/cmr/m/sc/10 project 
+ []
+
+! Undefined control sequence.
+<recently read> \large 
+                       
+l.46 \textsc{\large TINF11AI-BC}
+                                \\[0.5cm] % Minor heading such as course title
+The control sequence at the end of the top line
+of your error message was never \def'ed. If you have
+misspelled it (e.g., `\hobx'), type `I' and the correct
+spelling (e.g., `I\hbox'). Otherwise just continue,
+and I'll forget about whatever was undefined.
+
+
+Overfull \hbox (54.20778pt too wide) in paragraph at lines 46--46
+ []\OT1/cmr/m/sc/10 TINF11AI- 
+ []
+
+
+Overfull \hbox (15.56929pt too wide) in paragraph at lines 46--46
+ \OT1/cmr/m/sc/10 BC 
+ []
+
+! Undefined control sequence.
+l.53 { \huge
+             \bfseries Implementing a SetlX to Pyton compiler}\\[0.4cm] % Ti...
+The control sequence at the end of the top line
+of your error message was never \def'ed. If you have
+misspelled it (e.g., `\hobx'), type `I' and the correct
+spelling (e.g., `I\hbox'). Otherwise just continue,
+and I'll forget about whatever was undefined.
+
+
+Overfull \hbox (69.52742pt too wide) in paragraph at lines 53--53
+ []\OT1/cmr/bx/n/10 Implementing 
+ []
+
+
+Overfull \hbox (5.59023pt too wide) in paragraph at lines 53--53
+ \OT1/cmr/bx/n/10 a 
+ []
+
+
+Overfull \hbox (28.02069pt too wide) in paragraph at lines 53--53
+ \OT1/cmr/bx/n/10 SetlX 
+ []
+
+
+Overfull \hbox (10.22217pt too wide) in paragraph at lines 53--53
+ \OT1/cmr/bx/n/10 to 
+ []
+
+
+Overfull \hbox (17.7638pt too wide) in paragraph at lines 53--53
+ \OT1/cmr/bx/n/10 Py- 
+ []
+
+
+Overfull \hbox (16.61102pt too wide) in paragraph at lines 53--53
+ \OT1/cmr/bx/n/10 ton 
+ []
+
+
+Overfull \hbox (24.27765pt too wide) in paragraph at lines 53--53
+ \OT1/cmr/bx/n/10 com- 
+ []
+
+
+Overfull \hbox (22.78462pt too wide) in paragraph at lines 53--53
+ \OT1/cmr/bx/n/10 piler 
+ []
+
+! Undefined control sequence.
+l.61 \begin{flushleft} \large
+                             
+The control sequence at the end of the top line
+of your error message was never \def'ed. If you have
+misspelled it (e.g., `\hobx'), type `I' and the correct
+spelling (e.g., `I\hbox'). Otherwise just continue,
+and I'll forget about whatever was undefined.
+
+Missing character: There is no J in font nullfont!
+Missing character: There is no a in font nullfont!
+Missing character: There is no n in font nullfont!
+Missing character: There is no - in font nullfont!
+Missing character: There is no C in font nullfont!
+Missing character: There is no h in font nullfont!
+Missing character: There is no r in font nullfont!
+Missing character: There is no i in font nullfont!
+Missing character: There is no s in font nullfont!
+Missing character: There is no t in font nullfont!
+Missing character: There is no o in font nullfont!
+Missing character: There is no p in font nullfont!
+Missing character: There is no h in font nullfont!
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <7> on input line 65.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <5> on input line 65.
+! Undefined control sequence.
+l.68 \begin{flushright} \large
+                              
+The control sequence at the end of the top line
+of your error message was never \def'ed. If you have
+misspelled it (e.g., `\hobx'), type `I' and the correct
+spelling (e.g., `I\hbox'). Otherwise just continue,
+and I'll forget about whatever was undefined.
+
+Missing character: There is no P in font nullfont!
+Missing character: There is no r in font nullfont!
+Missing character: There is no o in font nullfont!
+Missing character: There is no f in font nullfont!
+Missing character: There is no . in font nullfont!
+Missing character: There is no D in font nullfont!
+Missing character: There is no r in font nullfont!
+Missing character: There is no . in font nullfont!
+Missing character: There is no K in font nullfont!
+Missing character: There is no a in font nullfont!
+Missing character: There is no r in font nullfont!
+Missing character: There is no l in font nullfont!
+
+Overfull \hbox (3276.74998pt too wide) in paragraph at lines 60--72
+ []$[]$ 
+ []
+
+
+Overfull \hbox (3276.74998pt too wide) in paragraph at lines 60--72
+ []$ 
+ []
+
+! Undefined control sequence.
+l.82 {\large
+             \today}\\[3cm] % Date, change the \today to a set date if you w...
+The control sequence at the end of the top line
+of your error message was never \def'ed. If you have
+misspelled it (e.g., `\hobx'), type `I' and the correct
+spelling (e.g., `I\hbox'). Otherwise just continue,
+and I'll forget about whatever was undefined.
+
+! Undefined control sequence.
+l.82 {\large \today
+                   }\\[3cm] % Date, change the \today to a set date if you w...
+The control sequence at the end of the top line
+of your error message was never \def'ed. If you have
+misspelled it (e.g., `\hobx'), type `I' and the correct
+spelling (e.g., `I\hbox'). Otherwise just continue,
+and I'll forget about whatever was undefined.
+
+
+! LaTeX Error: There's no line here to end.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.82 {\large \today}\\
+                      [3cm] % Date, change the \today to a set date if you w...
+
+Your command was ignored.
+Type  I <command> <return>  to replace it with another command,
+or  <return>  to continue without it.
+
+
+! LaTeX Error: \begin{document} ended by \end{titlepage}.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.94 \end{titlepage}
+                    
+Your command was ignored.
+Type  I <command> <return>  to replace it with another command,
+or  <return>  to continue without it.
+
+)
+
+! LaTeX Error: Missing \begin{document}.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+<*> titelpage.tex -
+                   recorder
+You're in trouble here.  Try typing  <return>  to proceed.
+If that doesn't work, type  X <return>  to quit.
+
+Missing character: There is no - in font nullfont!
+Missing character: There is no r in font nullfont!
+Missing character: There is no e in font nullfont!
+Missing character: There is no c in font nullfont!
+Missing character: There is no o in font nullfont!
+Missing character: There is no r in font nullfont!
+Missing character: There is no d in font nullfont!
+Missing character: There is no e in font nullfont!
+Missing character: There is no r in font nullfont!
+! Emergency stop.
+<*> titelpage.tex -recorder
+                           
+*** (job aborted, no legal \end found)
+
+ 
+Here is how much of TeX's memory you used:
+ 20 strings out of 493308
+ 278 string characters out of 6141367
+ 53419 words of memory out of 5000000
+ 3576 multiletter control sequences out of 15000+600000
+ 4595 words of font info for 17 fonts, out of 8000000 for 9000
+ 957 hyphenation exceptions out of 8191
+ 20i,3n,18p,149b,218s stack positions out of 5000i,500n,10000p,200000b,80000s
+!  ==> Fatal error occurred, no output PDF file produced!
