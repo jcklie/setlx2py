@@ -10,6 +10,7 @@
 \usepackage{todonotes}
 \usepackage{upgreek}
 \usepackage{dirtree}
+\usepackage[nonumberlist]{glossaries}
 
 \usepackage[parfill]{parskip}
 
@@ -23,6 +24,19 @@
   columns=fullflexible
 }
 
+% Python style for highlighting
+\lstdefinestyle{MyPython}{
+language=Python,
+basicstyle=\ttm,
+otherkeywords={self},             % Add keywords here
+keywordstyle=\ttb\color{deepblue},
+emph={MyClass,__init__},          % Custom highlighting
+emphstyle=\ttb\color{deepred},    % Custom highlighting style
+stringstyle=\color{deepgreen},
+frame=tb,                         % Any extra options here
+showstringspaces=false            % 
+}
+
 \usepackage{syntax}
 \setlength{\grammarparsep}{20pt plus 1pt minus 1pt} % increase separation between rules
 \setlength{\grammarindent}{12em} % increase separation between LHS/RHS 
@@ -33,6 +47,10 @@
 \newcommand{\token}[1]{\lstinline$#1$}
 \newcommand{\myparagraph}[1]{\paragraph{#1}\mbox{}}
 
+\makeglossaries
+\include{Chapters/glossary}
+\renewcommand*{\glossaryname}{List of Abbreviations}
+
 % BEGIN DOCUMENT
 
 \begin{document}
@@ -42,8 +60,10 @@
 \include{Chapters/titelpage}
 
 \tableofcontents
+\clearpage
 \listoftables
 \listoffigures
+\printglossaries
 
 \pagenumbering{arabic}
 
@@ -80,16 +100,11 @@
 \clearpage
 
 \include{Chapters/structure}
+\include{Chapters/testing}
+\include{Chapters/ast}
+\include{Chapters/transformer}
+\include{Chapters/codegen}
 
-\section{Testing}
-
-\section{Running the tests}
-
-\section{AST}
-
-\section{Transformations}
-
-\section{Code generation}
 
 \section{Execution}
 

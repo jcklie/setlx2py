@@ -1,3 +1,5 @@
 \contentsline {figure}{\numberline {1}{\ignorespaces Running python from a shell without fully specified path}}{5}{figure.1}
 \contentsline {figure}{\numberline {2}{\ignorespaces Installing the package manager pip}}{5}{figure.2}
 \contentsline {figure}{\numberline {3}{\ignorespaces Installing the dependencies of setlx2py with pip}}{6}{figure.3}
+\contentsline {figure}{\numberline {4}{\ignorespaces Folders and files in setlx2py}}{27}{figure.4}
+\contentsline {figure}{\numberline {5}{\ignorespaces Output of nosetest: All tests passed}}{32}{figure.5}

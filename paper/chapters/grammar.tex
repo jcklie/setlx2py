@@ -1,7 +1,7 @@
 %!TEX root = ../main.tex
 \section{Grammar}
 
-In this chapter, the grammar of SetlX is explained. The syntax used to describe it is BNF. The grammar was implemented in a LALR(1) parser, therefore, the grammar is LALR(1). 
+In this chapter, the grammar of SetlX is explained. The syntax used to describe it is \gls{bnf}. The grammar was implemented in a \gls{lalr}(1) parser, therefore, the grammar is LALR(1). 
 
 In some cases, the reader might think of an easier way to express given constructs. These strange and too complex looking rules are in most cases written that way to preserve the LALR nature and to deal with parsers which do not offer operator precedence.
 
@@ -11,7 +11,6 @@ The grammar model used is heavily borrowed from the Python 2.7 grammar. It can b
 %
 % SUBSECTION
 %
-\clearpage
 \subsection{Top-level components}
 
 All input read from files has the same form:
@@ -27,9 +26,6 @@ All input read from files has the same form:
 
 <statement> ::= <simple_statement> `;'
 \alt <compound_statement>
-
-<expression_list> ::= <expression>
-\alt <expression_list> `,' <expression>
 
 <block> ::= <statement_list>
 \alt $\upepsilon$

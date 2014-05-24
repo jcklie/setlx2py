@@ -17,7 +17,7 @@ Now you could run Python with the command
 # $PYHOME\python.exe
 \end{lstlisting}
 
-Typing the full path is very tedious. To ease the usage of the Python interpreter, Windows has the feature of the \texttt{\$PATH}-Variable. Whenever you insert a command without a fully specified path, it looks in the folders you specified in that variable, and looks for a match. There are two ways to add a program to the path variable. Open a Powershell with either \keys{Win + R + "powershell" + Enter}. Insert the follwing command in the just opened window: 
+Typing the full path is very tedious. To ease the usage of the Python interpreter, Windows has the feature of the \texttt{\$PATH}-Variable. Whenever you insert a command without a fully specified path, it looks in the folders you specified in that variable, and looks for a match. There are two ways to add a program to the path variable. Open a Powershell with either \keys{Win + R + `powershell' + Enter}. Insert the follwing command in the just opened window: 
 
 \begin{lstlisting}{breaklines=true, language=bash}
 # [Environment]::SetEnvironmentVariable("Path", "$env:Path;C:\Python27\;C:\Python27\Scripts\", "User")
@@ -63,7 +63,7 @@ You should see a confirmation that it is installed everything successfully like 
 
 \subsection{Install binary dependencies}
 
-Setlx2py uses internally some platform-specific binary libraries. It is possible to compile these for Windows with some effort, but people offer them precompiled already. Download the fitting version of the \texttt{blist} package (for the curious, it offers better/more advanced data structures) and install it. Be sure to download the same architecture as you did for Python (32- or 64-bit), else you get an error with a name of "Cannot install" or similar. The package itself can be obtained from
+Setlx2py uses internally some platform-specific binary libraries. It is possible to compile these for Windows with some effort, but people offer them precompiled already. Download the fitting version of the \texttt{blist} package (for the curious, it offers better/more advanced data structures) and install it. Be sure to download the same architecture as you did for Python (32- or 64-bit), else you get an error with a name of `Cannot install' or similar. The package itself can be obtained from
 
 \url{http://www.lfd.uci.edu/~gohlke/pythonlibs/#blist}
 
@@ -79,7 +79,7 @@ and extract it. Open a shell and change the working directory to the folder wher
 # pip install -r REQUIREMENTS.txt
 \end{lstlisting}
 
-The package manager now retrieves all the dependencies specified in the given file. After some time, it messages "Successfully installed". Everything is now in place to actually use setlx2py.
+The package manager now retrieves all the dependencies specified in the given file. After some time, it messages `Successfully installed'. Everything is now in place to actually use setlx2py.
 
 \begin{figure}[ht]
     \centering
