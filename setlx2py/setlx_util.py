@@ -17,8 +17,6 @@ from setlx2py.setlx_parser import Parser
 from setlx2py.setlx_ast_transformer import AstTransformer
 from setlx2py.setlx_codegen import Codegen
 
-from setlx2py.setlx_builtin import *
-
 HEADER = """
 from setlx2py.builtin.setlx_functions import *
 from setlx2py.builtin.setlx_set import SetlxSet

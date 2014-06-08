@@ -35,6 +35,12 @@ def stlx_from(m):
     m.remove(n)
     return n
 
+def stlx_domain(s):
+    """14.
+    """
+    lst = [x for x, unused in s]
+    return SetlxSet(lst)
+
 def stlx_powerset(s):
     """17. If s is a set, the expression pow(s) computes the power set of s. The power set of s is 
     defined as the set of all subsets of s."""

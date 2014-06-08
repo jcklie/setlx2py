@@ -27,7 +27,7 @@ class SetlxSet(blist.sortedset):
         it1 = iter(self)
         it2 = iter(other)
 
-        for i in range(max(l1,l2)):
+        for _ in range(max(l1,l2)):
             try:
                 x = it1.next()
                 y = it2.next()
@@ -40,13 +40,13 @@ class SetlxSet(blist.sortedset):
 
     def __getitem__(self, key):
         """ Sets of pairs, e.g. { [1,2], [3, 4] } act like maps """
-
         if isinstance(key, slice):
-            return super(SetlxSet, self).__getitem__(key)
+            return blist.sortedset.__getitem__(self, key)
         else:
+            if self._has_duplicate_keys(): return None
             for x, y in self:
                 if x == key:
-                    return y        
+                    return y   
 
     def __repr__(self):
         data = sorted(self)
@@ -56,4 +56,10 @@ class SetlxSet(blist.sortedset):
         s = s.replace('(', '{')
         s = s.replace(')', '}')
         s = s.replace(',}', '}')
-        return '{' + s + '}'
+        return '{' + s + '}'    
+    
+    def _has_duplicate_keys(self):
+        """ Returns True if self is map and iterable contains 
+        duplicate entries at first position of tuple
+        """        
+        return len({x for x, _ in self}) != len(self)

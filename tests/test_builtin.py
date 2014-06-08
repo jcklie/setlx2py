@@ -61,10 +61,11 @@ def test_trigonometric():
     assert_almost_equals(stlx_acos(X), m.acos(X))
     assert_almost_equals(stlx_atan(X), m.atan(X))
     
+def test_domain():
+    eq_(stlx_domain( SetlxSet([[1,2],[1,3],[5,7]]) ), SetlxSet([1,5]))
+    
 # Custom/Overloaded set Operations
 # ----------
-
-
 
 def test_cartesian_two():
     s1 = SetlxSet([1,2])

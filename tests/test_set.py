@@ -6,7 +6,7 @@
 # License: Apache v2
 #------------------------------------------------------------------------------
 
-from nose.tools import eq_
+from nose.tools import eq_, raises
 
 from setlx2py.builtin.setlx_set import SetlxSet
 from setlx2py.builtin.setlx_functions import stlx_pow
@@ -15,10 +15,20 @@ def test_create():
     x = SetlxSet([5,4,4,2,5,1])
     eq_(len(x), 4)
 
-def test_get_by_int_key_legit():
+@raises(Exception)    
+def test_get_by_int_key():
+    x = SetlxSet([[4,3,2,1]])
+    x[3]
+
+def test_get_map_by_int_key():
     x = SetlxSet([[1,2], [3,4]])
     eq_(x[1], 2)
     eq_(x[3], 4)
+    
+def test_get_duplicate():
+    x = SetlxSet([[1,1], [1,4], [3,3]])
+    eq_(x[1], None)
+    eq_(x[2], None)    
     
 def test_set_operations():
     s1 = SetlxSet([1,2])

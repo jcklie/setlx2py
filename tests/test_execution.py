@@ -83,6 +83,7 @@ def test_logic_results():
     # assert_same_result(SOURCE_LOGIC, 'knf.stlx') TERMS/MATCHING
     # assert_same_result(SOURCE_LOGIC, 'davis-putnam.stlx') PARSE
     # assert_same_result(SOURCE_LOGIC, 'fibonacci-combinatorics.stlx') SCOPE
+    # 'transitive-closure.stlx' LIST ASSIGNMENT
     
     files_to_test = [  
         'allValuations.stlx',
@@ -109,7 +110,7 @@ def test_logic_results():
         'solve.stlx',
         'path-cyclic.stlx',
         'primes-while.stlx',
-        'simple-tuple.stlx',
+        'simple-tuple.stlx',        
     ]
     
     for stlx_file in files_to_test:
