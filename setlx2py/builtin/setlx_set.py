@@ -47,6 +47,17 @@ class SetlxSet(blist.sortedset):
             for x, y in self:
                 if x == key:
                     return y   
+                
+    def __setitem__(self, key, item):
+        for x, y in self:
+            if x == key:
+                self.remove([x, y])
+                break
+        self.add([key, item])
+        
+    def _contains_key(self, key, item):
+
+        return False
 
     def __repr__(self):
         data = sorted(self)

@@ -41,6 +41,12 @@ def stlx_domain(s):
     lst = [x for x, unused in s]
     return SetlxSet(lst)
 
+def stlx_range(s):
+    """18.
+    """
+    lst = [y for unused, y in s]
+    return SetlxSet(lst)
+
 def stlx_powerset(s):
     """17. If s is a set, the expression pow(s) computes the power set of s. The power set of s is 
     defined as the set of all subsets of s."""
@@ -72,7 +78,7 @@ def stlx_print(*args):
     s = ''.join(str(arg) for arg in args) + '\n'
     sys.stdout.write(s)
 
-def stlx_range(*args):
+def stlx_lst_from_range(*args):
     """
     [a..z]
     [a,b..z]
@@ -228,4 +234,8 @@ class memoized(object):
     def __get__(self, obj, objtype):
         '''Support instance methods.'''
         return functools.partial(self.__call__, obj)
+    
+
+def is_builtin_function(name):
+    return name in [ 'print', 'from', 'arb', 'pow', 'char', 'isString', 'abort', 'cos', 'powerset', 'domain', 'range' ]
     

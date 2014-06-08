@@ -9,9 +9,7 @@
 
 from setlx2py.setlx_ast import *
 from setlx2py.setlx_util import *
-
-def is_builtin_function(name):
-    return name in [ 'print', 'from', 'arb', 'pow', 'char', 'isString', 'abort', 'cos', 'powerset' ]
+from setlx2py.builtin.setlx_functions import is_builtin_function
 
 class Codegen(object):
 
@@ -169,10 +167,10 @@ class Codegen(object):
         z = self._parenthesize_unless_simple(n.c)
 
         if b:
-            s = '{0}(stlx_range({1}, {2}, {3}))'
+            s = '{0}(stlx_lst_from_range({1}, {2}, {3}))'
             return s.format(collection, a, b, z)
         else:
-            s = '{0}(stlx_range({1},{2}))'
+            s = '{0}(stlx_lst_from_range({1},{2}))'
             return s.format(collection, a, z)
 
     def visit_Comprehension(self, n):

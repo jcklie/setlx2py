@@ -110,7 +110,8 @@ def test_logic_results():
         'solve.stlx',
         'path-cyclic.stlx',
         'primes-while.stlx',
-        'simple-tuple.stlx',        
+        'simple-tuple.stlx',
+        'function.stlx',        
     ]
     
     for stlx_file in files_to_test:

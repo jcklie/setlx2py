@@ -164,8 +164,8 @@ def test_print():
     eq_(result, 'Foo Bar baz\n')
 
 def test_range():
-    eq_( SetlxList(stlx_range(0,5)), SetlxList([0, 1, 2, 3, 4, 5]))
-    eq_( SetlxList(stlx_range(0,2,5)), SetlxList([0,2,4]))
-    eq_( SetlxList(stlx_range(-3,-1)), SetlxList([-3, -2, -1]))
-    eq_( SetlxList(stlx_range(10,8,1)), SetlxList([10, 8, 6, 4, 2]))
+    eq_( SetlxList(stlx_lst_from_range(0,5)), SetlxList([0, 1, 2, 3, 4, 5]))
+    eq_( SetlxList(stlx_lst_from_range(0,2,5)), SetlxList([0,2,4]))
+    eq_( SetlxList(stlx_lst_from_range(-3,-1)), SetlxList([-3, -2, -1]))
+    eq_( SetlxList(stlx_lst_from_range(10,8,1)), SetlxList([10, 8, 6, 4, 2]))
     

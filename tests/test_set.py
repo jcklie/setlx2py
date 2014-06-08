@@ -28,7 +28,12 @@ def test_get_map_by_int_key():
 def test_get_duplicate():
     x = SetlxSet([[1,1], [1,4], [3,3]])
     eq_(x[1], None)
-    eq_(x[2], None)    
+    eq_(x[2], None)  
+    
+def test_set_value():
+    x = SetlxSet( [ [1,2], [3,4] ] )
+    x[5] = 6
+    eq_(x[5], 6)    
     
 def test_set_operations():
     s1 = SetlxSet([1,2])
@@ -40,4 +45,6 @@ def test_set_operations():
     eq_(s1 % s2, SetlxSet([1, 3]) )
     eq_(stlx_pow(s1, 2), SetlxSet([(1, 1), (1, 2), (2, 1), (2, 2)]))
     eq_(stlx_pow(2, s2), SetlxSet([(), (2,), (2,3), (3,)]))    
+    
+
     
