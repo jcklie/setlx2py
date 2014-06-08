@@ -1,0 +1,11 @@
+a + b == 20
+
+uncached factorial
+a! == 15511210043330985984000000
+a! == 15511210043330985984000000
+
+a.number == 5
+b.number == 15
+a ** b == swapped
+a.number == 15
+b.number == 5

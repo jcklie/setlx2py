@@ -1,0 +1,27 @@
+=>PYTHONTEX#PYGbash#default#defaultverb#0#verbatim#####32#
+[Environment]::SetEnvironmentVariable("Path", "\textdollar{}env:Path;C:\textbackslash{}Python27\textbackslash{};C:\textbackslash{}Python27\textbackslash{}Scripts\textbackslash{}", "User")
+=>PYTHONTEX:SETTINGS#
+version=v0.12
+outputdir=pythontex-files-main
+workingdir=pythontex-files-main
+gobble=none
+rerun=default
+hashdependencies=default
+makestderr=false
+stderrfilename=full
+keeptemps=none
+pyfuture=default
+pyconfuture=none
+pygments=true
+pygglobal=:GLOBAL||
+fvextfile=-1
+pyconbanner=none
+pyconfilename=stdin
+depythontex=false
+pygfamily=py|python|
+pygfamily=pycon|pycon|
+pygfamily=sympy|python|
+pygfamily=sympycon|pycon|
+pygfamily=pylab|python|
+pygfamily=pylabcon|pycon|
+pygfamily=PYGbash|bash|

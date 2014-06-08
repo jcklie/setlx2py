@@ -1,0 +1,4 @@
+read := procedure(s) { return 42; };
+n := read("Type a natural number and press return: ");
+s := +/ { 1 .. n };
+print("The sum 1 + 2 + ... + ", n, " is equal to ", s, ".");

@@ -1,0 +1,3 @@
+['a', '+', 'b', '<->', 'c']
+[['a', '+', 'b'], '<->', 'c']
+Die Formel "((a + b) <-> c)" ist keine Tautologie.
