@@ -9,9 +9,6 @@
 #------------------------------------------------------------------------------
 
 import sys
-import re
-
-from cStringIO import StringIO
 
 from setlx2py.setlx_parser import Parser
 from setlx2py.setlx_ast_transformer import AstTransformer
@@ -19,6 +16,7 @@ from setlx2py.setlx_codegen import Codegen
 
 HEADER = """
 from setlx2py.builtin.setlx_functions import *
+from setlx2py.builtin.setlx_internals import *
 from setlx2py.builtin.setlx_set import SetlxSet
 from setlx2py.builtin.setlx_list import SetlxList
 from setlx2py.builtin.setlx_string import SetlxString

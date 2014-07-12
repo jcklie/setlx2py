@@ -7,6 +7,8 @@
 # License: Apache v2
 #------------------------------------------------------------------------------
 
+import re
+
 from setlx2py.setlx_ast import *
 from setlx2py.setlx_util import *
 from setlx2py.builtin.setlx_functions import is_builtin_function

@@ -1,3 +1,12 @@
+#------------------------------------------------------------------------------
+# setlx2py: setlx_list.py
+#
+# Home of the SetlxString
+#
+# Copyright (C) 2014, Jan-Christoph Klie
+# License: Apache v2
+#------------------------------------------------------------------------------
+
 class SetlxString(str):
     
     def __init__(self, s):

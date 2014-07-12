@@ -230,7 +230,7 @@ def test_set_powerset():
     s1 := { 1, 2 };
     result := 2 ** s1;
     """
-    assert_res(s, {'result' : SetlxSet([(), (1,), (1,2), (2,)])})
+    assert_res(s, {'result' : SetlxSet([SetlxSet(), SetlxSet([1]), SetlxSet([1,2]), SetlxSet([2])])})
 
 def test_set_cartesian():
     s = """

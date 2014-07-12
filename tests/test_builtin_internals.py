@@ -1,3 +1,13 @@
+#------------------------------------------------------------------------------
+# setlx2py: test_builtin_functions.py
+#
+# Unit tests for the internal functions in SetlX generated code
+# (setlx2py/builtin/setlx_internals.py)
+#
+# Copyright (C) 2014, Jan-Christoph Klie
+# License: Apache v2
+#------------------------------------------------------------------------------
+
 from nose.tools import eq_, nottest
 
 import sys
@@ -7,26 +17,12 @@ import math as m
 from StringIO import StringIO
 
 from setlx2py.builtin.setlx_functions import *
+from setlx2py.builtin.setlx_internals import *
 
 def assert_almost_equals(a, b):
     assert abs(a-b) < 0.0001
 
-# Functions and Operators on Sets and Lists
 
-def test_arb():
-    random.seed(42)
-    s = SetlxSet([42])
-
-    result = stlx_arb(s)
-    eq_(result, 42)
-    eq_(s, SetlxSet([42]))
-    
-def test_from():
-    s = SetlxSet([42])
-    result = stlx_from(s)
-
-    eq_(result, 42)
-    eq_(s, SetlxSet([]))  
 
 # Mathematical Functions
 
@@ -60,10 +56,7 @@ def test_trigonometric():
     assert_almost_equals(stlx_asin(X), m.asin(X))
     assert_almost_equals(stlx_acos(X), m.acos(X))
     assert_almost_equals(stlx_atan(X), m.atan(X))
-    
-def test_domain():
-    eq_(stlx_domain( SetlxSet([[1,2],[1,3],[5,7]]) ), SetlxSet([1,5]))
-    
+        
 # Custom/Overloaded set Operations
 # ----------
 

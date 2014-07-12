@@ -73,14 +73,23 @@ def assert_same_result(folder, name, verbose=False, print_ast=False):
     assert has_same_result(source_path, ref_path, verbose, print_ast), name
 
 def test_example_results():
-    assert_same_result(SOURCE_EXAMPLES, 'ggt.stlx')
-    assert_same_result(SOURCE_EXAMPLES, 'min-sort.stlx')
-    assert_same_result(SOURCE_EXAMPLES, 'kgv.stlx')
-    assert_same_result(SOURCE_EXAMPLES, 'primes-sieve.stlx')
-    assert_same_result(SOURCE_EXAMPLES, 'tautology.stlx')
+    files_to_test = [
+         # 'aufgaben_zur_gdi.stlx', LIST ASSIGNMENT
+        'ggt.stlx',
+        'kgv.stlx',
+        # 'klausur_aufgabe_power.stlx',
+        'min-sort.stlx',
+        
+        'primes-sieve.stlx',
+        'primes-tuple.stlx',
+        'tautology.stlx'
+    ]
 
-def test_logic_results():    
-    # assert_same_result(SOURCE_LOGIC, 'knf.stlx') TERMS/MATCHING
+    for stlx_file in files_to_test:
+        assert_same_result(SOURCE_EXAMPLES, stlx_file) 
+
+def test_logic_results():     
+
     # assert_same_result(SOURCE_LOGIC, 'davis-putnam.stlx') PARSE
     # assert_same_result(SOURCE_LOGIC, 'fibonacci-combinatorics.stlx') SCOPE
     # 'transitive-closure.stlx' LIST ASSIGNMENT

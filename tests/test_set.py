@@ -44,7 +44,7 @@ def test_set_operations():
     eq_(s1 * s2, SetlxSet([2]))
     eq_(s1 % s2, SetlxSet([1, 3]) )
     eq_(stlx_pow(s1, 2), SetlxSet([(1, 1), (1, 2), (2, 1), (2, 2)]))
-    eq_(stlx_pow(2, s2), SetlxSet([(), (2,), (2,3), (3,)]))    
+    eq_(stlx_pow(2, s2), SetlxSet([SetlxSet(), SetlxSet([2]), SetlxSet([2,3]), SetlxSet([3])]))    
     
 
     
