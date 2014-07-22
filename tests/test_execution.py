@@ -40,31 +40,6 @@ def has_same_result(source_path, ref_path, verbose=False, print_ast=False):
 
     return result == reference
 
-"""    
-def assert_same_result(folder,verbose=False):
-    all_correct = True
-    wrong_files = []
-
-    entries = [os.path.join(folder,f) for f in os.listdir(folder)]
-    files = [f for f in entries if os.path.isfile(f)]
-
-    for source_path in files:
-        name = os.path.basename(source_path)
-        ref_path = os.path.join(folder, 'reference', name + '.reference')
-        current_same_result = has_same_result(source_path, ref_path, verbose, verbose)
-
-        if not current_same_result:
-            all_correct = False
-            wrong_files.append(source_path)
-
-    correct_count = len(files) - len(wrong_files)
-    msg =  'Ran [{0}/{1}]\n'.format(correct_count, len(files))
-    msg += 'The following files had different results: '
-    msg += '\n{0}'.format('\n'.join(wrong_files))
-    
-    assert all_correct, msg
-"""
-
 def assert_same_result(folder, name, verbose=False, print_ast=False):
     random.seed(0)
     source_path = os.path.join(folder, name)
@@ -96,31 +71,32 @@ def test_logic_results():
     
     files_to_test = [  
         'allValuations.stlx',
-        'fixpoint.stlx',
-        'primes-for.stlx',
-        'primes-eratosthenes.stlx',
-        'count.stlx',
-        'from.stlx',
         'arb.stlx',
-        'mySort.stlx',
-        'min-sort.stlx',
-        'ggt-loop.stlx',
+        'count.stlx',
         'evaluateOld.stlx',
+        'fixpoint.stlx',
+        'from.stlx',
+        'function.stlx', 
         'ggt-fast.stlx',
-        'switch.stlx',
-        'sum-recursive.stlx',
-        'sort.stlx',
-        'sum.stlx',
+        'ggt-loop.stlx',
+        'min-sort.stlx',
+        'mySort.stlx',
+        'path-cyclic.stlx',
+        'primes-eratosthenes.stlx',
+        'primes-for.stlx',
         'primes-forall.stlx',
         'primes-sieve.stlx',
         'primes-slim.stlx',
         'primes-tuple.stlx',
+        'primes-while.stlx',        
         'simple.stlx',
-        'solve.stlx',
-        'path-cyclic.stlx',
-        'primes-while.stlx',
         'simple-tuple.stlx',
-        'function.stlx',        
+        'solve.stlx',
+        'sort.stlx',        
+        'sum.stlx',
+        'sum-recursive.stlx',
+        'switch.stlx',    
+        'transitive-closure.stlx',   
     ]
     
     for stlx_file in files_to_test:

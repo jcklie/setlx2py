@@ -53,6 +53,18 @@ def stlx_from(m):
     m.remove(n)
     return n
 
+#12
+def stlx_fromB(s):
+    e = stlx_first(s)
+    s.remove(e)
+    return e
+
+#13
+def stlx_fromE(s):
+    e = stlx_last(s)
+    del s[-1]
+    return e
+
 #14
 def stlx_domain(s):
     """"""
