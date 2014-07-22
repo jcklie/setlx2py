@@ -95,8 +95,7 @@ def test_logic_results():
         'sort.stlx',        
         'sum.stlx',
         'sum-recursive.stlx',
-        'switch.stlx',    
-        'transitive-closure.stlx',   
+        'switch.stlx',       
     ]
     
     for stlx_file in files_to_test:
