@@ -1,5 +1,46 @@
+<<<<<<< HEAD
+%!TEX root = ../main.tex
+
+\section{Code generation}
+
+The code generator used is model based, as described in \cite{parr2010}{, p. 295ff}. It is implemented with the visitor pattern: the AST is traversed depth-first, and one can specify actions for every AST node type. 
+
+Therefore, every AST node type used in setlx2py has a Python format string with filler (like printf in the C language), where the content is injected. Every node is translated on its own, and the resulting strings are simply concatenated in the \texttt{FileAST} rule. The name scheme for callbacks is \texttt{visit\_} + \texttt{<node name>}, for example \texttt{visit\_Assignment}. 
+
+The following snippet is a very basic code generator. The visit method dynamicalls looks up the callback to use for the current node and executes them. In the assignment itself, the subtrees are constructed in place (for lhs and rhs), and insert the resulting strings into the template.
+
+\begin{lstlisting}[language=python]
+class Codegen(object):
+
+    def visit(self, node):
+        method = 'visit_' + node.__class__.__name__
+        fun = getattr(self, method, self.generic_visit)(node)
+        return fun
+
+    def visit_FileAST(self, n):
+        s = ''
+        for stmt in n.stmts:
+            s += self.visit(stmt) + '\n'
+        return s
+
+    def visit_Assignment(self, n):
+        s = '{0} {1} {2}'
+        op = n.op if n.op != ':=' else '='
+        lhs = self.visit(n.target)
+        rhs = self.visit(n.right)
+
+        s = '{0} {1} {2}'
+        return s.format(lhs, op, rhs)
+\end{lstlisting}
+
+
+
+
+ 
+=======
 %!TEX root = ../main.tex
 
 \section{Code generation}
 
 \label{sec:codegen}
+>>>>>>> 6640584894f5245d515ca7633dadcb0b4d99f7b3

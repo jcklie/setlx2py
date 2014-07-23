@@ -1,3 +1,607 @@
+<<<<<<< HEAD
+%!TEX root = ../main.tex
+\section{Grammar}
+
+In this chapter, the grammar of SetlX is explained. The syntax used to describe it is \gls{bnf}. The grammar was implemented in a \gls{lalr}(1) parser, therefore, the grammar is LALR(1). 
+
+In some cases, the reader might think of an easier way to express given constructs. These strange and too complex looking rules are in most cases written that way to preserve the LALR nature and to deal with parsers which do not offer operator precedence.
+
+The grammar used is heavily borrowed from the Python 2.7 grammar. It can be found in \cite{py2}.
+
+%
+% SUBSECTION
+%
+\subsection{Top-level components}
+
+All input read from files has the same form:
+
+\begin{grammar}
+<S> ::= <file_input>
+
+<file_input> ::= <statement_list>
+\alt <expression>
+
+<statement_list> ::= <statement>
+\alt <statement_list> <statement>
+
+<statement> ::= <simple_statement> `;'
+\alt <compound_statement>
+
+<block> ::= <statement_list>
+\alt $\upepsilon$
+\end{grammar}
+
+%
+% SUBSECTION
+%
+\clearpage
+\subsection{Expressions}
+
+This section explains the elements occuring in SetlX expressions.
+
+\begin{grammar}
+<expression> ::= <implication>
+\alt <lambda_definition>
+\alt <implication> `<==>' <implication>
+\alt <implication> `<!=>' <implication>
+
+<implication> ::= <disjunction>
+\alt <disjunction> `=>' <disjunction>
+
+<disjunction> ::= <conjunction>
+\alt <disjunction> `||' <conjunction>
+
+<conjunction> ::= <comparison>
+\alt <conjunction> `&&' <comparison>
+
+<comparison> ::= <sum>
+\alt <sum> `==' <sum>
+\alt <sum> `!=' <sum>
+\alt <sum> `<' <sum>
+\alt <sum> `<=' <sum>
+\alt <sum> `>' <sum>
+\alt <sum> `>=' <sum>
+\alt <sum> `in' <sum>
+\alt <sum> `notin' <sum>
+
+<sum> ::= <product>
+\alt <sum> `+' <product>
+\alt <sum> `-' <product>
+
+<product> ::= <reduce>
+\alt <product> `*' <reduce>
+\alt <product> `/' <reduce>
+\alt <product> `\\' <reduce>
+\alt <product> `\%' <reduce>
+\alt <product> `<>' <reduce>
+
+<reduce> ::= <unary_expression>
+\alt `\\+' <unary_expression>
+\alt `\\*' <unary_expression>
+
+<unary_expression> ::= <power>
+\alt `\\+' <unary_expression>
+\alt `\\*' <unary_expression>
+\alt `#' <unary_expression>
+\alt `-' <unary_expression>
+\alt `@' <unary_expression>
+\alt `!' <unary_expression>
+\alt <quantor>
+\alt <term>
+
+<power> ::= <primary>
+\alt <primary> `**' <power>
+
+<primary> ::= <atom>
+\alt <attributeref>
+\alt <subscription>
+\alt <slicing>
+\alt <procedure>
+\alt <call>
+\alt <primary> `!'
+
+\end{grammar}
+
+%
+\myparagraph{lambda}
+
+\begin{grammar}
+<lambda_definition> ::= <lambda_parameters> `|->' <expression>
+
+<lambda_parameters> ::= <identifier>
+\alt <list_display>
+\end{grammar}
+
+%
+\myparagraph{quantor}
+
+\begin{grammar}
+<quantor> ::= `forall' `(' <iterator_chain> `|' <expression> `)'
+\alt `exists' `(' <iterator_chain> `|' <expression> `)'
+\end{grammar}
+
+%
+\myparagraph{term}
+
+\begin{grammar}
+<term> ::= `TERM' `(' <argument_list> `)'
+\alt `TERM' `(' `)'
+\end{grammar}
+
+%#####################
+%
+\subsubsection{Atom}
+
+Atoms (as the name implies) are the fundamental elements of expressions.
+
+\begin{grammar}
+<atom> ::= <identifier>
+\alt <literal>
+\alt <enclosure>
+
+<identifier> ::= `IDENTIFIER'
+\alt `_'
+\end{grammar}
+
+%
+\myparagraph{Literals}
+
+SetlX supports three kinds of string literals and two numeric literals:
+
+\begin{grammar}
+<literal> ::= <stringliteral>
+\alt <integer>
+\alt <floatnumber>
+\alt <boolean>
+
+<stringliteral> ::= `STRING'
+\alt `LITERAL'
+\alt `INTERPOLATION'
+
+<integer> ::= `INTEGER'
+
+<floatnumber> ::= `DOUBLE'
+
+<boolean> ::= `true'
+\alt `false'
+\end{grammar}
+
+%#####################
+%
+\subsubsection{Primaries}
+
+Primaries represent the most tightly bound operations of the language. That is why they are at then bottom of the expression grammar.
+
+%
+\myparagraph{Attributeref}
+
+An attribute reference is a primary followed by a period and a name:
+
+\begin{grammar}
+<attributeref> ::= <primary> `.' <identifier>
+\end{grammar}
+
+%
+\myparagraph{Subscription}
+
+A subscription retrieves an item of an indexable:
+
+\begin{grammar}
+<subscription> ::= <primary> `[' <expression> `]'
+\end{grammar}
+
+%
+\myparagraph{Slicing}
+
+A slice retrieves a subset of the sliced object. SetlX allows leaving out either the lower or upper bound. The object sliced has to support the operation.
+
+\begin{grammar}
+<slicing> ::= <primary> `[' <lower_bound> `..' <upper_bound> `]'
+
+<lower_bound> ::= <expression>
+\alt $\upepsilon$
+
+<upper_bound> ::= <expression>
+\alt $\upepsilon$
+\end{grammar}
+
+%
+\myparagraph{Procedure}
+
+The definition of a function in SetlX is an expression, not a compound statement, since it needs to be bound to a variable to be usable.
+
+There are two kinds of procedures: vanilla and cached.
+
+\begin{grammar}
+<procedure> ::= `procedure' `(' parameter_list `)' `{' `block' `}'
+\alt `cProcedure' `(' parameter_list `)' `{' `block' `}'
+
+<parameter_list> ::= <params>
+\alt $\upepsilon$
+
+<params> ::= <procedure_param>
+\alt <params> `,' <procedure_param>
+
+<procedure_param> ::= <identifier>
+\end{grammar}
+
+%
+\myparagraph{Call}
+
+A call invokes a callable with a possible empty list of arguments.
+
+\begin{grammar}
+<call> ::= <primary> `(' <argument_list> `)'
+\alt <primary> `(' `)'
+
+<argument_list> ::= <expression>
+\alt <argument_list> `,' <expression>
+\end{grammar}
+
+%#####################
+%
+\subsubsection{Enclosures}
+
+SetlX extensively uses enclosures for the syntax sugar of builtin data types.
+
+\begin{grammar}
+<enclosure> ::= <parenth_form>
+\alt <set_range>
+\alt <list_range>
+\alt <set_display>
+\alt <list_display>
+\alt <set_comprehension>
+\alt <list_comprehension>
+\end{grammar}
+
+%
+\myparagraph{Parenthesized forms}
+
+A parenthesized form is an expression enclosed in parentheses. The fact that it is at the bottom of the expression tree gives it the highest precedence in arithmetic expressions.
+
+\begin{grammar}
+<parenth_form> ::= `(' <expression> `)'
+\end{grammar}
+
+%
+\myparagraph{Comprehensions}
+
+Comprehensions provide a concise way to create new instances of that type based on an already existing collection.
+
+\begin{grammar}
+<set_comprehension> ::= `{' <expression> `:' <iterator_chain> <comprehension_condition> `}'
+
+<list_comprehension> ::= `[' <expression> `:' <iterator_chain> <comprehension_condition> `]'
+
+<comprehension_condition> ::= `|' <expression>
+\alt $\upepsilon$
+\end{grammar}
+
+%
+\myparagraph{Ranges}
+
+Ranges provide a short syntax to create collections which contain all values from a given start to an end with an optional specified step size. The expressions must evaluate to integers.
+
+\begin{grammar}
+<set_range> ::= `{' <expression> `..' <expression> `}'
+\alt `{' <expression> `,' <expression> `..' <expression> `}'
+
+<list_range> ::= `[' <expression> `..' <expression> `]'
+\alt `[' <expression> `,' <expression> `..' <expression> `]'
+\end{grammar}
+
+%
+\myparagraph{Displays}
+
+Displays are the syntax sugar for lists and sets. Values of the collection to be are enclosed in either round or curly braces. 
+
+These are also used in case statements for representing the matchee collections.
+
+\begin{grammar}
+<set_display> ::= `{' <expression> `}'
+\alt `{' <expression> `,' argument_list `}'
+\alt `{' `}'
+\alt `{' <expression> `|' <expression> `}'
+\alt `{' <expression> `,' argument_list `|' <expression> `}'
+
+<list_display> ::= `[' <expression> `]'
+\alt `[' <expression> `,' argument_list `]'
+\alt `[' `]'
+\alt `[' <expression> `|' <expression> `]'
+\alt `[' <expression> `,' argument_list `|' <expression> `]'
+\end{grammar}
+
+%
+\clearpage
+% SUBSECTION
+%
+\subsection{Simple statements}
+
+Simple statements form a single logical line and therefore have to end with a semicolon.
+
+\begin{grammar}
+<simple_statement> ::= <assert_statement>
+\alt <assignment_statement>
+\alt <augmented_assign_statement>
+\alt <backtrack_statement>
+\alt <break_statement>
+\alt <continue_statement>
+\alt <exit_statement>
+\alt <expression_statement>
+\alt <return_statement>
+\end{grammar}
+
+%#####################
+%
+\subsubsection{Assert statement}
+
+An assert statement throws an exception when the condition does not match the given expectation. This is useful for sanity checks and debugging during runtime.
+
+\begin{grammar}
+<assert_statement> ::= `assert' `(' <expression> `COMMA' <expression> `)'
+\end{grammar}
+
+%#####################
+%
+\subsubsection{Assignment statement}
+
+Assignment statements bind the right-hand side to the names of the left-hand side. The target has to be checked to be a valid assignable, since the LALR nature of the grammar prevents using more strict non-terminals like list-displays.
+
+\begin{grammar}
+<assignment_statement> ::= <target> `:=' <expression>
+
+<target> ::= <expression>
+\end{grammar}
+
+%#####################
+%
+\subsubsection{Augmented assignment statement}
+
+Augmented assignment statements combine assignment with an binary operation. See the note for assignment statements.
+
+\begin{grammar}
+<augmented_assign_statement> ::= <augtarget> <augop> <expression>
+
+<augtarget> ::= <identifier>
+\alt <attributeref>
+\alt <subscription>
+
+<augop> ::= `+='
+| `-='
+| `*='
+| `/='
+| `\\='
+| `\%='
+\end{grammar}
+
+%#####################
+%
+\subsubsection{Backtrack statement}
+
+\begin{grammar}
+<backtrack_statement> ::= `backtrack'
+\end{grammar}
+
+%#####################
+%
+\subsubsection{Break statement}
+
+\begin{grammar}
+<break_statement> ::= `break'
+\end{grammar}
+
+%#####################
+%
+\subsubsection{Continue statement}
+
+\begin{grammar}
+<continue_statement> ::= `continue'
+\end{grammar}
+
+%#####################
+%
+\subsubsection{Exit statement}
+
+\begin{grammar}
+<exit_statement> ::= `exit'
+\end{grammar}
+
+%#####################
+%
+\subsubsection{Expression statement}
+
+An expression statement evaluates the given expression.
+
+\begin{grammar}
+<expression_statement> ::= <expression>
+\end{grammar}
+
+%#####################
+%
+\subsubsection{Return statement}
+
+\begin{grammar}
+<return_statement> ::= `return'
+\alt `return' <expression>
+\end{grammar}
+
+%
+% SUBSECTION
+%
+\clearpage
+\subsection{Compound statements}
+
+Compound statements contain other statements; in general, they span more than one line and are not ended by a semicolon.
+
+\begin{grammar}
+<compound_statement> ::= <check_statement>
+\alt <class>
+\alt <do_while_loop>
+\alt <for_loop>
+\alt <if_statement>
+\alt <match_statement>
+\alt <scan_statement>
+\alt <switch_statement>
+\alt <try_statement>
+\alt <while_loop>
+\end{grammar}
+
+%#####################
+%
+\subsubsection{Check statement}
+
+Belongs to backtracking.
+
+\begin{grammar}
+<check_statement> ::= `check' `{' <block> `}'
+\end{grammar}
+
+%#####################
+%
+\subsubsection{Class statement}
+
+\begin{grammar}
+<class> ::= `class' <identifier> `(' <parameter_list> `)' `{' <block> <static_block> `}'
+
+<static_block> ::= `static' `{' <block> `}'
+\alt $\upepsilon$
+\end{grammar}
+
+%#####################
+%
+\subsubsection{Do-While statement}
+
+Typical do-while loop.
+
+\begin{grammar}
+<do_while_loop> ::= `do' `{' <block> `}' `while' `(' <expression> `)' `;'
+\end{grammar}
+
+%#####################
+%
+\subsubsection{For-Loop statement}
+
+The for-loop iterates over the cartesian of the iterator chain, not the zip.
+
+\begin{grammar}
+<for_loop> ::= `for' `(' <iterator_chain> `)' `{' <block> `}'
+
+<iterator> ::= <comparison>
+
+<iterator_chain> ::= <iterator>
+\alt <iterator_chain> `,' <iterator>
+\end{grammar}
+
+%#####################
+%
+\subsubsection{If statement}
+
+Typical if-else statement. Note that the block attached needs parenthesis, there is nothing like a single line body.
+
+\begin{grammar}
+<if_statement> ::= `if' `(' <expression> `)' `{' <block> `}'
+\alt `if' `(' <expression> `)' `{' <block> `}' `else' `{' <block> `}'
+\alt `if' `(' <expression> `)' `{' <block> `}' `else' <if_statement>
+\end{grammar}
+
+%#####################
+%
+\subsubsection{Match statement}
+
+The match statement looks whether a matchee maches a given list on patterns and conditions, and then binds it according to the match.
+
+\begin{grammar}
+<match_statement> ::= `match' `(' <expression> `)' `{' <match_list> <default_case> `}'
+
+<match_list> ::= <matchee>
+\alt <match_list> <matchee>
+
+<matchee> ::= <match_case>
+\alt <regex_branch>
+
+<match_case> ::= `case' <expression> <case_condition> `:' <block>
+
+<regex_branch> ::= `regex' <expression> <as> <case_condition> `:' <block>
+
+<as> ::= `as' <expression>
+\alt $\upepsilon$
+
+<case_condition> ::= `|' <expression>
+<case_condition> ::= $\upepsilon$
+\end{grammar}
+
+%#####################
+%
+\subsubsection{Scan statement}
+
+\begin{grammar}
+<scan_statement> ::= `scan' `(' <expression> `)' `using' `{' <regex_list> <default_case> `}'
+
+<regex_list> ::= <regex_branch>
+\alt <regex_list> <regex_branch>
+\end{grammar}
+
+%#####################
+%
+\subsubsection{Switch statement}
+
+A slightly different version of the normal switch-case statement. It auto breaks on hit and needs an expression instead of giving a matchee to switch on and  then values in each case.
+
+\begin{grammar}
+<switch_statement> ::= `switch' `{' <case_statements> <default_case> `}'
+
+<case_statements> ::= <case_list>
+\alt epsilon
+
+<case_list> ::= <case_statement>
+\alt <case_list> <case_statement>
+
+<case_statement> ::= `case' <expression> `:' <block>
+
+<default_case> ::= `default' `:' <block>
+\alt $\upepsilon$
+\end{grammar}
+
+%#####################
+%
+\subsubsection{Try statement}
+
+\begin{grammar}
+<try_statement> ::= `try' `{' <block> `}' <catches>
+
+<catches> ::= <catch_clause>
+\alt <catches> <catch_clause>
+
+<catch_clause> ::= <catch_type> `(' <identifier> `)' `{' <block> `}'
+
+<catch_type> ::= `catch'
+\alt `catchUsr'
+\alt `catchLng'
+\end{grammar}
+
+%#####################
+%
+\subsubsection{While-Loop statement}
+
+Typical while-loop.
+
+\begin{grammar}
+<while_loop> ::= `while' `(' <expression> `)' `{' <block> `}'
+\end{grammar}
+
+\clearpage
+
+%####################################################################################
+\begin{verbatim}
+
+
+
+
+
+
+
+
+=======
 %!TEX root = ../main.tex
 \section{Grammar}
 
@@ -601,4 +1205,5 @@ Typical while-loop.
 
 
 
+>>>>>>> 6640584894f5245d515ca7633dadcb0b4d99f7b3
  \end{verbatim}

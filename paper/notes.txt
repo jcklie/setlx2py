@@ -1,8 +1,0 @@
-Name Spacing
-Builtin Function Naming
-Zero Indexing
-String interpolation is compile time
-
-Hacks
-=====
-

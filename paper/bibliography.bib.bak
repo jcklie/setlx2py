@@ -1,0 +1,16 @@
+% This file was created with JabRef 2.10.
+% Encoding: UTF-8
+
+
+@Misc{py2,
+  Title                    = {The Python Language Reference},
+
+  Author                   = {{Python Software Foundation}},
+  HowPublished             = {\url{https://docs.python.org/2/reference/]}},
+  Month                    = {May},
+  Year                     = {2014},
+
+  Owner                    = {jck},
+  Timestamp                = {2014.05.29}
+}
+

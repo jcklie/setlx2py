@@ -1,3 +1,159 @@
+<<<<<<< HEAD
+% TEX-option: shell-escape
+
+\documentclass[a4paper,11pt]{article}
+
+\usepackage[
+    backend=biber,
+    style=numeric,
+    sortlocale=de_DE,
+    natbib=true,
+    url=false, 
+    doi=true,
+    eprint=false
+]{biblatex}
+
+\usepackage[left=3.0cm, right=3.0cm, top=2.5cm, bottom=2.5cm]{geometry}
+\usepackage{url}
+\usepackage{menukeys}
+\usepackage{cleveref}
+\usepackage{graphicx}
+\usepackage{todonotes}
+\usepackage{upgreek}
+\usepackage{dirtree}
+\usepackage[nonumberlist]{glossaries}
+\usepackage[autostyle]{csquotes}
+
+\usepackage[parfill]{parskip}
+
+\usepackage{listings} % Syntax highlighting
+\lstset{
+  breaklines=true,                
+  basicstyle=\ttfamily,
+  showstringspaces=false,
+  commentstyle=\color{red},
+  keywordstyle=\color{blue},
+  columns=fullflexible
+}
+
+% Python style for highlighting
+\lstdefinestyle{MyPython}{
+language=Python,
+basicstyle=\ttm,
+otherkeywords={self},             % Add keywords here
+keywordstyle=\ttb\color{deepblue},
+emph={MyClass,__init__},          % Custom highlighting
+emphstyle=\ttb\color{deepred},    % Custom highlighting style
+stringstyle=\color{deepgreen},
+frame=tb,                         % Any extra options here
+showstringspaces=false            % 
+}
+
+\usepackage{syntax}
+\setlength{\grammarparsep}{20pt plus 1pt minus 1pt} % increase separation between rules
+\setlength{\grammarindent}{12em} % increase separation between LHS/RHS 
+
+
+
+\newcommand{\token}[1]{\lstinline$#1$}
+\newcommand{\myparagraph}[1]{\paragraph{#1}\mbox{}}
+
+% Glossary
+
+\makeglossaries
+\include{Chapters/glossary}
+\renewcommand*{\glossaryname}{List of Abbreviations}
+
+% Bibliography
+
+\addbibresource{bibliography.bib}
+
+%Autornamen in Bibliography fett
+\AtBeginBibliography{\renewcommand*{\mkbibnamelast }[1]{\textbf{#1}}}
+\AtBeginBibliography{\renewcommand*{\mkbibnamefirst }[1]{\textbf{#1}}}
+
+% Hyperref
+
+%\usepackage{hyperref}
+%\hypersetup{colorlinks=false}
+
+% BEGIN DOCUMENT
+
+\begin{document}
+
+\pagenumbering{roman}
+
+\include{Chapters/titelpage}
+
+\tableofcontents
+\clearpage
+%\listoftables
+\listoffigures
+\printglossaries
+
+\pagenumbering{arabic}
+
+% ************************
+% USER GUIDE
+% ************************
+\clearpage
+\part{User Guide}
+
+\include{Chapters/preface}
+\include{Chapters/windows}
+\include{Chapters/usage}
+
+%\section{Linux}
+
+%\section{Mac OS}
+
+% ************************
+% LANGUAGE REFERENCE
+% ************************
+\clearpage
+\part{The SetlX language}
+\clearpage
+
+\include{Chapters/lexanal}
+%\section{Execution model}
+%\subsection{Scoping}
+\include{Chapters/grammar}
+
+% ************************
+% SETLX2PY REFERENCE
+% ************************
+\clearpage
+\part{Setlx2py internals}
+\clearpage
+
+\include{Chapters/structure}
+\include{Chapters/testing}
+\include{Chapters/ast}
+\include{Chapters/codegen}
+\include{Chapters/transformer}
+
+\section{Known issues}
+
+There is still work to be done:
+
+\begin{itemize}
+	\item Nested collections in iterators
+	\item Scan
+	\item Try/Catch
+	\item Backtrack
+	\item Many of the builtins
+\end{itemize}
+
+% ************************
+% SETLX2PY bibliography 
+% ************************
+
+\clearpage
+\nocite{*}
+
+\printbibliography 
+
+=======
 % TEX-option: shell-escape
 
 \documentclass[a4paper,11pt]{article}
@@ -110,4 +266,5 @@ showstringspaces=false            %
 
 \section{Known issues}
 
+>>>>>>> 6640584894f5245d515ca7633dadcb0b4d99f7b3
 \end{document}
