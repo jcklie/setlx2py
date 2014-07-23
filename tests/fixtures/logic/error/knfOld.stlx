@@ -25,13 +25,13 @@ scanFormula := procedure(s) {
     }
     index := 1;
     word  := "";
-    if (!s[index] in letters) {
+    if (!(s[index] in letters)) {
         printErr("Error in scanFormula( $s$ )");
     }
     while (s[index] in letters && index < #s) {
         index := index + 1;
     }
-    if (!s[index] in letters) {
+    if (!(s[index] in letters)) {
         return [ s[1 .. index - 1] ] + scanFormula( s[index ..] );
     }
     if (index == #s) {
@@ -367,12 +367,12 @@ knf := procedure(f) {
 
 // Die Prozedur simplify(k) eliminiert triviale Klauseln aus der KNF k.
 simplify := procedure(k) {
-    return { c in k | !isTrivial(c) };
+    return { c : c in k | !isTrivial(c) };
 };
 
 // Die Prozedur isTrivial(c) testet ob die Klausel c trivial ist.
 isTrivial := procedure(c) {
-    return { p in c | isString(p) } * { p[2] : p in c | #p == 2 } != {};
+    return { p : p in c | isString(p) } * { p[2] : p in c | #p == 2 } != {};
 };
 
 run := procedure() {

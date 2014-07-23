@@ -7,6 +7,6 @@ rest   := deck - hole;
 flops  := { { k1, k2, k3 } : k1 in rest, k2 in rest, k3 in rest 
                            | #{ k1, k2, k3 } == 3 };
 print(#flops);
-trips  := { f in flops | [ "3", "d" ] in f || [ "3", "h" ] in f };
+trips  := { f : f in flops | [ "3", "d" ] in f || [ "3", "h" ] in f };
 print(1.0 * #trips / #flops);
 

@@ -3,7 +3,7 @@ reachable := procedure(x, y, r) {
     while (true) {
         oldP  := p;
         p     := p + pathProduct(p, r);
-        found := { l in p | l[#l] == y };
+        found := { l : l in p | l[#l] == y };
         if (found != {}) {
             return arb(found);
         }
