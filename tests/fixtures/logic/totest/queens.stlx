@@ -1,22 +1,26 @@
-load("davis-putnam.stlx");
+load("../davis-putnam.stlx");
 
 // s is a set of propositional variables. The call atMostOne(s) creates
 // a set of clauses.  This set expresses the fact that at most one of
 // the variables in s is true.
 atMostOne := procedure(s) {
-    return { { !p, !q } : p in s, q in s | p != q };
+    return { { negateLiteral(p), negateLiteral(q) } : p in s, q in s | p != q };
+};
+
+createVar := procedure(row, col) {
+    return "v" + row + col;
 };
 
 // This procedure computes a set of clauses.  This set of clauses is true
 // iff there is at most one queen on the given row.
 atMostOneInRow := procedure(row, n) {
-    return atMostOne({ Var(row, j) : j in [1 .. n] });
+    return atMostOne({ createVar(row, j) : j in [1 .. n] });
 };
 
 // This procedure computes a set of clauses.  This set of clauses is true
 // iff there is at least one queen on the given column.
 oneInColumn := procedure(column, n) {
-    return { { Var(row, column) : row in { 1 .. n } } };
+    return { { createVar(row, column) : row in { 1 .. n } } };
 };
 
 
@@ -24,7 +28,7 @@ oneInColumn := procedure(column, n) {
 // iff there is at most one queen on the diagonal satisfying the equation 
 //    row + column = k.
 atMostOneInUpperDiagonal := procedure(k, n) {
-    s := { Var(r, c) : c in [1..n], r in [1..n] | r + c == k };
+    s := { createVar(r, c) : c in [1..n], r in [1..n] | r + c == k };
     return atMostOne(s);
 };
 
@@ -32,7 +36,7 @@ atMostOneInUpperDiagonal := procedure(k, n) {
 // iff there is at most one queen on the diagonal satisfying the equation 
 //    row - column = k.
 atMostOneInLowerDiagonal := procedure(k, n) {
-    s := { Var(r, c) : c in [1..n], r in [1..n] | r - c == k };
+    s := { createVar(r, c) : c in [1..n], r in [1..n] | r - c == k };
     return atMostOne(s);
 };
 
@@ -80,7 +84,7 @@ printBoard := procedure(i, n) {
         print(line);
         line := "        |";
         for (col in [1..n]) {
-            if ({ Var(row, col) } in i) {
+            if ({ createVar(row, col) } in i) {
                 line += "   Q   |";
             } else {
                 line += "       |";
@@ -98,7 +102,7 @@ printBoard := procedure(i, n) {
 
 solve := procedure(n) {
     clauses  := allClauses(n);
-    print(clauses);
+    // print(clauses);
     solution := davisPutnam(clauses, {});
     if (solution != { {} }) {
         printBoard(solution, n);
