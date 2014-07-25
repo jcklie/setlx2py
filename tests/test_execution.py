@@ -64,7 +64,6 @@ def test_example_results():
     for stlx_file in files_to_test:
         assert_same_result(SOURCE_EXAMPLES, stlx_file) 
 
-@nottest
 def test_logic_results():     
 
     # assert_same_result(SOURCE_LOGIC, 'davis-putnam.stlx') PARSE
@@ -76,6 +75,7 @@ def test_logic_results():
         'arb.stlx',
         'count.stlx',
         'evaluateOld.stlx',
+        'fibonacci-combinatorics.stlx',
         'find-path.stlx',
         'fixpoint.stlx',
         'from.stlx',

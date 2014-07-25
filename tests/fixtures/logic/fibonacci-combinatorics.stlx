@@ -8,10 +8,10 @@ allLists := procedure(s, n) {
 
 print("allLists(${4,5}$, 2) = $allLists({4,5}, 2)$");
 
-fibonacciLists := procedure(n) {
+fibonacciLists := cachedProcedure(n) {
     return #{ l : k in { 0 .. n-1 }, l in allLists({1, 2}, k) | +/ l == n-1 };
 };
 
-for (n in [0 .. 16]) {
+for (n in [0 .. 10]) {
     print("fib($n$) = $fibonacciLists(n)$");
 }

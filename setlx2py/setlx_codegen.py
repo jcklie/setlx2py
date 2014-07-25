@@ -227,7 +227,15 @@ class Codegen(object):
         s = 'for {0}:'
         s += '\n'
         s += '{1}'
-        iterators = self.visit(n.iterators)
+        
+        if isinstance(n.iterators, IteratorChain):
+            iterchain = n.iterators
+            targets = ', '.join(self.visit(itr.assignable) for itr in iterchain.iterators)
+            iterables = ', '.join(self.visit(itr.expression) for itr in iterchain.iterators)
+            iterators = '{0} in stlx_cartesian({1})'.format(targets, iterables)
+        else: # Has to be Iterator
+            iterators = self.visit(n.iterators)
+        
         body = self._generate_stmt(n.body, add_indent=True)
         return s.format(iterators, body)
 
@@ -244,10 +252,8 @@ class Codegen(object):
         return '{0} in {1}'.format(lhs, rhs)
 
     def visit_IteratorChain(self, n):
-        mode = 'stlx_cartesian'
-        targets = ', '.join(self.visit(itr.assignable) for itr in n.iterators)
-        iterables = ', '.join(self.visit(itr.expression) for itr in n.iterators)
-        return '{0} in {1}({2})'.format(targets, mode, iterables)
+        iterators = ' for '.join(self.visit(itr) for itr in n.iterators)
+        return iterators
 
     def visit_Quantor(self, n):
         s = '{0}({1} for {2})'        
@@ -348,26 +354,18 @@ class Codegen(object):
         s += 'elif stlx_matches(Pattern({0}, {1}), _matchee):\n'
 
         pattern = self.visit(n.pattern)
-        cond = self.visit(n.cond)
         body = self._generate_stmt(n.body, add_indent=True)
-
-        headcount = 0
-        has_tail = False
         
-        if isinstance(n.pattern, Pattern):
-            headcount = len(n.pattern.head.exprs)
-            has_tail = n.pattern.tail is not None
+        headcount = len(n.pattern.head.exprs)
+        has_tail = n.pattern.tail is not None
 
-            if headcount > 0:
-                self._indent()
-                binding = self._make_indent()
-                binding += '{2} = stlx_bind(Pattern({0}, {1}), _matchee)\n'
-                s += binding
-                self._unindent()
+        if headcount > 0:
+            self._indent()
+            binding = self._make_indent()
+            binding += '{2} = stlx_bind(Pattern({0}, {1}), _matchee)\n'
+            s += binding
+            self._unindent()
 
-        else:
-            head = pattern
-            tail = None
         s += '{3}'        
 
         return s.format(headcount, has_tail, pattern, body)
@@ -389,10 +387,7 @@ class Codegen(object):
             return 'SetlxList'
         else:
             msg = 'Invalid collection name: {0}'.format(clazz)
-            raise Exception(msg)
-
-
-        
+            raise Exception(msg)        
         
     # Indent
 
