@@ -1,0 +1,120 @@
+\ifglsentryexists{ast}{}%
+{%
+\gls@defglossaryentry{ast}%
+{%
+name={AST},%
+sort={AST},%
+type={main},%
+first={AST},%
+firstplural={ASTs},%
+text={AST},%
+plural={ASTs},%
+description={Abstract Syntax Tree},%
+descriptionplural={Abstract Syntax Tree},%
+symbol={\relax },%
+symbolplural={\relax },%
+user1={},%
+user2={},%
+user3={},%
+user4={},%
+user5={},%
+user6={},%
+long={},%
+longplural={},%
+short={},%
+shortplural={},%
+counter={page},%
+parent={},%
+%
+}%
+}%
+\ifglsentryexists{bnf}{}%
+{%
+\gls@defglossaryentry{bnf}%
+{%
+name={BNF},%
+sort={BNF},%
+type={main},%
+first={BNF},%
+firstplural={BNFs},%
+text={BNF},%
+plural={BNFs},%
+description={Backus-Naur Form},%
+descriptionplural={Backus-Naur Form},%
+symbol={\relax },%
+symbolplural={\relax },%
+user1={},%
+user2={},%
+user3={},%
+user4={},%
+user5={},%
+user6={},%
+long={},%
+longplural={},%
+short={},%
+shortplural={},%
+counter={page},%
+parent={},%
+%
+}%
+}%
+\ifglsentryexists{lalr}{}%
+{%
+\gls@defglossaryentry{lalr}%
+{%
+name={LALR},%
+sort={LALR},%
+type={main},%
+first={LALR},%
+firstplural={LALRs},%
+text={LALR},%
+plural={LALRs},%
+description={Look-Ahead Left to Right, Rightmost derivation parser},%
+descriptionplural={Look-Ahead Left to Right, Rightmost derivation parser},%
+symbol={\relax },%
+symbolplural={\relax },%
+user1={},%
+user2={},%
+user3={},%
+user4={},%
+user5={},%
+user6={},%
+long={},%
+longplural={},%
+short={},%
+shortplural={},%
+counter={page},%
+parent={},%
+%
+}%
+}%
+\ifglsentryexists{tdd}{}%
+{%
+\gls@defglossaryentry{tdd}%
+{%
+name={TDD},%
+sort={TDD},%
+type={main},%
+first={TDD},%
+firstplural={TDDs},%
+text={TDD},%
+plural={TDDs},%
+description={Test-driven development},%
+descriptionplural={Test-driven development},%
+symbol={\relax },%
+symbolplural={\relax },%
+user1={},%
+user2={},%
+user3={},%
+user4={},%
+user5={},%
+user6={},%
+long={},%
+longplural={},%
+short={},%
+shortplural={},%
+counter={page},%
+parent={},%
+%
+}%
+}%

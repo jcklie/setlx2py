@@ -27,16 +27,6 @@ def is_writable(parser, arg):
     except:
         parser.error("The file {0} cannot be written!".format(arg))
 
-def compile(inp, out):
-    parser = Parser()
-    transformer = AstTransformer()
-    generator = Codegen()
-    ast = parser.parse(source)
-    transformer.visit(ast)
-    compiled = generator.visit(ast)
-    header =  'from setlx2py.setlx_builtin import *\n'
-    compiled = header + compiled
-
 parser = ArgumentParser(description="ikjMatrix multiplication")
 parser.add_argument("-i", required=True, help="input file", metavar="FILE",
                     type=lambda x: is_valid_file(parser,x))

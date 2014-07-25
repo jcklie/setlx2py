@@ -47,6 +47,7 @@ def assert_same_result(folder, name, verbose=False, print_ast=False):
     ref_path = os.path.join(folder, 'reference', name + '.reference')
     assert has_same_result(source_path, ref_path, verbose, print_ast), name
 
+
 def test_example_results():
     files_to_test = [
          # 'aufgaben_zur_gdi.stlx', LIST ASSIGNMENT
@@ -74,11 +75,13 @@ def test_logic_results():
         'arb.stlx',
         'count.stlx',
         'evaluateOld.stlx',
+        'find-path.stlx',
         'fixpoint.stlx',
         'from.stlx',
         'function.stlx', 
         'ggt-fast.stlx',
         'ggt-loop.stlx',
+#        'knfOld.stlx',
         'min-sort.stlx',
         'mySort.stlx',
         'path-cyclic.stlx',

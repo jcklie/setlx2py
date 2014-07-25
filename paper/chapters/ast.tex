@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 %!TEX root = ../main.tex
 
 \section{AST}
@@ -45,54 +44,4 @@ gen.generate(f)
 
 Alternatively, the Makefile delivered with setlx2py offers a nice shortcut:
 
-=======
-%!TEX root = ../main.tex
-
-\section{AST}
-\label{sec:ast}
-
-\todo{original}
-
-The nodes for the \gls{ast} used  internally are generated from a config file to ease development. For the purpose of this project, the AST-generating part of another open-source compiler project  was forked into another project \url{ast-gen} for that. New functionallity was added to ease testing them against expected trees.  Further more, their vizualization was improved.
-
-The idea behind ast-gen is to describe the nodes, their attributes and children in a config file. From it, a Python file containing one class for every node is generated and then can be used without any dependency to the ast-gen project. Therefore, it is only needed in development.
-
-\subsection{Configuration}
-
-Each entry in the config file is a sub-class \texttt{<name>} of Node, listing its attributes and child nodes. Each line contains the name of the class, followed by it attributes:
-
-\verb$<Name>: [list, of, attributes]$
-
-The attributes can be of the following kind:
-
-\begin{verbatim}
-<name>*     - a child node
-<name>**    - a sequence of child nodes
-<name>      - an attribute.
-\end{verbatim}
-
-Example:
-
-\begin{verbatim}
-BinaryOp: [op, left*, right*]
-Constant: [type, value]
-ExprList: [exprs**]
-\end{verbatim}
-
-The file used in setlx2py can be found in \texttt{setlx2py/setlx_ast.cfg}.
-
-\subsection{Generation}
-
-After installing ast-gen, the Python file can be generated with the folling command in a Python shell:
-
-\begin{lstlisting}{language=python}
-from astgen.ast_gen import ASTCodeGenerator
-gen = ASTCodeGenerator(**PATH_TO_CONFIG.cfg**)
-with open(**PATH_TO_WHERE_TO_SAVE**, 'w') as f:
-gen.generate(f)
-\end{lstlisting}
-
-Alternatively, the Makefile delivered with setlx2py offers a nice shortcut:
-
->>>>>>> 6640584894f5245d515ca7633dadcb0b4d99f7b3
 \verb$make ast$
