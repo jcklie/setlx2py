@@ -34,6 +34,7 @@ def stlx_matches(pattern, variables):
         return len(variables) == pattern.headcount
 
 class Bumper(object):
+    "Null value for matching"
 
     def __add__(self, other):
         return other

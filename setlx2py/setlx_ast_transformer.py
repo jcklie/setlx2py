@@ -1,4 +1,5 @@
 import re
+import sys
 
 from setlx2py.setlx_ast import *
 from setlx2py.setlx_parser import Parser
@@ -51,11 +52,23 @@ class AstTransformer(NodeVisitor):
         self.generic_visit(n, p)
 
     def visit_List(self, n, p):
-        if isinstance(p, Iterator):
-            n.tags.append('outer_list')
-        elif "bracketed" in p.tags or  "outer_list" in p.tags :
+        if isinstance(p, Iterator) or isinstance(p, IteratorChain) or "bracketed" in p.tags:
+            n.tags.append('bracketed')
+        elif "bracketed" in p.tags:
             n.tags.append('bracketed')
         self.generic_visit(n, p)
+        
+
+        
+    def _load_file(self, path):
+        with open(path, 'r') as f:
+            source = f.read()
+            print source
+            parser = Parser()
+            transformer = AstTransformer()
+            ast = parser.parse(source)
+            transformer.visit(ast)
+            return ast
         
     def visit_Interpolation(self, n, p):
         self._fill_interpolation(n)

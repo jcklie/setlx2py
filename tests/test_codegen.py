@@ -168,6 +168,9 @@ def test_binop_simple():
 def test_binop_add_three():
     assert_res('x := 1 + 2 + 3;', {'x' : 6})
     
+def test_binop_integer_division():
+    assert_res('x := 3 \ 2;', {'x' : 1})
+    
 def test_binop_mult_before_add():
     assert_res('x := 4 + 3 * 2;', {'x' : 10})
     assert_res('x := (4 + 3) * 2;', {'x' : 14})
@@ -276,7 +279,7 @@ def test_exists_simple():
     s = 'result := exists (x in {1..10} | 2 ** x < x ** 2);'
     assert_res(s, {'result' : True})
 
-@nottest    
+
 def test_exists_two_iterators():
     s = 'result := exists ([x, y] in [[a,b] : a in {1..10}, b in {1..10}] | 3*x - 4*y == 5);'
     assert_res(s, {'result' : True})
@@ -328,7 +331,6 @@ def test_escapes():
 # Procedures
 # ----------
 
-@nottest    
 def test_procedure_primes():
     s = Template("""
     primes := procedure(n) {
@@ -735,7 +737,7 @@ def test_break():
     """
     assert_res(s, {'s' : 'fo'})    
 
-@nottest
+
 def test_break_and_continue():
     s = """
     lst := [];
@@ -748,6 +750,7 @@ def test_break_and_continue():
         if (n == 4) { break; } 
         lst += [n];
     } 
+    
 
     """
-    assert_res(s, {'s' : [1, 3]})    
+    assert_res(s, {'lst' : [1, 3]})    

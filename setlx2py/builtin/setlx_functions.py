@@ -22,6 +22,12 @@ from setlx2py.builtin.setlx_list import SetlxList
 # Functions and Operators on Sets and Lists
 # =========================================
 
+#5
+def stlx_sum(s):
+    if len(s) == 0: return 0
+    return reduce(operator.add, s)
+
+
 #7
 def stlx_arb(m):
     """The function arb(s) picks an arbitrary element from the sequence s. The argument s
@@ -141,7 +147,7 @@ def stlx_lst_from_range(*args):
         n += s
 
 stlx_len = len
-stlx_sum = sum
+
 stlx_zip = zip
 stlx_char = chr
 stlx_is_string = lambda x : isinstance(x, basestring)

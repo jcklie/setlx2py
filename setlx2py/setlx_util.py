@@ -44,8 +44,11 @@ def get_exception_line(e):
     exc_type, exc_obj, exc_tb = sys.exc_info()
     return exc_tb.tb_lineno
 
+def get_ast(source):
+    return parser.parse(source)
+
 def compile_setlx(source, verbose=False, print_ast=False):
-    ast = parser.parse(source)
+    ast = get_ast(source)
 
     if print_ast: log_ast(ast)
     

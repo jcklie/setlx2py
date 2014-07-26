@@ -95,9 +95,10 @@ class Codegen(object):
         s = '{0} {1} {2}'
 
         bool_op_simple = {
-            '&&' : 'and',
-            '||' : 'or',
+            '&&'    : 'and',
+            '||'    : 'or',
             'notin' : 'not in',
+            '\\'     : '//',
         }
 
         op_to_function = {

@@ -1,4 +1,4 @@
-load("../davis-putnam.stlx");
+load("tests/fixtures/logic/davis-putnam.stlx");
 
 // s is a set of propositional variables. The call atMostOne(s) creates
 // a set of clauses.  This set expresses the fact that at most one of
@@ -8,7 +8,7 @@ atMostOne := procedure(s) {
 };
 
 createVar := procedure(row, col) {
-    return "v" + row + col;
+    return "v$row$$col$";
 };
 
 // This procedure computes a set of clauses.  This set of clauses is true
