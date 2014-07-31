@@ -12,7 +12,7 @@ from ply.lex import TOKEN
 
 import re
 
-class SyntaxError (Exception):
+class SetlxSyntaxError (Exception):
     def __init__(self, msg, LEXER, src, lineno=None, lexpos=None):
         if lineno is None:
             lineno = LEXER.lexer.lineno
@@ -66,7 +66,7 @@ class Lexer():
         self.line_head_pos = t.lexpos + 1
 
     def t_error(self, t):
-        raise SyntaxError("Bad character: ", self, t.value[0])
+        raise SetlxSyntaxError("Bad character: ", self, t.value[0])
 
     ##
     ## Regexes for use in tokens

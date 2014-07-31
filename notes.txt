@@ -1,0 +1,2 @@
+negateLiteral
+cannot concat strings and ints, use interpolation

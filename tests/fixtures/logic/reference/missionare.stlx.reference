@@ -1,0 +1,29 @@
+32
+29
+29
+12
+Lösung:
+
+MMM   KKK   B      |~~~~~|                   
+                   > M K >
+MM    KK           |~~~~~|         M     K  B
+                   < M   <
+MMM   KK    B      |~~~~~|               K   
+                   >  KK >
+MMM                |~~~~~|             KKK  B
+                   <  K  <
+MMM   K     B      |~~~~~|              KK   
+                   > MM  >
+M     K            |~~~~~|        MM    KK  B
+                   < M K <
+MM    KK    B      |~~~~~|         M     K   
+                   > MM  >
+      KK           |~~~~~|       MMM     K  B
+                   <  K  <
+      KKK   B      |~~~~~|       MMM         
+                   >  KK >
+      K            |~~~~~|       MMM    KK  B
+                   <  K  <
+      KK    B      |~~~~~|       MMM     K   
+                   >  KK >
+                   |~~~~~|       MMM   KKK  B

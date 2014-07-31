@@ -135,13 +135,24 @@ showstringspaces=false            %
 
 There is still work to be done:
 
+\subsection{Missing statements}
+
 \begin{itemize}
-	\item Nested collections in iterators
-	\item Scan
-	\item Try/Catch
-	\item Backtrack
-	\item Many of the builtins
+  \item Scan
+  \item Try/Catch
+  \item Backtrack
 \end{itemize}
+
+\subsection{Missing features}
+
+\begin{description}
+  \item[Omega] Currently, the null literal \texttt{om} is not yet implemented. It should be easily matched by Pythons \texttt{None}, but there was no documentation about \texttt{om}.
+  \item[Builtins] The most important and most frequently used library functions were implemented, but many are still missing.
+\end{description}
+
+\subsection{Defective features}
+
+The datastructures have to be much more tested. Currently, all unit tests taken from the SetlX guide pass, but the set, especially as a relation and with builtin functions called on it appears buggy. One can see that when SetlX example code containing it, like the queens problem is compiled and run.
 
 % ************************
 % SETLX2PY bibliography 

@@ -1,0 +1,71 @@
+{'Anton', 'Bruno', 'Cindy', 'Doris', 'Mutter', 'Polizist', 'Vater', 'Verbrecher'}                  {}
+
+                                >>>> {'Polizist', 'Verbrecher'} >>>> 
+
+{'Anton', 'Bruno', 'Cindy', 'Doris', 'Mutter', 'Vater'}                    {'Polizist', 'Verbrecher'}
+
+                                <<<< {'Polizist'} <<<< 
+
+{'Anton', 'Bruno', 'Cindy', 'Doris', 'Mutter', 'Polizist', 'Vater'}                    {'Verbrecher'}
+
+                                >>>> {'Doris', 'Polizist'} >>>> 
+
+{'Anton', 'Bruno', 'Cindy', 'Mutter', 'Vater'}                    {'Doris', 'Polizist', 'Verbrecher'}
+
+                                <<<< {'Polizist', 'Verbrecher'} <<<< 
+
+{'Anton', 'Bruno', 'Cindy', 'Mutter', 'Polizist', 'Vater', 'Verbrecher'}                    {'Doris'}
+
+                                >>>> {'Cindy', 'Mutter'} >>>> 
+
+{'Anton', 'Bruno', 'Polizist', 'Vater', 'Verbrecher'}                    {'Cindy', 'Doris', 'Mutter'}
+
+                                <<<< {'Mutter'} <<<< 
+
+{'Anton', 'Bruno', 'Mutter', 'Polizist', 'Vater', 'Verbrecher'}                    {'Cindy', 'Doris'}
+
+                                >>>> {'Mutter', 'Vater'} >>>> 
+
+{'Anton', 'Bruno', 'Polizist', 'Verbrecher'}                    {'Cindy', 'Doris', 'Mutter', 'Vater'}
+
+                                <<<< {'Vater'} <<<< 
+
+{'Anton', 'Bruno', 'Polizist', 'Vater', 'Verbrecher'}                    {'Cindy', 'Doris', 'Mutter'}
+
+                                >>>> {'Polizist', 'Verbrecher'} >>>> 
+
+{'Anton', 'Bruno', 'Vater'}                    {'Cindy', 'Doris', 'Mutter', 'Polizist', 'Verbrecher'}
+
+                                <<<< {'Mutter'} <<<< 
+
+{'Anton', 'Bruno', 'Mutter', 'Vater'}                    {'Cindy', 'Doris', 'Polizist', 'Verbrecher'}
+
+                                >>>> {'Mutter', 'Vater'} >>>> 
+
+{'Anton', 'Bruno'}                    {'Cindy', 'Doris', 'Mutter', 'Polizist', 'Vater', 'Verbrecher'}
+
+                                <<<< {'Vater'} <<<< 
+
+{'Anton', 'Bruno', 'Vater'}                    {'Cindy', 'Doris', 'Mutter', 'Polizist', 'Verbrecher'}
+
+                                >>>> {'Bruno', 'Vater'} >>>> 
+
+{'Anton'}                    {'Bruno', 'Cindy', 'Doris', 'Mutter', 'Polizist', 'Vater', 'Verbrecher'}
+
+                                <<<< {'Polizist', 'Verbrecher'} <<<< 
+
+{'Anton', 'Polizist', 'Verbrecher'}                    {'Bruno', 'Cindy', 'Doris', 'Mutter', 'Vater'}
+
+                                >>>> {'Anton', 'Polizist'} >>>> 
+
+{'Verbrecher'}                    {'Anton', 'Bruno', 'Cindy', 'Doris', 'Mutter', 'Polizist', 'Vater'}
+
+                                <<<< {'Polizist'} <<<< 
+
+{'Polizist', 'Verbrecher'}                    {'Anton', 'Bruno', 'Cindy', 'Doris', 'Mutter', 'Vater'}
+
+                                >>>> {'Polizist', 'Verbrecher'} >>>> 
+
+{}                  {'Anton', 'Bruno', 'Cindy', 'Doris', 'Mutter', 'Polizist', 'Vater', 'Verbrecher'}
+
+18

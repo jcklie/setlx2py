@@ -21,6 +21,7 @@ The structure of setlx2py follows the one of a typical Python module. In additio
 	.3 builtin.
 	.4 __init__.py.
 	.4 setlx_functions.py.
+	.4 setlx_internals.py.
 	.4 setlx_list.py.
 	.4 setlx_set.py.
 	.4 setlx_string.py.
@@ -100,7 +101,7 @@ Central location to keep all functions which are called from at least to differe
 \clearpage
 \subsection{Test files}
 
-Nosetest, the test framework used, requires a folder named \texttt{tests}. Files prefixed with \texttt{test\_} are -inter alia- test files. All files not recognized as test files are ignored when tests are run. The following paragraphs briefly describe the tests whose function is not directly obvious.
+Nosetest, the test framework used, requires a folder named \texttt{tests}. Files prefixed with -inter alia- \texttt{test\_} are  test files. All files not recognized as test files are ignored when tests are run. The following paragraphs briefly describe the tests whose function is not directly obvious.
 
 %
 \subsubsection{test\_builtin}
@@ -112,9 +113,9 @@ Contains tests for the builtin functions.
 
 Contains acceptance tests for the code generation. It is tested whether the execution of setlx2py-generated code yields the same result as the standard SetlX interpreter.
 %
-\subsubsection{test\_list \& test\_set}
+\subsubsection{test\_list, test\_set \& test\_string }
 
-Tests for the setlx\_set and setlx_list.
+Tests for the three main data structures used in SetlX.
 
 %
 \subsubsection{test\_parsable}
